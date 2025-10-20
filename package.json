@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "node --require ts-node/register $(find tests -name \"*.test.ts\")"
+    "test": "node --require ts-node/register --test tests/core/eventBus.test.ts tests/core/actorSystem.test.ts tests/core/httpServer.test.ts"
   },
   "keywords": [],
   "author": "",

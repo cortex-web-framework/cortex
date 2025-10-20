@@ -21,7 +21,7 @@ export abstract class Actor {
   private processMailbox(): void {
     if (!this.processingMailbox) {
       this.processingMailbox = true;
-      setImmediate(() => {
+      process.nextTick(() => {
         while (this.mailbox.length > 0) {
           const message = this.mailbox.shift();
           this.receive(message);
@@ -40,11 +40,11 @@ export class ActorSystem {
     this.eventBus = eventBus;
   }
 
-  public createActor<T extends Actor>(ActorClass: new (id: string, system: ActorSystem) => T, id: string): T {
+  public createActor<T extends Actor>(ActorClass: new (id: string, system: ActorSystem, ...args: any[]) => T, id: string, ...args: any[]): T {
     if (this.actors.has(id)) {
       throw new Error(`Actor with id ${id} already exists.`);
     }
-    const actor = new ActorClass(id, this);
+    const actor = new ActorClass(id, this, ...args);
     this.actors.set(id, actor);
     return actor;
   }

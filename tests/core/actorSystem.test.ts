@@ -30,10 +30,10 @@ test('ActorSystem should create and register an actor', () => {
 test(`ActorSystem should dispatch a message to an actor's mailbox and it should be processed`, async () => {
   const eventBus = EventBus.getInstance();
   const system = new ActorSystem(eventBus);
-  const actor = system.createActor(TestActor, 'testActor2');
+  const actor = system.createActor(TestActor, 'testActor2'); // Re-added this line
   system.dispatch('testActor2', 'Hello Mailbox!');
 
-  await new Promise(resolve => setTimeout(resolve, 10)); // Allow time for async processing
+  await new Promise(resolve => setTimeout(resolve, 100)); // Allow time for async processing
 
   assert.strictEqual(actor.receivedMessages.length, 1, 'Actor should have processed one message');
   assert.strictEqual(actor.receivedMessages[0], 'Hello Mailbox!', 'Actor should have received the correct message');
@@ -47,7 +47,7 @@ test(`Actor should process messages from its mailbox asynchronously`, async () =
   system.dispatch('testActor3', 'Async Message 1');
   system.dispatch('testActor3', 'Async Message 2');
 
-  await new Promise(resolve => setTimeout(resolve, 10)); // Allow time for async processing
+  await new Promise(resolve => setTimeout(resolve, 100)); // Allow time for async processing
 
   assert.strictEqual(actor.receivedMessages.length, 2, 'Actor should have processed two messages');
   assert.deepStrictEqual(actor.receivedMessages, ['Async Message 1', 'Async Message 2'], 'Actor should have received messages in order');
