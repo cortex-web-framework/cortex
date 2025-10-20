@@ -52,7 +52,7 @@ test('CortexHttpServer should return 404 for unknown routes', async () => {
 test('CortexHttpServer should route to a specific path and method', async () => {
   const server = new CortexHttpServer(PORT);
   let handlerCalled = false;
-  server.get('/test', (req: http.IncomingMessage, res: http.ServerResponse) => {
+  server.get('/test', (_req: http.IncomingMessage, res: http.ServerResponse) => {
     handlerCalled = true;
     res.end('OK');
   });
@@ -72,7 +72,7 @@ test('CortexHttpServer should trigger the route handler callback', async () => {
   const server = new CortexHttpServer(PORT);
   let callbackTriggered = false;
   const mockCallback = () => { callbackTriggered = true; };
-  server.get('/callback-test', (req: http.IncomingMessage, res: http.ServerResponse) => {
+  server.get('/callback-test', (_req: http.IncomingMessage, res: http.ServerResponse) => {
     mockCallback();
     res.end('Callback OK');
   });
@@ -89,7 +89,7 @@ test('CortexHttpServer should trigger the route handler callback', async () => {
 test('CortexHttpServer should route to a specific POST path and method', async () => {
   const server = new CortexHttpServer(PORT + 1); // Use a different port to avoid conflicts
   let handlerCalled = false;
-  server.post('/post-test', (req: http.IncomingMessage, res: http.ServerResponse) => {
+  server.post('/post-test', (_req: http.IncomingMessage, res: http.ServerResponse) => {
     handlerCalled = true;
     res.end('POST OK');
   });

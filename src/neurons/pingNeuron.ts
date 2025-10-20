@@ -1,6 +1,11 @@
 import { Actor, ActorSystem } from '../core/actorSystem';
 import { EventBus } from '../core/eventBus';
 
+interface PingEvent {
+  sender: string;
+  message: string;
+}
+
 export class PingNeuron extends Actor {
   constructor(id: string, system: ActorSystem, private eventBus: EventBus) {
     super(id, system);
@@ -9,7 +14,7 @@ export class PingNeuron extends Actor {
   async receive(message: any): Promise<void> {
     if (message.type === 'start') {
       console.log(`${this.id} received start message, publishing ping.`);
-      this.eventBus.publish('ping', { sender: this.id, message: 'Ping!' });
+      this.eventBus.publish<PingEvent>('ping', { sender: this.id, message: 'Ping!' });
     }
   }
 }

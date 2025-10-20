@@ -1,78 +1,59 @@
-# Plan: Cortex Bio-Inspired Web Framework (TDD & From-Scratch Edition)
+## PLAN.md: Implementing Best Practices for Cortex Framework Development
 
-## 1. Project Goal
+## Phase 1: Git Branch Consolidation
 
-To build a working prototype of a web framework named "Cortex" with **zero external runtime dependencies**. The entire stack will be built from the ground up in TypeScript, following strict **Test-Driven Development (TDD)** and established **Design Patterns**. The project will be structured as a professional, community-ready open-source project from day one.
+### Goal
+To consolidate all existing feature branches into the `develop` branch, ensuring a clean and linear history.
 
-## 2. Development Principles
+### Tasks
 
-*   **Test-Driven Development (TDD):** No implementation code will be written before a failing test for it exists. The cycle will be: **Red** (write a failing test), **Green** (write the simplest code to make it pass), **Refactor** (improve the code without changing its behavior).
-*   **Design Patterns:** We will consciously apply design patterns to solve common problems, ensuring the architecture is clean and scalable.
-*   **Dependency Purity:** The final runtime code will have **no** `npm` dependencies. `jest` will be used as a **development dependency** only.
+1.  **Identify Current Branch:** Determine the current active branch.
+2.  **Checkout `develop`:** Switch to the `develop` branch.
+3.  **Merge Feature Branches:** Sequentially merge each feature branch into `develop` using a rebase-and-merge or squash-and-merge strategy as appropriate. The recommended order from `RESEARCH.md` is:
+    *   `feature/initial-setup`
+    *   `feature/event-bus`
+    *   `feature/actor-system`
+    *   `feature/http-server`
+    *   `feature/neurons`
+    *   `feature/documentation`
+    *   `feature/next-steps-research`
+    *   `feature/next-steps-plan`
+    *   `feature/next-steps-todo`
+    *   `feature/new-functionalities-research`
+    *   `feature/new-functionalities-todo`
+    *   `feature/strict-typescript-research` (current branch, will be merged last)
+4.  **Delete Merged Branches:** After successful merge, delete the feature branches.
 
-## 3. Project Governance & Community
+## Phase 2: Apply Strict TypeScript Configuration
 
-*   **License:** The project will be licensed under the **MIT License**, promoting wide adoption and contribution.
-*   **Code of Conduct:** A `CODE_OF_CONDUCT.md` will be established using the Contributor Covenant standard.
-*   **Branching Strategy:** We will use **GitFlow**. `main` will hold stable releases. `develop` will be the integration branch for new features. All work will be done on `feature/*` branches and submitted as Pull Requests to `develop`.
-*   **Contributing Guidelines:** A `CONTRIBUTING.md` file will detail the TDD process, coding standards, and the PR workflow.
-*   **Issue & PR Tracking:** We will use GitHub Issues and PRs with standardized templates.
+### Goal
+To enforce the highest level of type safety across the entire codebase.
 
-## 4. Technology Stack
+### Tasks
 
-*   **Language:** TypeScript
-*   **Runtime:** Node.js
-*   **Runtime Dependencies:** None
-*   **Development Dependencies:** `typescript`, `ts-node`, `jest`, `ts-jest`, `@types/jest`, `@types/node`
+1.  **Update `tsconfig.json`:** Modify `tsconfig.json` with the recommended strict settings from `RESEARCH.md` (Section 2).
 
-## 5. Proposed Project Structure
+## Phase 3: Iterative Refactoring for Type Safety
 
-```
-cortex/
-├── .github/
-│   ├── ISSUE_TEMPLATE/
-│   │   ├── bug_report.md
-│   │   └── feature_request.md
-│   └── PULL_REQUEST_TEMPLATE.md
-├── src/
-│   └── ... (as before)
-├── tests/
-│   └── ... (as before)
-├── .gitignore
-├── CODE_OF_CONDUCT.md
-├── CONTRIBUTING.md
-├── LICENSE
-├── package.json
-├── tsconfig.json
-└── jest.config.js
-```
+### Goal
+To eliminate all `any` types and resolve TypeScript compilation errors introduced by the strict configuration.
 
-## 6. Step-by-Step TDD Development Plan
+### Tasks
 
-**Part 0: Repository & Community Setup**
-1.  Create a public GitHub repository.
-2.  Initialize a local git repository, create `main` and `develop` branches, and push to GitHub.
-3.  Add a `LICENSE` file (MIT).
-4.  Add a `CODE_OF_CONDUCT.md`.
-5.  Create a `CONTRIBUTING.md` detailing the GitFlow and TDD process.
-6.  Create issue and PR templates in the `.github/` directory.
-7.  Create a `.gitignore` file for Node.js projects.
+1.  **Address Compilation Errors:** Systematically go through the codebase and resolve all TypeScript compilation errors.
+2.  **Eliminate `any` Types:** Replace all instances of `any` with explicit types, interfaces, or generics.
+3.  **Apply TDD for Refactoring:** For complex type-related refactoring, follow the Red-Green-Refactor cycle:
+    *   Write a test that highlights the type issue (if applicable).
+    *   Implement the type fix.
+    *   Refactor for clarity and maintainability.
 
-**Part 1: Environment & Test Setup**
-1.  From the `develop` branch, start a new `feature/initial-setup` branch.
-2.  Initialize `package.json` and install dev dependencies.
-3.  Create `tsconfig.json` and `jest.config.js`.
-4.  Write a simple placeholder test to ensure Jest is configured correctly.
-5.  Merge this feature branch back into `develop`.
+## Phase 4: Integrate Clean Code Principles and TDD for New Development
 
-**Part 2: The Event Bus (Observer & Singleton Patterns)**
-1.  Start a new `feature/event-bus` branch from `develop`.
-2.  **Red:** In `tests/core/eventBus.test.ts`, write tests for the `EventBus` singleton.
-3.  **Green:** Create `src/core/eventBus.ts` and implement the class to make the tests pass.
-4.  **Refactor:** Improve the implementation.
-5.  Merge the feature branch into `develop`.
+### Goal
+To establish a development workflow that consistently applies clean code principles and Test-Driven Development.
 
-**(The plan continues for all other components - Actor System, HTTP Server, Neurons - each on their own feature branch and following the TDD cycle as described in the previous version of the plan.)**
+### Tasks
 
-**Final Part: Documentation**
-1.  Create a `README.md` with a full explanation of the project, architecture, and instructions on how to run tests and the final application.
+1.  **Review Existing Code:** Conduct a review of existing code against clean code principles (meaningful names, small functions, etc.).
+2.  **Establish TDD Workflow:** Ensure all new feature development or bug fixes strictly follow the Red-Green-Refactor TDD cycle.
+3.  **Automate Code Quality Checks:** Explore integrating linting and formatting tools (if not already present and adhering to zero-dependency) into the development workflow.

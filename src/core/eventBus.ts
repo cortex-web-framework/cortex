@@ -1,11 +1,15 @@
-type Callback = (message: any) => void;
+type Callback<T> = (message: T) => void;
+import { EventBusError } from './errors';
+import { Logger } from './logger';
 
 class EventBus {
   private static instance: EventBus;
-  private subscriptions: Map<string, Callback[]>;
+  private subscriptions: Map<string, Callback<any>[]>;
+  private logger: Logger;
 
   private constructor() {
-    this.subscriptions = new Map<string, Callback[]>();
+    this.subscriptions = new Map<string, Callback<any>[]>();
+    this.logger = Logger.getInstance();
   }
 
   public static getInstance(): EventBus {
@@ -15,17 +19,22 @@ class EventBus {
     return EventBus.instance;
   }
 
-  public subscribe(topic: string, callback: Callback): void {
+  public subscribe<T>(topic: string, callback: Callback<T>): void {
     if (!this.subscriptions.has(topic)) {
       this.subscriptions.set(topic, []);
     }
     this.subscriptions.get(topic)?.push(callback);
   }
 
-  public publish(topic: string, message: any): void {
+  public publish<T>(topic: string, message: T): void {
     if (this.subscriptions.has(topic)) {
       this.subscriptions.get(topic)?.forEach(callback => {
-        callback(message);
+        try {
+          callback(message);
+        } catch (error: any) {
+          this.logger.error(`Error in EventBus subscriber for topic '${topic}'`, error, { topic });
+          this.publish('error', new EventBusError(`Error in subscriber for topic '${topic}'`, error));
+        }
       });
     }
   }
