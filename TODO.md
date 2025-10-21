@@ -1,54 +1,53 @@
-## TODO.md: Implementing Best Practices for Cortex Framework Development
+## TODO.md: Implementing Advanced Web Technologies in Cortex Framework
 
-## TODO.md: Implementing Best Practices for Cortex Framework Development
+## Phase 1: Web3 Integration
+*   `[web3]` Create `src/web3/smartContracts.ts` module.
+*   `[web3]` Implement `SmartContractClient` class (RPC calls, ABI encoding/decoding).
+*   `[web3]` Provide methods for calling contract functions.
+*   `[web3]` Provide methods for listening to contract events.
+*   `[web3]` Create `src/web3/ipfs.ts` module.
+*   `[web3]` Implement `IPFSClient` class for content addressing and retrieval.
+*   `[web3]` Provide methods for adding content to IPFS.
+*   `[web3]` Provide methods for getting content from IPFS.
 
-## Phase 1: Git Branch Consolidation
-*   [DONE] `[git]` Identify current active branch.
-*   [DONE] `[git]` Checkout `develop` branch.
-*   [DONE] `[git]` Merge `feature/initial-setup` into `develop` (rebase/squash).
-*   [DONE] `[git]` Merge `feature/event-bus` into `develop` (rebase/squash).
-*   [DONE] `[git]` Merge `feature/actor-system` into `develop` (rebase/squash).
-*   [DONE] `[git]` Merge `feature/http-server` into `develop` (rebase/squash).
-*   [DONE] `[git]` Merge `feature/neurons` into `develop` (rebase/squash).
-*   [DONE] `[git]` Merge `feature/documentation` into `develop` (rebase/squash).
-*   [DONE] `[git]` Merge `feature/next-steps-research` into `develop` (rebase/squash).
-*   [DONE] `[git]` Merge `feature/next-steps-plan` into `develop` (rebase/squash).
-*   [DONE] `[git]` Merge `feature/next-steps-todo` into `develop` (rebase/squash).
-*   [DONE] `[git]` Merge `feature/new-functionalities-research` into `develop` (rebase/squash).
-*   [DONE] `[git]` Merge `feature/new-functionalities-todo` into `develop` (rebase/squash).
-*   [DONE] `[git]` Merge `feature/strict-typescript-research` into `develop` (rebase/squash).
-*   [DONE] `[git]` Merge `feature/best-practices-todo` into `develop` (rebase/squash).
-*   [DONE] `[git]` Merge `feature/150-new-functionalities` into `develop` (rebase/squash).
-*   [DONE] `[git]` Merge `feature/best-practices-todo-2` into `develop` (rebase/squash).
-*   [DONE] `[git]` Merge `feature/web-dev-trends-research` into `develop` (rebase/squash).
-*   [DONE] `[git]` Delete `feature/initial-setup` branch.
-*   [DONE] `[git]` Delete `feature/event-bus` branch.
-*   [DONE] `[git]` Delete `feature/actor-system` branch.
-*   [DONE] `[git]` Delete `feature/http-server` branch.
-*   [DONE] `[git]` Delete `feature/neurons` branch.
-*   [DONE] `[git]` Delete `feature/documentation` branch.
-*   [DONE] `[git]` Delete `feature/next-steps-research` branch.
-*   [DONE] `[git]` Delete `feature/next-steps-plan` branch.
-*   [DONE] `[git]` Delete `feature/next-steps-todo` branch.
-*   [DONE] `[git]` Delete `feature/new-functionalities-research` branch.
-*   [DONE] `[git]` Delete `feature/new-functionalities-todo` branch.
-*   [DONE] `[git]` Delete `feature/strict-typescript-research` branch.
-*   [DONE] `[git]` Delete `feature/best-practices-todo` branch.
-*   [DONE] `[git]` Delete `feature/150-new-functionalities` branch.
-*   [DONE] `[git]` Delete `feature/best-practices-todo-2` branch.
-*   [DONE] `[git]` Delete `feature/web-dev-trends-research` branch.
+## Phase 2: WebAssembly (Wasm) Integration
+*   `[wasm]` Create `src/wasm/utils.ts` module.
+*   `[wasm]` Implement utilities for loading Wasm modules.
+*   `[wasm]` Implement utilities for instantiating Wasm modules.
+*   `[wasm]` Provide helper functions for passing data between JavaScript and Wasm.
+*   `[wasm][actor-system]` Modify `WorkerActor` base class to support offloading computations to Wasm modules.
 
-## Phase 2: Apply Strict TypeScript Configuration
-*   [DONE] `[typescript]` Update `tsconfig.json` with recommended strict settings.
+## Phase 3: WebWorker & Web Threads Integration
+*   `[workers]` Create `src/workers/workerActor.ts` base class extending `Actor`.
+*   `[workers]` Implement logic to run `receive` method in a Web Worker.
+*   `[workers]` Provide abstractions for message passing between main thread and worker.
+*   `[workers]` Create `src/workers/workerPool.ts` module.
+*   `[workers]` Implement `WorkerPool` class for managing `WorkerActor` instances.
 
-## Phase 3: Iterative Refactoring for Type Safety
-*   [DONE] `[typescript][refactor]` Address all TypeScript compilation errors introduced by strict configuration.
-*   [DONE] `[typescript][refactor]` Eliminate `any` types by replacing with explicit types, interfaces, or generics.
-*   [DONE] `[typescript][refactor][test]` For complex type-related refactoring, write a test that highlights the type issue.
-*   [DONE] `[typescript][refactor][test]` Implement the type fix to make the test pass.
-*   [DONE] `[typescript][refactor]` Refactor for clarity and maintainability after type fixes.
+## Phase 4: Enhanced Security Features
+*   `[security]` Create `src/security/csp.ts` module.
+*   `[security]` Implement helper class/function for generating CSP headers.
+*   `[security]` Implement helper class/function for setting CSP headers.
+*   `[security]` Create `src/security/rateLimiter.ts` module.
+*   `[security]` Implement configurable rate limiting middleware for HTTP endpoints.
 
-## Phase 4: Integrate Clean Code Principles and TDD for New Development
-*   [DONE] `[code-review]` Conduct a review of existing code against clean code principles (meaningful names, small functions, etc.).
-*   [DONE] `[workflow]` Establish TDD workflow: Ensure all new feature development or bug fixes strictly follow Red-Green-Refactor cycle.
-*   [DONE] `[workflow]` Automate code quality checks: Explore integrating linting and formatting tools (if not already present and adhering to zero-dependency) into the development workflow.
+## Phase 5: Performance Boosting Features
+*   `[performance]` Create `src/performance/httpCache.ts` module.
+*   `[performance]` Implement utilities for setting `Cache-Control` headers.
+*   `[performance]` Implement utilities for setting `ETag` headers.
+*   `[performance]` Implement utilities for setting `Last-Modified` headers.
+*   `[performance]` Create `src/performance/compression.ts` module.
+*   `[performance]` Implement built-in Brotli compression middleware for HTTP responses.
+*   `[performance]` Implement built-in Gzip compression middleware for HTTP responses.
+
+## Phase 6: Advanced API Technologies
+*   `[api]` Create `src/api/graphql.ts` module.
+*   `[api]` Implement basic GraphQL server (schema definition).
+*   `[api]` Implement basic GraphQL server (resolvers).
+*   `[api]` Integrate GraphQL server with `CortexHttpServer`.
+*   `[api]` Provide utilities for defining GraphQL schemas.
+*   `[api]` Create `src/api/grpc.ts` module.
+*   `[api]` Implement basic gRPC server using Protocol Buffers.
+*   `[api]` Implement basic gRPC client using Protocol Buffers.
+*   `[api]` Provide utilities for defining `.proto` files (manual step).
+*   `[api]` Provide utilities for generating corresponding code (manual step).

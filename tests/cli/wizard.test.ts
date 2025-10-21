@@ -1,0 +1,138 @@
+import { describe, it } from 'node:test';
+import assert from 'node:assert';
+import { InteractiveWizard, WizardStep, WizardConfig } from '../../src/cli/wizard/wizard';
+
+describe('InteractiveWizard', () => {
+  describe('constructor', () => {
+    it('should create wizard with config', () => {
+      const config: WizardConfig = {
+        title: 'Test Wizard',
+        description: 'A test wizard',
+        steps: [],
+      };
+      
+      const wizard = new InteractiveWizard(config);
+      assert.strictEqual(wizard.title, 'Test Wizard');
+      assert.strictEqual(wizard.description, 'A test wizard');
+    });
+  });
+
+  describe('addStep', () => {
+    it('should add step to wizard', () => {
+      const wizard = new InteractiveWizard({
+        title: 'Test',
+        description: 'Test',
+        steps: [],
+      });
+      
+      const step: WizardStep = {
+        id: 'test-step',
+        title: 'Test Step',
+        type: 'input',
+        prompt: 'Enter value:',
+        required: true,
+      };
+      
+      wizard.addStep(step);
+      assert.strictEqual(wizard.steps.length, 1);
+      assert.strictEqual(wizard.steps[0].id, 'test-step');
+    });
+  });
+
+  describe('run', () => {
+    it('should execute wizard steps in order', async () => {
+      const wizard = new InteractiveWizard({
+        title: 'Test Wizard',
+        description: 'Test wizard',
+        steps: [],
+      });
+      
+      let stepExecuted = false;
+      wizard.addStep({
+        id: 'step1',
+        title: 'Step 1',
+        type: 'input',
+        prompt: 'Enter value:',
+        required: true,
+        execute: async () => {
+          stepExecuted = true;
+          return { value: 'test' };
+        },
+      });
+      
+      const result = await wizard.run();
+      assert.strictEqual(stepExecuted, true);
+      assert.strictEqual(result.step1.value, 'test');
+    });
+  });
+});
+
+describe('WizardStep', () => {
+  describe('input step', () => {
+    it('should validate required input', async () => {
+      const step: WizardStep = {
+        id: 'required-input',
+        title: 'Required Input',
+        type: 'input',
+        prompt: 'Enter value:',
+        required: true,
+        validate: (value: string) => value.length > 0,
+      };
+      
+      assert.strictEqual(step.validate?.(''), false);
+      assert.strictEqual(step.validate?.('test'), true);
+    });
+  });
+
+  describe('select step', () => {
+    it('should validate selection', async () => {
+      const step: WizardStep = {
+        id: 'selection',
+        title: 'Selection',
+        type: 'select',
+        prompt: 'Choose option:',
+        choices: ['option1', 'option2', 'option3'],
+        required: true,
+        validate: (value: string) => ['option1', 'option2', 'option3'].includes(value),
+      };
+      
+      assert.strictEqual(step.validate?.('option1'), true);
+      assert.strictEqual(step.validate?.('invalid'), false);
+    });
+  });
+
+  describe('multiSelect step', () => {
+    it('should validate multiple selections', async () => {
+      const step: WizardStep = {
+        id: 'multi-selection',
+        title: 'Multi Selection',
+        type: 'multiSelect',
+        prompt: 'Choose options:',
+        choices: ['option1', 'option2', 'option3'],
+        required: true,
+        validate: (values: string[]) => values.length > 0 && values.every(v => ['option1', 'option2', 'option3'].includes(v)),
+      };
+      
+      assert.strictEqual(step.validate?.(['option1']), true);
+      assert.strictEqual(step.validate?.(['option1', 'option2']), true);
+      assert.strictEqual(step.validate?.([]), false);
+      assert.strictEqual(step.validate?.(['invalid']), false);
+    });
+  });
+
+  describe('confirm step', () => {
+    it('should validate confirmation', async () => {
+      const step: WizardStep = {
+        id: 'confirmation',
+        title: 'Confirmation',
+        type: 'confirm',
+        prompt: 'Continue?',
+        required: true,
+        validate: (value: boolean) => typeof value === 'boolean',
+      };
+      
+      assert.strictEqual(step.validate?.(true), true);
+      assert.strictEqual(step.validate?.(false), true);
+    });
+  });
+});

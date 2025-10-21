@@ -2,20 +2,25 @@
   "name": "cortex",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "ts-node src/index.ts",
-    "test": "node --require ts-node/register --test tests/core/eventBus.test.ts tests/core/actorSystem.test.ts tests/core/httpServer.test.ts tests/neurons/pingPong.test.ts"
+    "test": "find tests -name '*.test.ts' -not -path 'tests/web3/smartContracts.test.ts' -print0 | xargs -0 node --require ts-node/register --test"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/express": "^5.0.3",
     "@types/node": "^24.8.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "dotenv": "^17.2.3"
+    "dotenv": "^17.2.3",
+    "ethers": "^6.15.0",
+    "express": "^5.1.0",
+    "ipfs-http-client": "^60.0.1"
   }
 }

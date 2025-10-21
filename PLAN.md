@@ -1,59 +1,90 @@
-## PLAN.md: Implementing Best Practices for Cortex Framework Development
+## PLAN.md: Implementing Advanced Web Technologies in Cortex Framework
 
-## Phase 1: Git Branch Consolidation
+## Phase 1: Web3 Integration
 
 ### Goal
-To consolidate all existing feature branches into the `develop` branch, ensuring a clean and linear history.
+To enable the Cortex Framework to interact with blockchain networks and decentralized storage solutions.
 
 ### Tasks
 
-1.  **Identify Current Branch:** Determine the current active branch.
-2.  **Checkout `develop`:** Switch to the `develop` branch.
-3.  **Merge Feature Branches:** Sequentially merge each feature branch into `develop` using a rebase-and-merge or squash-and-merge strategy as appropriate. The recommended order from `RESEARCH.md` is:
-    *   `feature/initial-setup`
-    *   `feature/event-bus`
-    *   `feature/actor-system`
-    *   `feature/http-server`
-    *   `feature/neurons`
-    *   `feature/documentation`
-    *   `feature/next-steps-research`
-    *   `feature/next-steps-plan`
-    *   `feature/next-steps-todo`
-    *   `feature/new-functionalities-research`
-    *   `feature/new-functionalities-todo`
-    *   `feature/strict-typescript-research` (current branch, will be merged last)
-4.  **Delete Merged Branches:** After successful merge, delete the feature branches.
+1.  **Smart Contracts Interaction Module:**
+    *   Create `src/web3/smartContracts.ts` module.
+    *   Implement a `SmartContractClient` class for interacting with EVM-compatible chains (RPC calls, ABI encoding/decoding).
+    *   Provide methods for calling contract functions and listening to events.
+2.  **IPFS Integration Module:**
+    *   Create `src/web3/ipfs.ts` module.
+    *   Implement an `IPFSClient` class for content addressing and retrieval.
+    *   Provide methods for adding and getting content from IPFS.
 
-## Phase 2: Apply Strict TypeScript Configuration
+## Phase 2: WebAssembly (Wasm) Integration
 
 ### Goal
-To enforce the highest level of type safety across the entire codebase.
+To enable the Cortex Framework to leverage WebAssembly for performance-critical tasks.
 
 ### Tasks
 
-1.  **Update `tsconfig.json`:** Modify `tsconfig.json` with the recommended strict settings from `RESEARCH.md` (Section 2).
+1.  **Wasm Utilities Module:**
+    *   Create `src/wasm/utils.ts` module.
+    *   Implement utilities for loading and instantiating Wasm modules.
+    *   Provide helper functions for passing data between JavaScript and Wasm.
+2.  **WorkerActor with Wasm Support:**
+    *   Modify the `WorkerActor` base class (from WebWorker phase) to support offloading computations to Wasm modules.
 
-## Phase 3: Iterative Refactoring for Type Safety
+## Phase 3: WebWorker & Web Threads Integration
 
 ### Goal
-To eliminate all `any` types and resolve TypeScript compilation errors introduced by the strict configuration.
+To improve application responsiveness and performance by offloading heavy computations to background threads.
 
 ### Tasks
 
-1.  **Address Compilation Errors:** Systematically go through the codebase and resolve all TypeScript compilation errors.
-2.  **Eliminate `any` Types:** Replace all instances of `any` with explicit types, interfaces, or generics.
-3.  **Apply TDD for Refactoring:** For complex type-related refactoring, follow the Red-Green-Refactor cycle:
-    *   Write a test that highlights the type issue (if applicable).
-    *   Implement the type fix.
-    *   Refactor for clarity and maintainability.
+1.  **WorkerActor Base Class:**
+    *   Create `src/workers/workerActor.ts` base class that extends `Actor`.
+    *   Implement logic to run the `receive` method in a Web Worker.
+    *   Provide abstractions for message passing between the main thread and the worker.
+2.  **Worker Pool Management:**
+    *   Create `src/workers/workerPool.ts` module.
+    *   Implement a `WorkerPool` class for managing a pool of `WorkerActor` instances.
 
-## Phase 4: Integrate Clean Code Principles and TDD for New Development
+## Phase 4: Enhanced Security Features
 
 ### Goal
-To establish a development workflow that consistently applies clean code principles and Test-Driven Development.
+To provide built-in mechanisms to mitigate common web vulnerabilities.
 
 ### Tasks
 
-1.  **Review Existing Code:** Conduct a review of existing code against clean code principles (meaningful names, small functions, etc.).
-2.  **Establish TDD Workflow:** Ensure all new feature development or bug fixes strictly follow the Red-Green-Refactor TDD cycle.
-3.  **Automate Code Quality Checks:** Explore integrating linting and formatting tools (if not already present and adhering to zero-dependency) into the development workflow.
+1.  **Content Security Policy (CSP) Helper:**
+    *   Create `src/security/csp.ts` module.
+    *   Implement a helper class/function for generating and setting CSP headers.
+2.  **Rate Limiting Middleware:**
+    *   Create `src/security/rateLimiter.ts` module.
+    *   Implement a configurable rate limiting middleware for HTTP endpoints.
+
+## Phase 5: Performance Boosting Features
+
+### Goal
+To provide tools and patterns for achieving high performance in the Cortex Framework.
+
+### Tasks
+
+1.  **HTTP Caching Headers Utility:**
+    *   Create `src/performance/httpCache.ts` module.
+    *   Implement utilities for setting HTTP caching headers (e.g., `Cache-Control`, `ETag`, `Last-Modified`).
+2.  **Compression Middleware:**
+    *   Create `src/performance/compression.ts` module.
+    *   Implement built-in compression middleware (Brotli, Gzip) for HTTP responses.
+
+## Phase 6: Advanced API Technologies
+
+### Goal
+To offer flexible and modern API capabilities beyond traditional REST.
+
+### Tasks
+
+1.  **GraphQL Server Implementation:**
+    *   Create `src/api/graphql.ts` module.
+    *   Implement a basic GraphQL server (schema definition, resolvers) integrated with the `CortexHttpServer`.
+    *   Provide utilities for defining GraphQL schemas.
+2.  **gRPC Server/Client Implementation:**
+    *   Create `src/api/grpc.ts` module.
+    *   Implement basic gRPC server and client using Protocol Buffers.
+    *   Provide utilities for defining `.proto` files and generating corresponding code (manual step for now due to zero-dependency).
