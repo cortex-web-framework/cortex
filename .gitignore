@@ -102,3 +102,6 @@ typings/
 # IDE files
 .idea
 .vscode/
+
+# Build output
+dist/

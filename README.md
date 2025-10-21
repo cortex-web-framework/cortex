@@ -2,24 +2,99 @@
 
 ## Overview
 
-The Cortex Framework is a lightweight, modular, and extensible framework designed for building reactive and distributed systems using an Actor-like model. It leverages an Event Bus for inter-component communication and provides a simple HTTP server for external interactions.
+The Cortex Framework is a comprehensive, production-ready framework for building reactive, distributed, and event-driven systems using an Actor-model architecture. It combines advanced web technologies with strict TypeScript enforcement and zero external dependencies for core components.
 
-## Features
+## Key Features
 
-*   **Actor System:** A robust system for managing and dispatching messages to actors.
-*   **Event Bus:** A central messaging hub for publishing and subscribing to events.
-*   **HTTP Server:** A basic HTTP server for handling incoming requests and triggering actor-based workflows.
-*   **Modular Design:** Easily extendable with new neurons (actors) and integrations.
+### Core Architecture
+*   **Actor System:** Robust actor model for managing concurrent message-driven processes
+*   **Event Bus:** Central pub-sub messaging hub for event-driven communication
+*   **HTTP Server:** Built-in HTTP/REST server with middleware support
+*   **Configuration Management:** Centralized config system with environment support
+*   **Logger:** Structured logging with multiple output levels
+
+### Observability Stack
+*   **Distributed Tracing:** OpenTelemetry-compatible trace generation and collection
+*   **Metrics Collection:** Prometheus-compatible metrics (counters, gauges, histograms)
+*   **Health Checks:** Registry with memory, uptime, CPU, and app-level health checks
+
+### Resilience Patterns
+*   **Circuit Breaker:** Prevent cascading failures with intelligent request handling
+*   **Retry Executor:** Configurable retry logic with exponential backoff and jitter
+*   **Bulkhead Pattern:** Isolate resources and limit concurrent operations
+*   **Composite Policy:** Combine multiple resilience patterns seamlessly
+
+### Performance Optimization
+*   **HTTP Compression:** Support for Brotli, Gzip, and Deflate compression
+*   **HTTP Caching:** Client and server-side caching strategies
+*   **Response Streaming:** Efficient data transfer for large payloads
+
+### Security Features
+*   **Content Security Policy (CSP):** Builder for setting CSP headers
+*   **Rate Limiting:** Request throttling with sliding window algorithm
+*   **Request Validation:** Input sanitization and validation middleware
+
+### Advanced Technologies
+*   **Web3 Integration:** Smart contract interaction and IPFS client support
+*   **WebAssembly Support:** Memory management and WASM module utilities
+*   **Web Workers:** Actor-based worker pool for concurrent processing
+*   **GraphQL API:** Zero-dependency GraphQL stub for extensibility
+*   **gRPC Support:** gRPC server/client implementations
+
+### CLI & Project Tools
+*   **Project Generator:** Scaffold new Cortex projects with templates
+*   **Interactive Wizard:** Terminal-based configuration and setup
+*   **Command Framework:** Build custom CLI commands easily
 
 ## Architecture
 
-The framework is composed of the following core components:
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Cortex Framework                         │
+├─────────────────────────────────────────────────────────────┤
+│  Core Layer                                                 │
+│  ├─ EventBus (Singleton pub-sub)                          │
+│  ├─ ActorSystem (Actor lifecycle management)              │
+│  ├─ CortexHttpServer (HTTP/REST interface)                │
+│  ├─ Logger (Structured logging)                           │
+│  └─ Config (Configuration management)                     │
+├─────────────────────────────────────────────────────────────┤
+│  Feature Modules                                            │
+│  ├─ Observability (Tracing, Metrics, Health)              │
+│  ├─ Resilience (Circuit Breaker, Retry, Bulkhead)         │
+│  ├─ Performance (Compression, Caching)                    │
+│  ├─ Security (CSP, Rate Limiting)                         │
+│  ├─ Workers (WorkerPool, WorkerActor)                     │
+│  └─ Web3 (Smart Contracts, IPFS)                          │
+├─────────────────────────────────────────────────────────────┤
+│  API & Integration                                          │
+│  ├─ GraphQL (Zero-dependency stub)                        │
+│  ├─ gRPC (Server/Client implementations)                  │
+│  ├─ CLI (Project generation, commands)                    │
+│  └─ WASM (Memory manager, utilities)                      │
+└─────────────────────────────────────────────────────────────┘
+```
 
-*   **`EventBus` (`src/core/eventBus.ts`):** Implements the Singleton pattern, providing a central point for event-driven communication. Actors and other components can subscribe to specific topics and publish messages.
-*   **`ActorSystem` (`src/core/actorSystem.ts`):** Manages the lifecycle of actors. It allows for the creation, registration, and dispatching of messages to individual actors. Actors process messages asynchronously via their mailboxes.
-*   **`CortexHttpServer` (`src/core/httpServer.ts`):** A simple HTTP server built on Node.js's `http` module. It handles incoming HTTP requests and can be configured with routes that trigger actions within the Actor System.
-*   **`Actor` (`src/core/actorSystem.ts`):** An abstract base class for all actors in the system. Actors have an `id`, a `mailbox`, and a `receive` method to process messages.
-*   **Neurons (`src/neurons/`):** Concrete implementations of the `Actor` class that encapsulate specific business logic or interactions. Examples include `PingNeuron` and `PongNeuron` which demonstrate inter-neuron communication via the `EventBus`.
+### Core Components
+
+*   **`EventBus` (`src/core/eventBus.ts`):** Singleton pub-sub system providing central event-driven communication. Components subscribe to topics and publish typed messages.
+*   **`ActorSystem` (`src/core/actorSystem.ts`):** Manages actor lifecycle, message routing, and dispatch. Actors process messages asynchronously via mailboxes.
+*   **`CortexHttpServer` (`src/core/httpServer.ts`):** HTTP server with middleware support and route handling for triggering actor workflows.
+*   **`Logger` (`src/core/logger.ts`):** Structured logging with multiple levels and output handlers.
+*   **`Config` (`src/core/config.ts`):** Environment-aware configuration management with type safety.
+
+### Module Structure
+
+*   **`src/observability/`:** Distributed tracing, metrics collection, and health checks
+*   **`src/resilience/`:** Circuit breaker, retry logic, bulkhead, and composite policies
+*   **`src/performance/`:** Compression middleware, HTTP caching strategies
+*   **`src/security/`:** CSP builder, rate limiting middleware
+*   **`src/workers/`:** Web worker integration with actor model
+*   **`src/web3/`:** Smart contract client, IPFS integration
+*   **`src/wasm/`:** WebAssembly memory management and utilities
+*   **`src/api/`:** GraphQL and gRPC implementations
+*   **`src/cli/`:** Project generation and CLI framework
+*   **`src/neurons/`:** Example actors (PingNeuron, PongNeuron)
 
 ## Getting Started
 
@@ -41,6 +116,11 @@ The framework is composed of the following core components:
     npm install
     ```
 
+3.  **Build the project:**
+    ```bash
+    npm run build
+    ```
+
 ### Running the Framework
 
 To start the HTTP server and the integrated neuron system, run:
@@ -55,7 +135,50 @@ The server will listen on `http://localhost:3000`. You can then access the `/pin
 curl http://localhost:3000/ping
 ```
 
-This will dispatch a 'start' message to the `PingNeuron`, which in turn publishes a 'ping' event to the `EventBus`. The `PongNeuron`, subscribed to 'ping' events, will then receive and process this message.
+### Example Usage
+
+#### Creating an Actor
+
+```typescript
+import { ActorSystem, EventBus } from 'cortex';
+
+const eventBus = EventBus.getInstance();
+const actorSystem = new ActorSystem(eventBus);
+
+class MyActor extends Actor {
+  async receive(message: any): Promise<void> {
+    console.log('Received:', message);
+  }
+}
+
+actorSystem.createActor(MyActor, 'myActor', eventBus);
+await actorSystem.dispatch('myActor', { type: 'greeting', text: 'Hello!' });
+```
+
+#### Using Observability
+
+```typescript
+import { ObservabilityFactory } from 'cortex';
+
+const tracer = ObservabilityFactory.createTracer('my-service', 0.1);
+const span = tracer.startSpan('important-operation');
+// ... do work ...
+span.end();
+```
+
+#### Applying Resilience Patterns
+
+```typescript
+import { CircuitBreaker, RetryExecutor } from 'cortex';
+
+const circuitBreaker = new CircuitBreaker({ failureThreshold: 5 });
+const retryExecutor = new RetryExecutor({ maxAttempts: 3 });
+
+await circuitBreaker.execute(async () => {
+  // Protected operation
+  return await someRiskyOperation();
+});
+```
 
 ### Testing
 
@@ -65,7 +188,45 @@ To run all unit and integration tests, use:
 npm test
 ```
 
-This will execute tests for the Event Bus, Actor System, HTTP Server, and the neuron integration.
+This will execute comprehensive tests for all modules including:
+- Event Bus and Actor System
+- HTTP Server and routing
+- Observability stack (tracing, metrics, health)
+- Resilience patterns (circuit breaker, retry, bulkhead)
+- Performance optimizations (compression, caching)
+- Security features (CSP, rate limiting)
+- Advanced integrations (Web3, WebAssembly, Workers)
+
+## Design Principles
+
+The Cortex Framework is built on several core principles:
+
+1. **Actor Model:** Processes are isolated, concurrent entities that communicate via asynchronous messages
+2. **Event-Driven:** Components communicate through a central event bus for loose coupling
+3. **Reactive:** Non-blocking, asynchronous processing with proper error handling
+4. **Type-Safe:** Strict TypeScript enforcement with no implicit `any` types
+5. **Zero-Dependency Core:** Core framework has no external dependencies
+6. **Modular:** Features are organized into independently usable modules
+7. **Production-Ready:** Includes observability, resilience, and security patterns out-of-the-box
+
+## Best Practices
+
+### When Building with Cortex
+
+1. **Use Actors for Concurrent Work:** Leverage the actor model for handling multiple operations safely
+2. **Monitor with Observability:** Always instrument your actors with tracing and metrics
+3. **Apply Resilience Patterns:** Wrap external calls with circuit breakers and retry logic
+4. **Secure Your APIs:** Use rate limiting and CSP headers for production deployments
+5. **Test Integration Paths:** Use the integration test suite as a reference for multi-module interactions
+6. **Handle Backpressure:** Use the bulkhead pattern to control resource consumption
+
+## Documentation
+
+Comprehensive documentation is available in:
+- **`ARCHITECTURE_DIAGRAM.md`** - Visual framework architecture
+- **`IMPLEMENTATION_SPEC.md`** - Detailed implementation guide
+- **`RESEARCH_SUMMARY.md`** - Design decisions and best practices
+- **`QUICK_REFERENCE.md`** - Code examples and API reference
 
 ## Contributing
 
@@ -74,3 +235,7 @@ We welcome contributions to the Cortex Framework! Please refer to the `CONTRIBUT
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+---
+
+**Built with ❤️ using strict TypeScript and modern JavaScript**
