@@ -1,6 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
+import http from 'node:http';
 import { createBrotliCompress, createGzip, createDeflate } from 'node:zlib';
 import { Transform } from 'node:stream';
+
+type Request = http.IncomingMessage;
+type Response = http.ServerResponse;
+type NextFunction = () => void;
 
 /**
  * Compression configuration
@@ -129,9 +133,9 @@ function createCompressionStream(encoding: string, config: CompressionConfig): T
  */
 export function compression(config: CompressionConfig = {}): (req: Request, res: Response, next: NextFunction) => void {
   const finalConfig = { ...DEFAULT_COMPRESSION_CONFIG, ...config };
-  
+
   return (req: Request, res: Response, next: NextFunction): void => {
-    const acceptEncoding = req.get('Accept-Encoding') || '';
+    const acceptEncoding = (req.headers['accept-encoding'] as string) || '';
     const supportedEncodings = parseAcceptEncoding(acceptEncoding);
     const selectedEncoding = selectEncoding(supportedEncodings);
 

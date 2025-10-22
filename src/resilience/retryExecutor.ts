@@ -110,8 +110,7 @@ export class RetryExecutor implements ResiliencePolicy {
 
         // Check if we should retry this error
         if (!this.shouldRetry(lastError, attempt)) {
-          console.error('RetryExecutor: Forcing re-throw of non-retryable error:', lastError); // Debug log
-          throw lastError; // This should exit the method
+          throw lastError;
         }
 
         // Don't delay on the last attempt
@@ -135,13 +134,15 @@ export class RetryExecutor implements ResiliencePolicy {
   /**
    * Check if an error should be retried
    */
-              private shouldRetry(error: Error, attempt: number): boolean {
-                if (attempt >= this.config.maxAttempts) {
-                  return false;
-                }
-                const matcherResult = this.errorMatcher(error);
-                return matcherResult;
-              }  /**
+  private shouldRetry(error: Error, attempt: number): boolean {
+    if (attempt >= this.config.maxAttempts) {
+      return false;
+    }
+    const matcherResult = this.errorMatcher(error);
+    return matcherResult;
+  }
+
+  /**
    * Calculate delay for the given attempt
    */
   private calculateDelay(attempt: number): number {

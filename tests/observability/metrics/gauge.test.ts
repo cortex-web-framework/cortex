@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import type { MetricType } from '../../../src/observability/types';
-import { Gauge } from '../../../src/observability/metrics/gauge';
+import type { MetricType } from '../../../src/observability/types.js';
+import { Gauge } from '../../../src/observability/metrics/gauge.js';
 
 // Set operation tests
 test('Gauge: set value overwrites previous', () => {

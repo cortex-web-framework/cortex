@@ -1,4 +1,5 @@
 import { BulkheadConfig, ResiliencePolicy } from './types.js';
+import { BulkheadRejectError } from './errors.js';
 
 /**
  * Default bulkhead configuration
@@ -26,7 +27,10 @@ class Semaphore {
     }
 
     if (this.waitingQueue.length >= this.maxQueueSize) {
-      throw new Error('Semaphore waiting queue is full');
+      throw new BulkheadRejectError('Semaphore waiting queue is full', {
+        queueLength: this.waitingQueue.length,
+        maxQueueSize: this.maxQueueSize,
+      });
     }
 
     return new Promise((resolve) => {

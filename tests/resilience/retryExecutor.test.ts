@@ -12,8 +12,8 @@ test('RetryExecutor should succeed on first attempt', async () => {
 
 test('RetryExecutor should retry on retryable errors', async () => {
   let attemptCount = 0;
-  const retryExecutor = new RetryExecutor({ maxAttempts: 3, baseDelay: 10, maxDelay: 100, backoffMultiplier: 2, jitter: false, retryableErrors: ['TestError'] });
-  
+  const retryExecutor = new RetryExecutor({ maxAttempts: 3, baseDelay: 10, maxDelay: 100, backoffMultiplier: 2, jitter: false, retryableErrors: ['Error'] });
+
   const result = await retryExecutor.execute(async () => {
     attemptCount++;
     if (attemptCount < 3) {
@@ -21,22 +21,22 @@ test('RetryExecutor should retry on retryable errors', async () => {
     }
     return 'success';
   });
-  
+
   assert.strictEqual(result, 'success');
   assert.strictEqual(attemptCount, 3);
 });
 
 test('RetryExecutor should fail after max attempts', async () => {
   let attemptCount = 0;
-  const retryExecutor = new RetryExecutor({ maxAttempts: 2, baseDelay: 10, maxDelay: 100, backoffMultiplier: 2, jitter: false, retryableErrors: ['TestError'] });
-  
+  const retryExecutor = new RetryExecutor({ maxAttempts: 2, baseDelay: 10, maxDelay: 100, backoffMultiplier: 2, jitter: false, retryableErrors: ['Error'] });
+
   await assert.rejects(async () => {
     await retryExecutor.execute(async () => {
       attemptCount++;
       throw new Error('TestError');
     });
   });
-  
+
   assert.strictEqual(attemptCount, 2);
 });
 
@@ -74,11 +74,11 @@ test('RetryExecutor should not retry non-retryable errors', async () => {
 });
 
 test('RetryExecutor should calculate exponential backoff delay', async () => {
-  const retryExecutor = new RetryExecutor({ maxAttempts: 3, baseDelay: 100, maxDelay: 1000, backoffMultiplier: 2, jitter: false, retryableErrors: ['TestError'] });
-  
+  const retryExecutor = new RetryExecutor({ maxAttempts: 3, baseDelay: 100, maxDelay: 1000, backoffMultiplier: 2, jitter: false, retryableErrors: ['Error'] });
+
   let attemptCount = 0;
   const startTime = Date.now();
-  
+
   await retryExecutor.execute(async () => {
     attemptCount++;
     if (attemptCount < 3) {
@@ -86,20 +86,20 @@ test('RetryExecutor should calculate exponential backoff delay', async () => {
     }
     return 'success';
   });
-  
+
   const duration = Date.now() - startTime;
-  
+
   // Should have waited approximately 100ms + 200ms = 300ms
   assert.ok(duration >= 290 && duration <= 350);
   assert.strictEqual(attemptCount, 3);
 });
 
 test('RetryExecutor should respect max delay', async () => {
-  const retryExecutor = new RetryExecutor({ maxAttempts: 3, baseDelay: 100, maxDelay: 1000, backoffMultiplier: 2, jitter: false, retryableErrors: ['TestError'] });
-  
+  const retryExecutor = new RetryExecutor({ maxAttempts: 3, baseDelay: 100, maxDelay: 1000, backoffMultiplier: 2, jitter: false, retryableErrors: ['Error'] });
+
   let attemptCount = 0;
   const startTime = Date.now();
-  
+
   await retryExecutor.execute(async () => {
     attemptCount++;
     if (attemptCount < 3) {
@@ -107,9 +107,9 @@ test('RetryExecutor should respect max delay', async () => {
     }
     return 'success';
   });
-  
+
   const duration = Date.now() - startTime;
-  
+
   // Should have waited approximately 100ms + 200ms = 300ms (capped at maxDelay)
   assert.ok(duration >= 290 && duration <= 350);
   assert.strictEqual(attemptCount, 3);

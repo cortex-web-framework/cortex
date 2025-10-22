@@ -1,5 +1,7 @@
 import { Worker } from 'node:worker_threads';
 import { EventEmitter } from 'node:events';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 
 /**
  * Worker pool configuration
@@ -150,43 +152,12 @@ export class WorkerPool extends EventEmitter {
    * Create a new worker
    */
   private createWorker(workerId: string): void {
-    const worker = new Worker(`
-      const { parentPort } = require('worker_threads');
-      
-      parentPort.on('message', async (message) => {
-        try {
-          const { taskId, data } = message;
-          
-          // Simulate some work
-          const result = await processTask(data);
-          
-          parentPort.postMessage({
-            taskId,
-            result,
-            success: true
-          });
-        } catch (error) {
-          parentPort.postMessage({
-            taskId: message.taskId,
-            error: error.message,
-            success: false
-          });
-        }
-      });
-      
-      async function processTask(data) {
-        // Simulate different types of work based on data
-        if (typeof data === 'string') {
-          return \`Processed: \${data}\`;
-        } else if (Array.isArray(data)) {
-          return data.map(item => \`Processed: \${item}\`);
-        } else if (typeof data === 'object' && data !== null) {
-          return { ...data, processed: true, timestamp: Date.now() };
-        } else {
-          return \`Processed: \${String(data)}\`;
-        }
-      }
-    `);
+    // Get the path to the worker file
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+    const workerPath = join(__dirname, 'poolWorker.ts');
+
+    const worker = new Worker(workerPath);
 
     const workerInfo: WorkerInfo = {
       worker,

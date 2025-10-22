@@ -22,7 +22,9 @@ export * from './observability/index.js';
 export * from './resilience/circuitBreaker.js';
 export * from './resilience/retryExecutor.js';
 export * from './resilience/bulkhead.js';
+export * from './resilience/timeout.js';
 export * from './resilience/compositePolicy.js';
+export * from './resilience/errors.js';
 export * from './resilience/types.js';
 
 // Performance exports

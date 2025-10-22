@@ -1,4 +1,5 @@
 import { CircuitState, CircuitBreakerConfig, ResiliencePolicy } from './types.js';
+import { CircuitBreakerOpenError } from './errors.js';
 
 /**
  * Default circuit breaker configuration
@@ -45,7 +46,7 @@ export class CircuitBreaker implements ResiliencePolicy {
   public async execute<T>(operation: () => Promise<T>): Promise<T> {
     if (this.state === CircuitState.OPEN) {
       if (Date.now() < this.nextAttemptTime) {
-        throw new Error('Circuit breaker is OPEN');
+        throw new CircuitBreakerOpenError('Circuit breaker is OPEN', this.nextAttemptTime);
       }
       this.state = CircuitState.HALF_OPEN;
       this.successCount = 0;

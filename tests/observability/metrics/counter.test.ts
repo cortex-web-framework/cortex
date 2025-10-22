@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import type { MetricType } from '../../../src/observability/types';
-import { Counter } from '../../../src/observability/metrics/counter';
+import type { MetricType } from '../../../src/observability/types.js';
+import { Counter } from '../../../src/observability/metrics/counter.js';
 
 // Basic increment tests
 test('Counter: increment by default value 1', () => {

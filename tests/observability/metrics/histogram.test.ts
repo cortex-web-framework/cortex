@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import type { MetricType } from '../../../src/observability/types';
-import { Histogram } from '../../../src/observability/metrics/histogram';
+import type { MetricType } from '../../../src/observability/types.js';
+import { Histogram } from '../../../src/observability/metrics/histogram.js';
 
 // Basic observation tests
 test('Histogram: observe single value', () => {

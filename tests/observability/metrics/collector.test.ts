@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import type { MetricType } from '../../../src/observability/types';
-import { MetricsCollector } from '../../../src/observability/metrics/collector';
+import type { MetricType } from '../../../src/observability/types.js';
+import { MetricsCollector } from '../../../src/observability/metrics/collector.js';
 
 // Counter creation and retrieval
 test('MetricsCollector: create counter metric', () => {
