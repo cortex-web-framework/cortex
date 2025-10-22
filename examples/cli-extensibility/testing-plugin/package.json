@@ -1,0 +1,26 @@
+{
+  "name": "cortex-testing-plugin",
+  "version": "1.0.0",
+  "description": "Testing utilities plugin for Cortex CLI",
+  "main": "dist/plugin.js",
+  "types": "dist/plugin.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@cortex/cli": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "typescript": "^5.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0"
+  },
+  "cortex": {
+    "plugin": true,
+    "entry": "dist/plugin.js"
+  }
+}
