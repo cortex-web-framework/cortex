@@ -1,9 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
 import { IPFSClient } from '../../src/web3/ipfs.js';
-import { create } from 'ipfs-http-client';
 
-// Mock the ipfs-http-client for testing purposes
+// Mock the IPFS HTTP client for testing purposes
 class MockIPFSHTTPClient {
   public addCalled: boolean = false;
   public catCalled: boolean = false;

@@ -4,6 +4,7 @@ import * as http from 'http';
 export class GrpcServer {
   private server: http.Server;
   private services: Map<string, any> = new Map();
+  private sockets: Set<any> = new Set();
 
   constructor() {
     this.server = http.createServer((_req, res) => {
@@ -11,6 +12,14 @@ export class GrpcServer {
       // Real gRPC uses HTTP/2 and a specific protocol.
       res.statusCode = 501; // Not Implemented
       res.end('gRPC not implemented in this simplified example.');
+    });
+
+    // Track all sockets for proper cleanup
+    this.server.on('connection', (socket) => {
+      this.sockets.add(socket);
+      socket.on('close', () => {
+        this.sockets.delete(socket);
+      });
     });
   }
 
@@ -24,7 +33,10 @@ export class GrpcServer {
   public start(port: number): Promise<void> {
     return new Promise((resolve) => {
       this.server.listen(port, () => {
-        console.log(`gRPC Server listening on port ${port}`);
+        // Only log in debug mode to avoid interfering with tests
+        if (process.env.DEBUG_GRPC) {
+          console.log(`gRPC Server listening on port ${port}`);
+        }
         resolve();
       });
     });
@@ -32,12 +44,28 @@ export class GrpcServer {
 
   public stop(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.server.close((err) => {
-        if (err) {
-          reject(err);
-        }
-        resolve();
-      });
+      try {
+        // Destroy all sockets to ensure clean shutdown
+        this.sockets.forEach((socket) => {
+          try {
+            socket.destroy();
+          } catch (e) {
+            // Ignore socket destroy errors
+          }
+        });
+        this.sockets.clear();
+
+        // Now close the server
+        this.server.close((err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 }

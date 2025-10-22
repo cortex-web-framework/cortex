@@ -1,4 +1,17 @@
-import { ethers } from 'ethers';
+// Type definitions for ethers module (without importing actual ethers)
+interface JsonRpcPayload {
+  method: string;
+  params?: any[];
+  id?: string | number;
+  jsonrpc: string;
+}
+
+interface JsonRpcResult {
+  jsonrpc: string;
+  id: string | number | null;
+  result?: any;
+  error?: any;
+}
 
 export class MockJsonRpcProvider {
   public callCount: number = 0;
@@ -15,11 +28,11 @@ export class MockJsonRpcProvider {
     return this.mockResponse;
   }
 
-  async _send(payload: ethers.JsonRpcPayload): Promise<ethers.JsonRpcResult> {
+  async _send(payload: JsonRpcPayload): Promise<JsonRpcResult> {
     this.callCount++;
     this.lastMethod = payload.method;
     this.lastParams = payload.params || [];
-    return { jsonrpc: '2.0', id: payload.id, result: this.mockResponse };
+    return { jsonrpc: '2.0', id: payload.id || null, result: this.mockResponse };
   }
 }
 

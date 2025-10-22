@@ -1,4 +1,8 @@
-import { IPFSHTTPClient } from 'ipfs-http-client'; // Import types only
+// Type definition for IPFS HTTP Client
+interface IPFSHTTPClient {
+  add(content: string | Buffer): Promise<{ cid: { toString: () => string } }>;
+  cat(cid: string): AsyncIterable<Uint8Array>;
+}
 
 export class IPFSClient {
   private client: IPFSHTTPClient;

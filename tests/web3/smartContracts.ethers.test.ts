@@ -1,33 +1,29 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
 import { SmartContractClient } from '../../src/web3/smartContracts.js';
-import * as ethers from 'ethers'; // Import the real ethers for types
 import { MockJsonRpcProvider, MockContract } from '../mocks/ethers.js'; // Import mocks
 
 let mockProviderInstance: MockJsonRpcProvider;
 let mockContractInstance: MockContract;
 
-test.beforeEach(() => {
-  // Mock the ethers module
-  test.mock.module('ethers', {
-    ...ethers, // Keep original exports for types, if needed
-    JsonRpcProvider: class extends MockJsonRpcProvider {
-      constructor(url: string) {
-        super(url);
-        mockProviderInstance = this; // Store instance for assertions
-      }
-    },
-    Contract: class extends MockContract {
-      constructor(address: string, abi: any[], provider: any) {
-        super(address, abi, provider);
-        mockContractInstance = this; // Store instance for assertions
-      }
-    },
-  });
-});
+// Create mock ethers module
+const mockEthers = {
+  JsonRpcProvider: class extends MockJsonRpcProvider {
+    constructor(url: string) {
+      super(url);
+      mockProviderInstance = this; // Store instance for assertions
+    }
+  },
+  Contract: class extends MockContract {
+    constructor(address: string, abi: any[], provider: any) {
+      super(address, abi, provider);
+      mockContractInstance = this; // Store instance for assertions
+    }
+  },
+};
 
 test('SmartContractClient should call a contract function', async () => {
-  const client = new SmartContractClient('http://localhost:8545');
+  const client = new SmartContractClient('http://localhost:8545', mockEthers);
   const contractAddress = '0xabcdef';
   const abi = [{ "name": "myFunction", "type": "function", "inputs": [{ "type": "uint256", "name": "myNumber" }] }];
   const functionName = 'myFunction';
@@ -44,7 +40,7 @@ test('SmartContractClient should call a contract function', async () => {
 });
 
 test('SmartContractClient should listen to contract events', async () => {
-  const client = new SmartContractClient('http://localhost:8545');
+  const client = new SmartContractClient('http://localhost:8545', mockEthers);
   const contractAddress = '0xabcdef';
   const abi = [{ "anonymous": false, "inputs": [{ "indexed": true, "name": "from", "type": "address" }], "name": "Transfer", "type": "event" }];
   const eventName = 'Transfer';
