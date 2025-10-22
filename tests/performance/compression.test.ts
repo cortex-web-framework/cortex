@@ -6,7 +6,10 @@ import { compression, brotliCompression, gzipCompression, parseAcceptEncoding, s
 function createMockReq(acceptEncoding?: string) {
   return {
     get: (header: string) => header === 'Accept-Encoding' ? acceptEncoding : undefined,
-    acceptsEncodings: (encoding: string) => acceptEncoding?.includes(encoding) || false
+    acceptsEncodings: (encoding: string) => acceptEncoding?.includes(encoding) || false,
+    headers: {
+      'accept-encoding': acceptEncoding || ''
+    }
   } as any;
 }
 

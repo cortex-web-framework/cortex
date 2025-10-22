@@ -26,8 +26,8 @@ export function setLastModified(res: Response, date: Date): void {
 
 export function conditionalGet(data: string | Buffer, lastModified?: Date, etag?: string) {
   return (req: Request, res: Response, next: NextFunction) => {
-    const ifNoneMatch = req.headers['if-none-match'];
-    const ifModifiedSince = req.headers['if-modified-since'];
+    const ifNoneMatch = req.headers?.['if-none-match'];
+    const ifModifiedSince = req.headers?.['if-modified-since'];
 
     let isNotModified = false;
 

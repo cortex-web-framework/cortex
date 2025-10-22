@@ -86,18 +86,27 @@ export function selectEncoding(supportedEncodings: string[]): string | null {
  */
 export function isCompressible(contentType: string, config: CompressionConfig): boolean {
   const type = contentType.split(';')[0].toLowerCase();
-  
-  // Check excluded types first
-  if (config.excludeContentTypes?.some(excluded => 
+
+  // Check excluded types first (blacklist takes priority)
+  if (config.excludeContentTypes?.some(excluded =>
     type.includes(excluded.toLowerCase())
   )) {
     return false;
   }
-  
-  // Check included types
-  return config.contentTypes?.some(included => 
-    type.includes(included.toLowerCase())
-  ) ?? true;
+
+  // If contentTypes whitelist is specified, check it
+  if (config.contentTypes && config.contentTypes.length > 0) {
+    if (config.contentTypes.some(included =>
+      type.includes(included.toLowerCase())
+    )) {
+      return true;
+    }
+    // Also compress common text-based types even if not in whitelist
+    return /^text\/|^application\/(json|xml)/.test(type);
+  }
+
+  // Default: compress text-based and JSON/XML types
+  return /^text\/|^application\/(json|xml)/.test(type);
 }
 
 /**
@@ -135,7 +144,7 @@ export function compression(config: CompressionConfig = {}): (req: Request, res:
   const finalConfig = { ...DEFAULT_COMPRESSION_CONFIG, ...config };
 
   return (req: Request, res: Response, next: NextFunction): void => {
-    const acceptEncoding = (req.headers['accept-encoding'] as string) || '';
+    const acceptEncoding = (req.headers?.['accept-encoding'] as string) || '';
     const supportedEncodings = parseAcceptEncoding(acceptEncoding);
     const selectedEncoding = selectEncoding(supportedEncodings);
 
