@@ -155,7 +155,7 @@ export class WorkerPool extends EventEmitter {
     // Get the path to the worker file
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = dirname(__filename);
-    const workerPath = join(__dirname, 'poolWorker.ts');
+    const workerPath = join(__dirname, 'poolWorker.js');
 
     const worker = new Worker(workerPath);
 
