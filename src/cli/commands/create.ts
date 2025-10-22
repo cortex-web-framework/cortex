@@ -3,13 +3,15 @@
  * Zero dependencies, strictest TypeScript configuration
  */
 
-import { CLICommand } from '../types';
-import { colors } from '../utils/colors';
-import { fileUtils } from '../utils/fs';
-import { processUtils } from '../utils/process';
-import { DEFAULT_PROJECT_CONFIG } from '../config/project';
-import { ProjectConfig } from '../types';
-import { createProjectStructure } from '../generators/project';
+import { writeFileSync } from 'fs';
+
+import { createProjectStructure } from '../generators/project.js';
+
+import { colors } from '../utils/colors.js';
+import { fileUtils } from '../utils/fs.js';
+import { processUtils } from '../utils/process.js';
+import { CLICommand, ProjectConfig } from '../types.js';
+import { DEFAULT_PROJECT_CONFIG } from '../config/project.js';
 
 /**
  * Create command
@@ -183,7 +185,6 @@ export const createCommand: CLICommand = {
         // Save configuration
         const configPath = 'cortex.json';
         const configContent = JSON.stringify(config, null, 2);
-        const { writeFileSync } = require('fs');
         writeFileSync(configPath, configContent);
 
         // Display success message

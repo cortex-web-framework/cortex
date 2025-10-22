@@ -1,4 +1,4 @@
-import { HealthCheck, HealthCheckResult, HealthStatus } from '../types';
+import { HealthCheck, HealthCheckResult, HealthStatus } from '../types.js';
 
 /**
  * HealthCheckRegistry manages and executes health checks

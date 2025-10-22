@@ -3,7 +3,8 @@
  * Zero dependencies, strictest TypeScript configuration
  */
 
-import { ProjectConfig } from '../types';
+import { ProjectConfig } from '../types.js';
+import { readFileSync, writeFileSync } from 'node:fs';
 
 /**
  * Default project configuration
@@ -57,7 +58,6 @@ export const DEFAULT_PROJECT_CONFIG: ProjectConfig = {
  */
 export function loadProjectConfig(configPath: string = 'cortex.json'): ProjectConfig | null {
   try {
-    const { readFileSync } = require('fs');
     const content = readFileSync(configPath, 'utf8');
     const config = JSON.parse(content) as Partial<ProjectConfig>;
     
@@ -83,7 +83,6 @@ export function loadProjectConfig(configPath: string = 'cortex.json'): ProjectCo
  * Save project configuration to file
  */
 export function saveProjectConfig(config: ProjectConfig, configPath: string = 'cortex.json'): void {
-  const { writeFileSync } = require('fs');
   const content = JSON.stringify(config, null, 2);
   writeFileSync(configPath, content, 'utf8');
 }

@@ -1,4 +1,4 @@
-import { BulkheadConfig, ResiliencePolicy } from './types';
+import { BulkheadConfig, ResiliencePolicy } from './types.js';
 
 /**
  * Default bulkhead configuration
@@ -9,21 +9,24 @@ export const DEFAULT_BULKHEAD_CONFIG: BulkheadConfig = {
   queueTimeout: 5000, // 5 seconds
 };
 
-/**
- * Semaphore implementation for resource control
- */
 class Semaphore {
   private permits: number;
   private waitingQueue: Array<() => void> = [];
+  private maxQueueSize: number;
 
-  constructor(permits: number) {
+  constructor(permits: number, maxQueueSize: number) {
     this.permits = permits;
+    this.maxQueueSize = maxQueueSize;
   }
 
   async acquire(): Promise<void> {
     if (this.permits > 0) {
       this.permits--;
       return;
+    }
+
+    if (this.waitingQueue.length >= this.maxQueueSize) {
+      throw new Error('Semaphore waiting queue is full');
     }
 
     return new Promise((resolve) => {
@@ -51,104 +54,38 @@ class Semaphore {
   }
 }
 
-/**
- * Bulkhead implementation for resource isolation
- *
- * @example
- * ```typescript
- * const bulkhead = new Bulkhead({
- *   maxConcurrent: 5,
- *   maxQueueSize: 50
- * });
- * 
- * const result = await bulkhead.execute(() => resourceIntensiveOperation());
- * ```
- */
 export class Bulkhead implements ResiliencePolicy {
   public readonly name = 'Bulkhead';
   private semaphore: Semaphore;
-  private queue: Array<() => Promise<any>> = [];
-  private isProcessing = false;
 
   constructor(private config: BulkheadConfig = DEFAULT_BULKHEAD_CONFIG) {
     this.validateConfig();
-    this.semaphore = new Semaphore(config.maxConcurrent);
+    this.semaphore = new Semaphore(config.maxConcurrent, config.maxQueueSize);
   }
 
-  /**
-   * Execute an operation with bulkhead protection
-   */
   public async execute<T>(operation: () => Promise<T>): Promise<T> {
-    // Check if queue is full
-    if (this.queue.length >= this.config.maxQueueSize) {
-      throw new Error('Bulkhead queue is full');
+    try {
+      await this.semaphore.acquire();
+      const result = await operation();
+      return result;
+    } finally {
+      this.semaphore.release();
     }
-
-    return new Promise((resolve, reject) => {
-      const wrappedOperation = async () => {
-        try {
-          await this.semaphore.acquire();
-          const result = await operation();
-          resolve(result);
-        } catch (error) {
-          reject(error);
-        } finally {
-          this.semaphore.release();
-        }
-      };
-
-      this.queue.push(wrappedOperation);
-      
-      // Process queue asynchronously
-      setImmediate(() => this.processQueue());
-    });
   }
 
-  /**
-   * Get current statistics
-   */
   public getStats() {
     return {
       availablePermits: this.semaphore.getAvailablePermits(),
-      queueLength: this.queue.length,
+      queueLength: this.semaphore.getQueueLength(),
       maxConcurrent: this.config.maxConcurrent,
       maxQueueSize: this.config.maxQueueSize,
     };
   }
 
-  /**
-   * Check if bulkhead is available for new operations
-   */
   public isAvailable(): boolean {
-    return this.queue.length < this.config.maxQueueSize;
+    return this.semaphore.getQueueLength() < this.config.maxQueueSize;
   }
 
-  /**
-   * Process the operation queue
-   */
-  private async processQueue(): Promise<void> {
-    if (this.isProcessing || this.queue.length === 0) {
-      return;
-    }
-
-    this.isProcessing = true;
-
-    while (this.queue.length > 0) {
-      const operation = this.queue.shift();
-      if (operation) {
-        // Execute operation asynchronously
-        operation().catch(() => {
-          // Error handling is done in the wrapped operation
-        });
-      }
-    }
-
-    this.isProcessing = false;
-  }
-
-  /**
-   * Validate configuration
-   */
   private validateConfig(): void {
     if (this.config.maxConcurrent <= 0) {
       throw new Error('maxConcurrent must be greater than 0');

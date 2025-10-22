@@ -1,31 +1,76 @@
-import { EventBus } from './core/eventBus';
-import { ActorSystem } from './core/actorSystem';
-import { CortexHttpServer } from './core/httpServer';
-import { PingNeuron } from './neurons/pingNeuron';
-import { PongNeuron } from './neurons/pongNeuron';
-import { Config } from './core/config';
-import http from 'node:http'; // Import http for IncomingMessage and ServerResponse types
+// Core framework exports
+export * from './core/actorSystem.js';
+export * from './core/eventBus.js';
+export * from './core/logger.js';
+export * from './core/config.js';
+export * from './core/httpServer.js';
+export * from './core/errors.js';
+export * from './core/middleware.js';
+
+// Neurons exports
+export * from './neurons/pingNeuron.js';
+export * from './neurons/pongNeuron.js';
+
+// API exports
+export * from './api/graphql.js';
+export * from './api/grpc.js';
+
+// Observability exports
+export * from './observability/index.js';
+
+// Resilience exports
+export * from './resilience/circuitBreaker.js';
+export * from './resilience/retryExecutor.js';
+export * from './resilience/bulkhead.js';
+export * from './resilience/compositePolicy.js';
+export * from './resilience/types.js';
+
+// Performance exports
+export * from './performance/compression.js';
+export * from './performance/httpCache.js';
+
+// Security exports
+export * from './security/csp.js';
+export * from './security/rateLimiter.js';
+
+// Workers exports
+export * from './workers/workerActor.js';
+export * from './workers/workerPool.js';
+
+// Web3 exports
+export * from './web3/smartContracts.js';
+export * from './web3/ipfs.js';
+
+// WebAssembly exports
+export * from './wasm/memoryManager.js';
+export * from './wasm/utils.js';
+
+// CLI exports
+export * from './cli/index.js';
+
+// Entry point for demo/testing
+import { EventBus } from './core/eventBus.js';
+import { ActorSystem } from './core/actorSystem.js';
+import { CortexHttpServer } from './core/httpServer.js';
+import { PingNeuron } from './neurons/pingNeuron.js';
+import { PongNeuron } from './neurons/pongNeuron.js';
+import { Config } from './core/config.js';
+import http from 'node:http';
 
 async function main(): Promise<void> {
   console.log('Starting Cortex Framework...');
 
   const config = Config.getInstance();
-  const port: number = config.get<number>('app.port', 3000)!; // Non-null assertion as default is provided
+  const port: number = config.get<number>('app.port', 3000)!;
 
-  // 1. Get the EventBus instance
   const eventBus = EventBus.getInstance();
-
-  // 2. Create an ActorSystem instance
   const actorSystem = new ActorSystem(eventBus);
 
-  // 3. Create instances of PingNeuron and PongNeuron
   actorSystem.createActor(PingNeuron, 'pingActor', eventBus);
   actorSystem.createActor(PongNeuron, 'pongActor', eventBus);
 
-  // 4. Create an HttpServer instance
   const httpServer = new CortexHttpServer(port);
 
-  // 5. Define a simple GET route for the HttpServer
   httpServer.get('/ping', async (_req: http.IncomingMessage, res: http.ServerResponse) => {
     console.log('Received /ping request. Dispatching start message to PingNeuron.');
     await actorSystem.dispatch('pingActor', { type: 'start' });
@@ -33,11 +78,9 @@ async function main(): Promise<void> {
     res.end('Ping dispatched!');
   });
 
-  // 6. Start the HttpServer
   await httpServer.start();
   console.log(`HTTP Server listening on port ${port}`);
 
-  // Example of how to stop the server (e.g., on process exit)
   process.on('SIGINT', async () => {
     console.log('Stopping HTTP Server...');
     await httpServer.stop();

@@ -1,4 +1,4 @@
-import { WasmMemoryManager, createMemoryManager } from './memoryManager';
+import { WasmMemoryManager, createMemoryManager } from './memoryManager.js';
 
 export async function loadWasmModule(wasmUrl: string): Promise<WebAssembly.Module> {
   const response = await fetch(wasmUrl);

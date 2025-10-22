@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { SpanImpl } from '../../../src/observability/tracing/span';
-import { SpanKind, SpanStatusCode } from '../../../src/observability/types';
+import { SpanImpl } from '../../../src/observability/tracing/span.js';
+import { SpanKind, SpanStatusCode } from '../../../src/observability/types.js';
 
 test('Span should be created with correct properties', () => {
   const span = new SpanImpl({

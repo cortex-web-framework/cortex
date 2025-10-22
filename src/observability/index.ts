@@ -3,34 +3,34 @@
  * Unified interface for tracing, metrics, and health checks
  */
 
-import { MetricsCollector } from './metrics/collector';
-import { Tracer } from './tracing/tracer';
-import { ProbabilitySampler } from './tracing/sampler';
-import { HealthCheckRegistry } from './health/healthRegistry';
+import { MetricsCollector } from './metrics/collector.js';
+import { Tracer } from './tracing/tracer.js';
+import { ProbabilitySampler } from './tracing/sampler.js';
+import { HealthCheckRegistry } from './health/healthRegistry.js';
 
-export * from './types';
+export * from './types.js';
 
 // Metrics exports
-export { MetricsCollector } from './metrics/collector';
-export { Counter } from './metrics/counter';
-export { Gauge } from './metrics/gauge';
-export { Histogram } from './metrics/histogram';
+export { MetricsCollector } from './metrics/collector.js';
+export { Counter } from './metrics/counter.js';
+export { Gauge } from './metrics/gauge.js';
+export { Histogram } from './metrics/histogram.js';
 
 // Tracing exports
-export { Tracer } from './tracing/tracer';
-export { SpanImpl } from './tracing/span';
-export { Sampler, ProbabilitySampler } from './tracing/sampler';
-export { generateTraceId, generateSpanId } from './tracing/ids';
+export { Tracer } from './tracing/tracer.js';
+export { SpanImpl } from './tracing/span.js';
+export { Sampler, ProbabilitySampler } from './tracing/sampler.js';
+export { generateTraceId, generateSpanId } from './tracing/ids.js';
 
 // Health check exports
-export { HealthCheckRegistry } from './health/healthRegistry';
+export { HealthCheckRegistry } from './health/healthRegistry.js';
 export {
   MemoryHealthCheck,
   UptimeHealthCheck,
   CpuHealthCheck,
   ApplicationHealthCheck,
   getDefaultHealthChecks
-} from './health/defaultChecks';
+} from './health/defaultChecks.js';
 
 /**
  * Factory for creating a unified observability setup

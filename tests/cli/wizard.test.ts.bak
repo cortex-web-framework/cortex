@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { InteractiveWizard, WizardStep, WizardConfig } from '../../src/cli/wizard/wizard';
+import { InteractiveWizard, WizardStep, WizardConfig } from '../../src/cli/wizard/wizard.js';
 
 describe('InteractiveWizard', () => {
   describe('constructor', () => {

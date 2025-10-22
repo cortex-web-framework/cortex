@@ -103,21 +103,19 @@ function createCompressionStream(encoding: string, config: CompressionConfig): T
   switch (encoding) {
     case 'br':
       return createBrotliCompress({
-        level: config.level,
-        chunkSize: config.chunkSize,
-        memLevel: config.memLevel
+        params: {
+          [11]: config.level ?? 6, // BROTLI_PARAM_QUALITY
+        }
       });
     case 'gzip':
       return createGzip({
-        level: config.level,
-        chunkSize: config.chunkSize,
-        memLevel: config.memLevel
+        level: config.level ?? 6,
+        memLevel: config.memLevel ?? 8
       });
     case 'deflate':
       return createDeflate({
-        level: config.level,
-        chunkSize: config.chunkSize,
-        memLevel: config.memLevel,
+        level: config.level ?? 6,
+        memLevel: config.memLevel ?? 8,
         windowBits: config.windowBits,
         strategy: config.strategy
       });
@@ -132,91 +130,89 @@ function createCompressionStream(encoding: string, config: CompressionConfig): T
 export function compression(config: CompressionConfig = {}): (req: Request, res: Response, next: NextFunction) => void {
   const finalConfig = { ...DEFAULT_COMPRESSION_CONFIG, ...config };
   
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     const acceptEncoding = req.get('Accept-Encoding') || '';
     const supportedEncodings = parseAcceptEncoding(acceptEncoding);
-    const encoding = selectEncoding(supportedEncodings);
-    
-    if (!encoding) {
-      return next();
+    const selectedEncoding = selectEncoding(supportedEncodings);
+
+    if (!selectedEncoding) {
+      next();
+      return;
     }
-    
+
     // Store original methods
-    const originalWrite = res.write;
-    const originalEnd = res.end;
-    const originalWriteHead = res.writeHead;
-    
+    const originalWrite = res.write.bind(res);
+    const originalEnd = res.end.bind(res);
+    const originalWriteHead = res.writeHead.bind(res);
+
     let shouldCompress = false;
     let compressionStream: Transform | null = null;
     let contentLength = 0;
     let chunks: Buffer[] = [];
-    
+
     // Override writeHead to check content type and length
-    res.writeHead = function(statusCode: number, statusMessage?: string | any, headers?: any) {
-      const contentType = this.getHeader('Content-Type') as string || '';
-      const contentLengthHeader = this.getHeader('Content-Length') as string;
-      
+    res.writeHead = function writeHeadImpl(statusCode: number, ...args: any[]): Response {
+      const contentType = res.getHeader('Content-Type') as string || '';
+      const contentLengthHeader = res.getHeader('Content-Length') as string;
+
       if (contentLengthHeader) {
         contentLength = parseInt(contentLengthHeader, 10);
       }
-      
+
       // Check if we should compress
-      if (isCompressible(contentType, finalConfig) && 
+      if (isCompressible(contentType, finalConfig) &&
           contentLength >= finalConfig.threshold) {
         shouldCompress = true;
-        this.setHeader('Content-Encoding', encoding);
-        this.removeHeader('Content-Length'); // Remove original content length
+        res.setHeader('Content-Encoding', selectedEncoding);
+        res.removeHeader('Content-Length'); // Remove original content length
       }
-      
-      return originalWriteHead.call(this, statusCode, statusMessage, headers);
-    };
-    
+
+      return originalWriteHead(statusCode, ...args);
+    } as unknown as typeof res.writeHead;
+
     // Override write to collect chunks
-    res.write = function(chunk: any, encoding?: any) {
+    res.write = function writeImpl(chunk: any, ...args: any[]): boolean {
       if (shouldCompress && chunk) {
-        chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk, encoding));
+        chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
         return true;
       }
-      return originalWrite.call(this, chunk, encoding);
-    };
-    
+      return originalWrite(chunk, ...args);
+    } as unknown as typeof res.write;
+
     // Override end to compress and send
-    res.end = function(chunk?: any, encoding?: any) {
+    res.end = function endImpl(chunkArg?: any, ...args: any[]): Response {
       if (shouldCompress) {
-        if (chunk) {
-          chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk, encoding));
+        if (chunkArg) {
+          chunks.push(Buffer.isBuffer(chunkArg) ? chunkArg : Buffer.from(chunkArg));
         }
-        
-        // Create compression stream
-        compressionStream = createCompressionStream(encoding, finalConfig);
-        
+
+        // Create compression stream using detected encoding
+        compressionStream = createCompressionStream(selectedEncoding, finalConfig);
+
         // Set up compression stream
-        compressionStream.on('data', (compressedChunk) => {
-          originalWrite.call(res, compressedChunk);
+        compressionStream.on('data', (compressedChunk: Buffer) => {
+          originalWrite(compressedChunk);
         });
-        
+
         compressionStream.on('end', () => {
-          originalEnd.call(res);
+          originalEnd();
         });
-        
-        compressionStream.on('error', (error) => {
+
+        compressionStream.on('error', (error: Error) => {
           console.error('Compression error:', error);
           // Fallback to uncompressed
-          chunks.forEach(chunk => originalWrite.call(res, chunk));
-          if (chunk) {
-            originalWrite.call(res, chunk, encoding);
-          }
-          originalEnd.call(res);
+          chunks.forEach(chunk => originalWrite(chunk));
+          originalEnd();
         });
-        
+
         // Compress all collected chunks
         chunks.forEach(chunk => compressionStream!.write(chunk));
         compressionStream.end();
-      } else {
-        return originalEnd.call(this, chunk, encoding);
+        return res;
       }
-    };
-    
+      return originalEnd(chunkArg, ...args);
+    } as unknown as typeof res.end;
+
     next();
   };
 }

@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { CompositePolicy } from '../../src/resilience/compositePolicy';
-import { CircuitBreaker } from '../../src/resilience/circuitBreaker';
-import { RetryExecutor } from '../../src/resilience/retryExecutor';
-import { Bulkhead } from '../../src/resilience/bulkhead';
+import { CompositePolicy } from '../../src/resilience/compositePolicy.js';
+import { CircuitBreaker } from '../../src/resilience/circuitBreaker.js';
+import { RetryExecutor } from '../../src/resilience/retryExecutor.js';
+import { Bulkhead } from '../../src/resilience/bulkhead.js';
 
 test('CompositePolicy should execute operation without policies', async () => {
   const policy = new CompositePolicy();
@@ -52,6 +52,13 @@ test('CompositePolicy should handle policy failures', async () => {
   }, /Circuit breaker is OPEN/);
 });
 
+class TestError extends Error {
+  constructor(message?: string) {
+    super(message);
+    this.name = 'TestError';
+  }
+}
+
 test('CompositePolicy should retry with circuit breaker', async () => {
   const circuitBreaker = new CircuitBreaker({ failureThreshold: 3, successThreshold: 1, timeout: 1000, resetTimeout: 1000 });
   const retryExecutor = new RetryExecutor({ maxAttempts: 2, baseDelay: 10, maxDelay: 100, backoffMultiplier: 2, jitter: false, retryableErrors: ['TestError'] });
@@ -65,7 +72,7 @@ test('CompositePolicy should retry with circuit breaker', async () => {
   const result = await policy.execute(async () => {
     attemptCount++;
     if (attemptCount < 2) {
-      throw new Error('TestError');
+      throw new TestError('TestError');
     }
     return 'success';
   });

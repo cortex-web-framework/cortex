@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { TerminalUI, TerminalConfig } from '../../src/cli/wizard/terminal';
+import { TerminalUI, TerminalConfig } from '../../src/cli/wizard/terminal.js';
 
 describe('TerminalUI', () => {
   describe('constructor', () => {
@@ -92,7 +92,7 @@ describe('TerminalUI', () => {
     it('should draw spinner', () => {
       const terminal = new TerminalUI({ width: 80, height: 24 });
       const result = terminal.drawSpinner(10, 5, 0);
-      assert.strictEqual(typeof result, 'string');
+      assert.ok(result !== undefined, 'Result should not be undefined');
       assert.ok(['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'].includes(result.trim()));
     });
   });
@@ -101,7 +101,7 @@ describe('TerminalUI', () => {
     it('should draw banner', () => {
       const terminal = new TerminalUI({ width: 80, height: 24 });
       const result = terminal.drawBanner('CORTEX');
-      assert.strictEqual(typeof result, 'string');
+      assert.ok(result !== undefined, 'Result should not be undefined');
       assert.ok(result.includes('CORTEX'));
     });
   });

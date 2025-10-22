@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { SmartContractClient } from '../../src/web3/smartContracts';
+import { SmartContractClient } from '../../src/web3/smartContracts.js';
 import * as ethers from 'ethers'; // Import the real ethers for types
-import { MockJsonRpcProvider, MockContract } from '../mocks/ethers'; // Import mocks
+import { MockJsonRpcProvider, MockContract } from '../mocks/ethers.js'; // Import mocks
 
 let mockProviderInstance: MockJsonRpcProvider;
 let mockContractInstance: MockContract;

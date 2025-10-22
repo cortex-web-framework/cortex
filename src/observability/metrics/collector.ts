@@ -1,7 +1,7 @@
-import { Metric, MetricType, Labels } from '../types';
-import { Counter } from './counter';
-import { Gauge } from './gauge';
-import { Histogram } from './histogram';
+import { Metric, MetricType, Labels } from '../types.js';
+import { Counter } from './counter.js';
+import { Gauge } from './gauge.js';
+import { Histogram } from './histogram.js';
 
 /**
  * MetricsCollector aggregates and exposes metrics in Prometheus format

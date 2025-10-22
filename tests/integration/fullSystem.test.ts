@@ -1,18 +1,18 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { ActorSystem } from '../../src/core/actorSystem';
-import { EventBus } from '../../src/core/eventBus';
-import { Logger } from '../../src/core/logger';
-import { MetricsCollector } from '../../src/observability/metrics/collector';
-import { Tracer } from '../../src/observability/tracing/tracer';
-import { HealthCheckRegistry } from '../../src/observability/health/healthRegistry';
-import { CircuitBreaker } from '../../src/resilience/circuitBreaker';
-import { RetryExecutor } from '../../src/resilience/retryExecutor';
-import { Bulkhead } from '../../src/resilience/bulkhead';
-import { CompositePolicy } from '../../src/resilience/compositePolicy';
-import { compression } from '../../src/performance/compression';
-import { WorkerPool } from '../../src/workers/workerPool';
-import { createMemoryManager } from '../../src/wasm/memoryManager';
+import { ActorSystem } from '../../src/core/actorSystem.js';
+import { EventBus } from '../../src/core/eventBus.js';
+import { Logger } from '../../src/core/logger.js';
+import { MetricsCollector } from '../../src/observability/metrics/collector.js';
+import { Tracer } from '../../src/observability/tracing/tracer.js';
+import { HealthCheckRegistry } from '../../src/observability/health/healthRegistry.js';
+import { CircuitBreaker } from '../../src/resilience/circuitBreaker.js';
+import { RetryExecutor } from '../../src/resilience/retryExecutor.js';
+import { Bulkhead } from '../../src/resilience/bulkhead.js';
+import { CompositePolicy } from '../../src/resilience/compositePolicy.js';
+import { compression } from '../../src/performance/compression.js';
+import { WorkerPool } from '../../src/workers/workerPool.js';
+import { createMemoryManager } from '../../src/wasm/memoryManager.js';
 
 // Mock WebAssembly instance for testing
 function createMockWasmInstance() {

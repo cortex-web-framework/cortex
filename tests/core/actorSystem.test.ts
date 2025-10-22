@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
 
-import { ActorSystem, Actor } from '../../src/core/actorSystem';
-import { EventBus } from '../../src/core/eventBus';
+import { ActorSystem, Actor } from '../../src/core/actorSystem.js';
+import { EventBus } from '../../src/core/eventBus.js';
 
 // Define a simple test actor for use in tests
 class TestActor extends Actor {

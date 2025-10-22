@@ -35,6 +35,7 @@ export function conditionalGet(data: string | Buffer, lastModified?: Date, etag?
 
     if (isNotModified) {
       res.status(304).send();
+      return;
     } else {
       if (lastModified) setLastModified(res, lastModified);
       if (etag) setEtag(res, data);

@@ -1,5 +1,5 @@
-import { Actor, ActorSystem } from '../core/actorSystem';
-import { EventBus } from '../core/eventBus';
+import { Actor, ActorSystem } from '../core/actorSystem.js';
+import { EventBus } from '../core/eventBus.js';
 
 interface PingEvent {
   sender: string;

@@ -40,7 +40,6 @@ export const DEFAULT_MEMORY_CONFIG: Required<MemoryManagerConfig> = {
  * Handles safe memory allocation, deallocation, and data transfer
  */
 export class WasmMemoryManager {
-  private instance: WebAssembly.Instance;
   private memory: WebAssembly.Memory;
   private allocations: Map<number, MemoryAllocation> = new Map();
   private freeList: Set<number> = new Set();
@@ -49,7 +48,6 @@ export class WasmMemoryManager {
   private gcTimer: NodeJS.Timeout | null = null;
 
   constructor(instance: WebAssembly.Instance, config: MemoryManagerConfig = {}) {
-    this.instance = instance;
     this.memory = instance.exports.memory as WebAssembly.Memory;
     this.config = { ...DEFAULT_MEMORY_CONFIG, ...config };
     
@@ -193,7 +191,7 @@ export class WasmMemoryManager {
       memoryPages,
       memoryUsage,
       freeListSize: this.freeList.size,
-      nextPtr
+      nextPtr: this.nextPtr
     };
   }
 

@@ -1,21 +1,30 @@
 import { IncomingMessage, ServerResponse } from 'node:http';
-import { buildSchema, GraphQLSchema, graphql } from 'graphql';
+
+// GraphQL module stub - zero-dependency implementation note
+// Full GraphQL support would require graphql package
+// This is a placeholder for future implementation
+
+interface GraphQLSchema {
+  query?: any;
+  mutation?: any;
+  subscription?: any;
+}
+
+interface GraphQLResolverMap {
+  Query?: Record<string, Function>;
+  Mutation?: Record<string, Function>;
+  Subscription?: Record<string, Function>;
+}
 
 // Utility for defining GraphQL schemas
-export function createGraphQLSchema(typeDefs: string, resolvers: any): GraphQLSchema {
-  const schema = buildSchema(typeDefs);
-  // Attach resolvers to the schema
-  // This is a simplified approach. In a real app, you'd use makeExecutableSchema from @graphql-tools/schema
-  // or similar to properly link resolvers.
-  return new GraphQLSchema({
-    query: schema.getQueryType(),
-    mutation: schema.getMutationType(),
-    subscription: schema.getSubscriptionType(),
-    // @ts-ignore - This is a simplified example, direct assignment is not how it works with graphql-js
-    _queryType: resolvers.Query,
-    _mutationType: resolvers.Mutation,
-    _subscriptionType: resolvers.Subscription,
-  });
+export function createGraphQLSchema(_typeDefs: string, resolvers: GraphQLResolverMap): GraphQLSchema {
+  // Simplified schema creation without external dependencies
+  // Note: typeDefs are not used in this stub implementation
+  return {
+    query: resolvers.Query,
+    mutation: resolvers.Mutation,
+    subscription: resolvers.Subscription,
+  };
 }
 
 interface GraphQLOptions {
@@ -24,28 +33,48 @@ interface GraphQLOptions {
 }
 
 export function graphqlMiddleware(options: GraphQLOptions) {
-  return async (req: IncomingMessage, res: ServerResponse, next: () => void) => {
+  return async (req: IncomingMessage, res: ServerResponse, next: () => void): Promise<void> => {
     if (req.url === '/graphql' && req.method === 'POST') {
       let body = '';
-      req.on('data', (chunk) => {
+      req.on('data', (chunk: Buffer) => {
         body += chunk.toString();
       });
       req.on('end', async () => {
         try {
-          const { query, variables } = JSON.parse(body);
-          const contextValue = options.context ? options.context(req, res) : {};
-          const result = await graphql({
-            schema: options.schema,
-            source: query,
-            variableValues: variables,
-            contextValue: contextValue,
-          });
+          const { query: queryString }: { query: string; variables?: Record<string, any> } = JSON.parse(body);
+
+          if (!queryString) {
+            res.setHeader('Content-Type', 'application/json');
+            res.statusCode = 400;
+            res.end(JSON.stringify({ errors: [{ message: 'No query provided' }] }));
+            return;
+          }
+
+          // Simplified query parsing: extracts the field name between '{' and '}'
+          const match = /{\s*(\w+)\s*}/.exec(queryString);
+          const fieldName = match ? match[1] : null;
+
+          if (!fieldName || !options.schema.query || !options.schema.query[fieldName]) {
+            res.setHeader('Content-Type', 'application/json');
+            res.statusCode = 400;
+            res.end(JSON.stringify({ errors: [{ message: 'Invalid query' }] }));
+            return;
+          }
+
+          const resolver = options.schema.query[fieldName];
+          const resultData = await resolver();
+          const result = {
+            data: {
+              [fieldName]: resultData,
+            },
+          };
+
           res.setHeader('Content-Type', 'application/json');
           res.end(JSON.stringify(result));
         } catch (error: any) {
           res.setHeader('Content-Type', 'application/json');
           res.statusCode = 500;
-          res.end(JSON.stringify({ errors: [{ message: error.message }] }));
+          res.end(JSON.stringify({ errors: [{ message: error instanceof Error ? error.message : 'Internal server error' }] }));
         }
       });
     } else {

@@ -1,6 +1,6 @@
 import { describe, it, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert';
-import { NodeFileSystem, fileUtils } from '../../src/cli/utils/fs';
+import { NodeFileSystem, fileUtils } from '../../src/cli/utils/fs.js';
 import { rmSync } from 'fs';
 import { join } from 'path';
 

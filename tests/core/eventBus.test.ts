@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert';
 
 // Import the EventBus class
-const { EventBus } = require('../../src/core/eventBus');
+import { EventBus } from '../../src/core/eventBus.js';
 
 // Test for Singleton Pattern
 test('EventBus should be a singleton', () => {

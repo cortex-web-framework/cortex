@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { EventBus } from '../../src/core/eventBus';
-import { Actor as _Actor, ActorSystem } from '../../src/core/actorSystem';
-import { PingNeuron } from '../../src/neurons/pingNeuron';
-import { PongNeuron } from '../../src/neurons/pongNeuron';
+import { EventBus } from '../../src/core/eventBus.js';
+import { Actor as _Actor, ActorSystem } from '../../src/core/actorSystem.js';
+import { PingNeuron } from '../../src/neurons/pingNeuron.js';
+import { PongNeuron } from '../../src/neurons/pongNeuron.js';
 
 test('PingNeuron and PongNeuron should communicate via EventBus', async () => {
   const eventBus = EventBus.getInstance();

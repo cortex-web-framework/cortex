@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { WasmMemoryManager, createMemoryManager, DEFAULT_MEMORY_CONFIG } from '../../src/wasm/memoryManager';
+import { WasmMemoryManager, createMemoryManager, DEFAULT_MEMORY_CONFIG } from '../../src/wasm/memoryManager.js';
 
 // Mock WebAssembly instance for testing
 function createMockWasmInstance() {

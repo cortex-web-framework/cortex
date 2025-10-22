@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { EventBus } from '../../src/core/eventBus';
+import { EventBus } from '../../src/core/eventBus.js';
 
 interface TestEvent {
   value: string;

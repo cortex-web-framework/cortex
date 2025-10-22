@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { colors, supportsColors } from '../../src/cli/utils/colors';
+import { colors, supportsColors } from '../../src/cli/utils/colors.js';
 
 describe('Colors', () => {
   describe('supportsColors', () => {

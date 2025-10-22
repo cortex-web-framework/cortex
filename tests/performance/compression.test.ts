@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { compression, brotliCompression, gzipCompression, parseAcceptEncoding, selectEncoding, isCompressible } from '../../src/performance/compression';
+import { compression, brotliCompression, gzipCompression, parseAcceptEncoding, selectEncoding, isCompressible } from '../../src/performance/compression.js';
 
 // Mock Express request and response
 function createMockReq(acceptEncoding?: string) {

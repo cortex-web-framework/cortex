@@ -1,4 +1,4 @@
-import { Metric, MetricType, Labels } from '../types';
+import { Metric, MetricType, Labels } from '../types.js';
 
 /**
  * Gauge is a metric that can go up and down

@@ -1,4 +1,4 @@
-import * as http from 'node:http';
+import * as http from 'http';
 
 // Placeholder for gRPC server implementation
 export class GrpcServer {
@@ -6,7 +6,7 @@ export class GrpcServer {
   private services: Map<string, any> = new Map();
 
   constructor() {
-    this.server = http.createServer((req, res) => {
+    this.server = http.createServer((_req, res) => {
       // This is a very simplified placeholder.
       // Real gRPC uses HTTP/2 and a specific protocol.
       res.statusCode = 501; // Not Implemented
@@ -44,17 +44,14 @@ export class GrpcServer {
 
 // Placeholder for gRPC client implementation
 export class GrpcClient {
-  private serviceClient: any;
-
   constructor(serviceDefinition: any, address: string) {
     // In a real gRPC setup, you'd create a client from generated code
     // and connect to the gRPC server address.
     console.log(`Initialized gRPC client for ${serviceDefinition.name} at ${address}`);
-    this.serviceClient = {}; // Placeholder
   }
 
   public callMethod(methodName: string, request: any): Promise<any> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       console.log(`Calling gRPC method ${methodName} with request:`, request);
       // Simulate a response
       setTimeout(() => {

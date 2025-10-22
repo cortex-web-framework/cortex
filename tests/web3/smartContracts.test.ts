@@ -46,10 +46,10 @@ test('SmartContractClient should call a contract function', async () => {
   assert.strictEqual(mockRpc.lastMethod, 'eth_call', 'RPC client should call eth_call');
   assert.ok(isEthCallTransaction(mockRpc.lastParams[0]), 'RPC call params should be an EthCallTransaction');
   const transaction: EthCallTransaction = mockRpc.lastParams[0];
-  assert.notStrictEqual(mockRpc.lastParams[0].to, undefined, 'RPC call params should include 'to' address');
-  assert.notStrictEqual(mockRpc.lastParams[0].to, null, 'RPC call params should include 'to' address');
-  assert.notStrictEqual(mockRpc.lastParams[0].data, undefined, 'RPC call params should include 'data'');
-  assert.notStrictEqual(mockRpc.lastParams[0].data, null, 'RPC call params should include 'data'');
+  assert.notStrictEqual(mockRpc.lastParams[0].to, undefined, 'RPC call params should include to address');
+  assert.notStrictEqual(mockRpc.lastParams[0].to, null, 'RPC call params should include to address');
+  assert.notStrictEqual(mockRpc.lastParams[0].data, undefined, 'RPC call params should include data');
+  assert.notStrictEqual(mockRpc.lastParams[0].data, null, 'RPC call params should include data');;
   assert.strictEqual(result, '0x000000000000000000000000000000000000000000000000000000000000007b', 'Result should match mock response');
 });
 

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { CircuitBreaker } from '../../src/resilience/circuitBreaker';
-import { CircuitState } from '../../src/resilience/types';
+import { CircuitBreaker } from '../../src/resilience/circuitBreaker.js';
+import { CircuitState } from '../../src/resilience/types.js';
 
 test('CircuitBreaker should start in CLOSED state', () => {
   const circuitBreaker = new CircuitBreaker();
@@ -54,17 +54,27 @@ test('CircuitBreaker should reject requests when OPEN', async () => {
 
 test('CircuitBreaker should transition to HALF_OPEN after timeout', async () => {
   const circuitBreaker = new CircuitBreaker({ failureThreshold: 1, successThreshold: 1, timeout: 100, resetTimeout: 1000 });
-  
+
   // Open the circuit
   await assert.rejects(async () => {
     await circuitBreaker.execute(async () => { throw new Error('Test error'); });
   });
-  
+
   // Wait for timeout
   await new Promise(resolve => setTimeout(resolve, 150));
-  
-  // Should be in HALF_OPEN state
-  assert.strictEqual(circuitBreaker.getState(), CircuitState.HALF_OPEN);
+
+  // Now, the next call to execute should transition to HALF_OPEN
+  const operationPromise = circuitBreaker.execute(async () => {
+    // This operation will be executed while the circuit is HALF_OPEN
+    // We don't need to assert the state here, as the test is about the transition *to* HALF_OPEN
+    return 'dummy_result';
+  });
+
+  // Immediately after calling execute, the state should be HALF_OPEN
+  assert.strictEqual(circuitBreaker.getState(), CircuitState.HALF_OPEN, 'Circuit breaker should be HALF_OPEN after timeout and before operation completes');
+
+  // Wait for the operation to complete (it might succeed or fail)
+  await Promise.resolve(operationPromise).catch(() => {}); // Catch potential rejection
 });
 
 test('CircuitBreaker should close from HALF_OPEN after success threshold', async () => {

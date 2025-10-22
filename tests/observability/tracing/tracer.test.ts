@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { Tracer } from '../../../src/observability/tracing/tracer';
-import { SpanKind } from '../../../src/observability/types';
-import { AlwaysOnSampler, AlwaysOffSampler } from '../../../src/observability/tracing/sampler';
+import { Tracer } from '../../../src/observability/tracing/tracer.js';
+import { SpanKind } from '../../../src/observability/types.js';
+import { AlwaysOnSampler, AlwaysOffSampler } from '../../../src/observability/tracing/sampler.js';
 
 test('Tracer should create spans correctly', () => {
   const tracer = new Tracer({ serviceName: 'test-service' });

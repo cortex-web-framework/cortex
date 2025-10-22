@@ -3,9 +3,9 @@
  * Zero dependencies, strictest TypeScript configuration
  */
 
-import { CLICommand, CLIConfig, CLIError, CLIOutput, CLIInput } from '../types';
-import { colors } from '../utils/colors';
-import { processOps } from '../utils/process';
+import { CLICommand, CLIConfig, CLIError, CLIOutput, CLIInput } from '../types.js';
+import { colors } from '../utils/colors.js';
+import { processOps } from '../utils/process.js';
 
 /**
  * Default CLI output implementation
@@ -101,12 +101,10 @@ class DefaultCLIInput implements CLIInput {
 export class CLIParser {
   private readonly config: CLIConfig;
   private readonly output: CLIOutput;
-  private readonly input: CLIInput;
 
   constructor(config: CLIConfig, output: CLIOutput = new DefaultCLIOutput(), _input: CLIInput = new DefaultCLIInput()) {
     this.config = config;
     this.output = output;
-    this.input = _input;
   }
 
   /**

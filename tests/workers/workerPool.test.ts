@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { WorkerPool, DEFAULT_WORKER_POOL_CONFIG } from '../../src/workers/workerPool';
+import { WorkerPool, DEFAULT_WORKER_POOL_CONFIG } from '../../src/workers/workerPool.js';
 
 test('WorkerPool should initialize with default config', () => {
   const pool = new WorkerPool();

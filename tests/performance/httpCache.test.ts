@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { setCacheControl, setEtag, setLastModified, conditionalGet } from '../../src/performance/httpCache';
+import { setCacheControl, setEtag, setLastModified, conditionalGet } from '../../src/performance/httpCache.js';
 import { IncomingMessage, ServerResponse } from 'node:http';
 
 // Mock Request and Response objects for middleware testing
@@ -11,36 +11,34 @@ class MockRequest extends IncomingMessage {
   }
 }
 
-class MockResponse extends ServerResponse {
+class MockResponse {
   public headers: Record<string, string> = {};
   public statusCode: number = 200;
   public _endCalled: boolean = false;
   public _data: any[] = [];
 
-  constructor() {
-    super({} as any);
-  }
-
-  override setHeader(name: string, value: string | number | readonly string[]): this {
+  setHeader(name: string, value: string | number | readonly string[]): this {
     this.headers[name] = value.toString();
     return this;
   }
 
-  override getHeader(name: string): string | undefined {
+  getHeader(name: string): string | undefined {
     return this.headers[name];
   }
 
   status(code: number): this {
     this.statusCode = code;
+    console.log('MockResponse.status called with:', code); // Debug log
     return this;
   }
 
-  send(data: any): void {
+  send(data: any): this {
     this._data.push(data);
     this._endCalled = true;
+    return this;
   }
 
-  override end(chunk?: any, ...args: any[]): this {
+  end(chunk?: any, ...args: any[]): this {
     this._endCalled = true;
     if (chunk) {
       this._data.push(chunk);
@@ -93,7 +91,7 @@ test('conditionalGet should return 304 if ETag matches', (_t, done) => {
   }, 10);
 });
 
-test('conditionalGet should return 304 if Last-Modified matches', (_t, done) => {
+test('conditionalGet should return 304 if Last-Modified matches', async () => {
   const req = new MockRequest();
   const res = new MockResponse();
   const data = 'some data';
@@ -102,15 +100,19 @@ test('conditionalGet should return 304 if Last-Modified matches', (_t, done) => 
   req.headers['if-modified-since'] = lastModified.toUTCString();
 
   const middleware = conditionalGet(data, lastModified, undefined);
-  middleware(req as any, res as any, () => {
-    assert.fail('Next should not be called if 304 is sent');
+
+  let nextCalled = false;
+  await new Promise<void>((resolve) => {
+    middleware(req as any, res as any, () => {
+      nextCalled = true;
+      resolve();
+    });
+    setTimeout(resolve, 100);
   });
 
-  setTimeout(() => {
-    assert.strictEqual(res.statusCode, 304, 'Status code should be 304');
-    assert.strictEqual(res._endCalled, true, 'Response should be ended');
-    done();
-  }, 10);
+  assert.strictEqual(res.statusCode, 304, 'Status code should be 304');
+  assert.strictEqual(res._endCalled, true, 'Response should be ended');
+  assert.strictEqual(nextCalled, false, 'Next should not be called if 304 is sent');
 });
 
 test('conditionalGet should call next if no match', (_t, done) => {

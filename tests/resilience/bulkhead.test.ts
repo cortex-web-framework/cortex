@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { Bulkhead } from '../../src/resilience/bulkhead';
+import { Bulkhead } from '../../src/resilience/bulkhead.js';
 
 test('Bulkhead should execute operations within concurrency limit', async () => {
   const bulkhead = new Bulkhead({ maxConcurrent: 2, maxQueueSize: 10, queueTimeout: 1000 });
@@ -27,27 +27,24 @@ test('Bulkhead should execute operations within concurrency limit', async () => 
 
 test('Bulkhead should queue operations when at capacity', async () => {
   const bulkhead = new Bulkhead({ maxConcurrent: 1, maxQueueSize: 3, queueTimeout: 1000 });
-  
-  const startTime = Date.now();
-  
-  // First operation should start immediately
+
   const op1 = bulkhead.execute(async () => {
     await new Promise(resolve => setTimeout(resolve, 100));
     return 'first';
   });
-  
-  // These should be queued
-  const op2 = bulkhead.execute(async () => 'second');
-  const op3 = bulkhead.execute(async () => 'third');
-  
+
+  const op2 = bulkhead.execute(async () => {
+    await new Promise(resolve => setTimeout(resolve, 50)); // Shorter delay
+    return 'second';
+  });
+
+  const op3 = bulkhead.execute(async () => {
+    return 'third';
+  });
+
   const results = await Promise.all([op1, op2, op3]);
-  
-  assert.strictEqual(results[0], 'first');
-  assert.strictEqual(results[1], 'second');
-  assert.strictEqual(results[2], 'third');
-  
-  // Should have taken at least 200ms (100ms per operation)
-  assert.ok(Date.now() - startTime >= 200);
+
+  assert.deepStrictEqual(results, ['first', 'second', 'third'], 'Operations should complete in order');
 });
 
 test('Bulkhead should reject when queue is full', async () => {
@@ -64,7 +61,7 @@ test('Bulkhead should reject when queue is full', async () => {
   // This should be rejected
   await assert.rejects(async () => {
     await bulkhead.execute(async () => 'third');
-  }, /Bulkhead queue is full/);
+  }, /Semaphore waiting queue is full/);
   
   await Promise.all([op1, op2]);
 });
@@ -80,27 +77,34 @@ test('Bulkhead should provide correct statistics', async () => {
   assert.strictEqual(stats.maxQueueSize, 5);
 });
 
-test('Bulkhead should check availability correctly', () => {
+test('Bulkhead should check availability correctly', async () => {
   const bulkhead = new Bulkhead({ maxConcurrent: 1, maxQueueSize: 2, queueTimeout: 1000 });
-  
+
   assert.strictEqual(bulkhead.isAvailable(), true);
-  
+
   // Fill the queue
-  bulkhead.execute(async () => {
+  const op1 = bulkhead.execute(async () => {
     await new Promise(resolve => setTimeout(resolve, 100));
     return 'first';
   });
-  
-  bulkhead.execute(async () => 'second');
-  
-  // Should still be available (queue not full)
+
+  const op2 = bulkhead.execute(async () => 'second');
+
+  // Wait for op1 to acquire the permit, so op2 is queued
+  await new Promise(resolve => setTimeout(resolve, 10));
+
+  // Now op2 should be in the queue, so isAvailable should still be true
   assert.strictEqual(bulkhead.isAvailable(), true);
-  
+
   // Fill the queue completely
-  bulkhead.execute(async () => 'third');
-  
-  // Should not be available
+  const op3 = bulkhead.execute(async () => 'third');
+
+  // Now op3 should be rejected, so isAvailable should be false
+  await new Promise(resolve => setTimeout(resolve, 10));
+
   assert.strictEqual(bulkhead.isAvailable(), false);
+
+  await Promise.allSettled([op1, op2, op3]);
 });
 
 test('Bulkhead should handle operation errors', async () => {

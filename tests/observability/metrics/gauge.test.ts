@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { Gauge } from '../../../src/observability/metrics/gauge';
+import { Gauge } from '../../../src/observability/metrics/gauge.js';
 
 test('Gauge should set value correctly', () => {
   const gauge = new Gauge('memory_usage_bytes', 'Memory usage in bytes');

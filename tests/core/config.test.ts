@@ -1,9 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { Config } from '../../src/core/config';
+import { Config } from '../../src/core/config.js';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const TEST_CONFIG_DIR = path.join(__dirname, 'temp_config');
 
 // Helper to create temporary config files

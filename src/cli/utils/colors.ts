@@ -77,6 +77,9 @@ function shouldUseColors(): boolean {
  * Colorize text with ANSI codes
  */
 function colorize(text: string, ...colors: readonly ColorName[]): string {
+  if (text.length === 0) {
+    return '';
+  }
   if (!shouldUseColors()) {
     return text;
   }

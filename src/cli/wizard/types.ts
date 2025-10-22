@@ -73,8 +73,8 @@ export interface WizardResult {
 export interface TerminalConfig {
   readonly width: number;
   readonly height: number;
-  readonly colors: boolean;
-  readonly animations: boolean;
+  readonly colors?: boolean;
+  readonly animations?: boolean;
   readonly theme?: 'default' | 'dark' | 'light';
 }
 

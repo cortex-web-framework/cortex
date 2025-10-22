@@ -17,8 +17,8 @@ const clients = new Map<string, { count: number; lastReset: number }>();
 export function rateLimiter(options?: Partial<RateLimiterOptions>) {
   const opts = { ...defaultOptions, ...options };
 
-  return (req: Request, res: Response, next: NextFunction) => {
-    const ip = req.ip; // Or use a more robust client identifier
+  return (req: Request, res: Response, next: NextFunction): void => {
+    const ip = req.ip ?? 'unknown'; // Use 'unknown' if ip is undefined
 
     if (!clients.has(ip)) {
       clients.set(ip, { count: 0, lastReset: Date.now() });
@@ -32,7 +32,8 @@ export function rateLimiter(options?: Partial<RateLimiterOptions>) {
     }
 
     if (client.count >= opts.max) {
-      return res.status(429).send(opts.message);
+      res.status(429).send(opts.message);
+      return;
     }
 
     client.count++;

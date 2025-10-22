@@ -1,4 +1,4 @@
-import { RetryConfig, ErrorMatcher, ResiliencePolicy } from './types';
+import { RetryConfig, ErrorMatcher, ResiliencePolicy } from './types.js';
 
 /**
  * Default retry configuration
@@ -20,7 +20,9 @@ export class ErrorMatchers {
    * Match by error name
    */
   static byName(errorNames: string[]): ErrorMatcher {
-    return (error: Error) => errorNames.includes(error.constructor.name);
+    return (error: Error) => {
+      return errorNames.includes(error.name);
+    };
   }
 
   /**
@@ -105,12 +107,13 @@ export class RetryExecutor implements ResiliencePolicy {
         return await operation();
       } catch (error) {
         lastError = error as Error;
-        
+
         // Check if we should retry this error
         if (!this.shouldRetry(lastError, attempt)) {
-          throw lastError;
+          console.error('RetryExecutor: Forcing re-throw of non-retryable error:', lastError); // Debug log
+          throw lastError; // This should exit the method
         }
-        
+
         // Don't delay on the last attempt
         if (attempt < this.config.maxAttempts) {
           const delay = this.calculateDelay(attempt);
@@ -132,15 +135,13 @@ export class RetryExecutor implements ResiliencePolicy {
   /**
    * Check if an error should be retried
    */
-  private shouldRetry(error: Error, attempt: number): boolean {
-    if (attempt >= this.config.maxAttempts) {
-      return false;
-    }
-    
-    return this.errorMatcher(error);
-  }
-
-  /**
+              private shouldRetry(error: Error, attempt: number): boolean {
+                if (attempt >= this.config.maxAttempts) {
+                  return false;
+                }
+                const matcherResult = this.errorMatcher(error);
+                return matcherResult;
+              }  /**
    * Calculate delay for the given attempt
    */
   private calculateDelay(attempt: number): number {

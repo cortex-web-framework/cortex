@@ -1,4 +1,4 @@
-import { CircuitState, CircuitBreakerConfig, ResiliencePolicy } from './types';
+import { CircuitState, CircuitBreakerConfig, ResiliencePolicy } from './types.js';
 
 /**
  * Default circuit breaker configuration
@@ -33,7 +33,6 @@ export class CircuitBreaker implements ResiliencePolicy {
   private state: CircuitState = CircuitState.CLOSED;
   private failureCount = 0;
   private successCount = 0;
-  private lastFailureTime = 0;
   private nextAttemptTime = 0;
 
   constructor(private config: CircuitBreakerConfig = DEFAULT_CIRCUIT_BREAKER_CONFIG) {
@@ -90,7 +89,6 @@ export class CircuitBreaker implements ResiliencePolicy {
     this.state = CircuitState.CLOSED;
     this.failureCount = 0;
     this.successCount = 0;
-    this.lastFailureTime = 0;
     this.nextAttemptTime = 0;
   }
 
@@ -129,8 +127,7 @@ export class CircuitBreaker implements ResiliencePolicy {
    */
   private onFailure(): void {
     this.failureCount++;
-    this.lastFailureTime = Date.now();
-    
+
     if (this.state === CircuitState.HALF_OPEN) {
       this.state = CircuitState.OPEN;
       this.nextAttemptTime = Date.now() + this.config.timeout;

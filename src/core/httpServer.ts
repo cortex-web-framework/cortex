@@ -1,6 +1,6 @@
 import http from 'node:http';
 import { Socket } from 'node:net';
-import { RouteNotFound } from './errors';
+import { RouteNotFound } from './errors.js';
 
 declare module 'node:http' {
   interface IncomingMessage {

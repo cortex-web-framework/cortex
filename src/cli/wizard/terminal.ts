@@ -3,8 +3,11 @@
  * Zero dependencies, strictest TypeScript configuration
  */
 
-import { TerminalConfig, AnimationConfig, MenuConfig, ProgressBarConfig, TableConfig, BoxConfig, SpinnerConfig, BannerConfig } from './types';
-import { colors } from '../utils/colors';
+import { TerminalConfig } from './types.js';
+import { colors } from '../utils/colors.js';
+
+// Re-export for convenience
+export type { TerminalConfig };
 
 /**
  * Terminal UI implementation
@@ -19,8 +22,8 @@ export class TerminalUI {
   constructor(config: TerminalConfig) {
     this.width = config.width;
     this.height = config.height;
-    this.colors = config.colors;
-    this.animations = config.animations;
+    this.colors = config.colors ?? true;
+    this.animations = config.animations ?? true;
     this.theme = config.theme || 'default';
   }
 
@@ -123,7 +126,7 @@ export class TerminalUI {
     result += ']';
     
     if (this.colors) {
-      result += ` ${colors.cyan(Math.round(progress * 100))}%`;
+      result += ` ${colors.cyan(Math.round(progress * 100).toString())}%`;
     } else {
       result += ` ${Math.round(progress * 100)}%`;
     }
@@ -156,7 +159,7 @@ export class TerminalUI {
     
     let result = this.moveCursor(x, y);
     result += spinnerFrames[frameIndex];
-    
+    console.log('drawSpinner result:', result); // Debug log
     return result;
   }
 
@@ -165,6 +168,7 @@ export class TerminalUI {
    */
   public drawBanner(text: string): string {
     const banner = this.generateBanner(text);
+    console.log('drawBanner result:', banner); // Debug log
     return banner;
   }
 
@@ -257,7 +261,7 @@ export class TerminalUI {
   /**
    * Generate ASCII banner
    */
-  private generateBanner(text: string): string {
+  private generateBanner(_text: string): string {
     const banner = `
 ╔══════════════════════════════════════════════════════════════╗
 ║                                                              ║
@@ -273,7 +277,7 @@ export class TerminalUI {
 ╚══════════════════════════════════════════════════════════════╝
 `;
 
-    return this.colors ? colors.cyan(banner) : banner;
+    return banner;
   }
 
   /**

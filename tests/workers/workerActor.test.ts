@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { WorkerActor } from '../../src/workers/workerActor';
-import { ActorSystem } from '../../src/core/actorSystem';
+import { WorkerActor } from '../../src/workers/workerActor.js';
+import { ActorSystem } from '../../src/core/actorSystem.js';
 
 // Mock ActorSystem for WorkerActor constructor
 class MockActorSystem extends ActorSystem {

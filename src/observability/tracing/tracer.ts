@@ -1,7 +1,7 @@
-import { Span, SpanKind, TraceContext, SpanStatusCode } from '../types';
-import { SpanImpl } from './span';
-import { Sampler, ProbabilitySampler } from './sampler';
-import { generateTraceId, generateSpanId } from './ids';
+import { Span, SpanKind, TraceContext } from '../types.js';
+import { SpanImpl } from './span.js';
+import { Sampler, ProbabilitySampler } from './sampler.js';
+import { generateTraceId, generateSpanId } from './ids.js';
 
 /**
  * Configuration options for Tracer

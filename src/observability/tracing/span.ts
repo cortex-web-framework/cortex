@@ -1,4 +1,4 @@
-import { Span, SpanKind, SpanStatus, SpanStatusCode, SpanEvent, AttributeValue } from '../types';
+import { Span, SpanKind, SpanStatus, SpanStatusCode, SpanEvent, AttributeValue } from '../types.js';
 
 /**
  * Span implementation for distributed tracing

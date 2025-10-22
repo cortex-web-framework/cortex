@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { NodeProcessOps, processUtils } from '../../src/cli/utils/process';
+import { NodeProcessOps, processUtils } from '../../src/cli/utils/process.js';
 
 describe('ProcessOps', () => {
   const processOps = new NodeProcessOps();

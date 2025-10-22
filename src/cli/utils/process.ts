@@ -3,7 +3,8 @@
  * Strictest TypeScript configuration
  */
 
-import { ProcessOps } from '../types';
+import { ProcessOps } from '../types.js';
+import { execSync, spawn } from 'node:child_process';
 
 /**
  * Process operations implementation using Node.js built-ins
@@ -196,7 +197,6 @@ export const processUtils = {
    */
   commandExists(command: string): boolean {
     try {
-      const { execSync } = require('child_process');
       execSync(`which ${command}`, { stdio: 'ignore' });
       return true;
     } catch {
@@ -209,7 +209,6 @@ export const processUtils = {
    */
   execCommand(command: string, options: { cwd?: string; silent?: boolean } = {}): string {
     try {
-      const { execSync } = require('child_process');
       return execSync(command, {
         cwd: options.cwd,
         stdio: options.silent ? 'pipe' : 'inherit',
@@ -225,7 +224,6 @@ export const processUtils = {
    */
   spawnProcess(command: string, args: readonly string[] = [], options: { cwd?: string; stdio?: 'inherit' | 'pipe' } = {}): void {
     try {
-      const { spawn } = require('child_process');
       const child = spawn(command, args, {
         cwd: options.cwd,
         stdio: options.stdio || 'inherit',

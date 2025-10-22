@@ -1,10 +1,10 @@
-import { SamplingContext, SamplingResult, SamplingDecision } from '../types';
+import { SamplingContext, SamplingResult, SamplingDecision } from '../types.js';
 
 /**
  * Sampler interface for deciding whether to sample a trace
  */
 export interface Sampler {
-  shouldSample(context: SamplingContext): SamplingResult;
+  shouldSample(_context: SamplingContext): SamplingResult;
 }
 
 /**
@@ -17,7 +17,7 @@ export class ProbabilitySampler implements Sampler {
     }
   }
 
-  shouldSample(context: SamplingContext): SamplingResult {
+  shouldSample(_context: SamplingContext): SamplingResult {
     const random = Math.random();
     const decision = random < this.probability ? SamplingDecision.RECORD_AND_SAMPLE : SamplingDecision.DROP;
     
@@ -32,7 +32,7 @@ export class ProbabilitySampler implements Sampler {
  * Always sample sampler
  */
 export class AlwaysOnSampler implements Sampler {
-  shouldSample(context: SamplingContext): SamplingResult {
+  shouldSample(_context: SamplingContext): SamplingResult {
     return {
       decision: SamplingDecision.RECORD_AND_SAMPLE,
       attributes: {},
@@ -44,7 +44,7 @@ export class AlwaysOnSampler implements Sampler {
  * Never sample sampler
  */
 export class AlwaysOffSampler implements Sampler {
-  shouldSample(context: SamplingContext): SamplingResult {
+  shouldSample(_context: SamplingContext): SamplingResult {
     return {
       decision: SamplingDecision.DROP,
       attributes: {},
@@ -67,7 +67,7 @@ export class TraceIdRatioBasedSampler implements Sampler {
     const traceIdNum = parseInt(context.traceId.substring(0, 8), 16);
     const threshold = Math.floor(this.ratio * 0xffffffff);
     const decision = traceIdNum < threshold ? SamplingDecision.RECORD_AND_SAMPLE : SamplingDecision.DROP;
-    
+
     return {
       decision,
       attributes: {},

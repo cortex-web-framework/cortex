@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { Histogram } from '../../../src/observability/metrics/histogram';
+import { Histogram } from '../../../src/observability/metrics/histogram.js';
 
 test('Histogram should observe values correctly', () => {
   const histogram = new Histogram('http_request_duration_seconds', 'HTTP request duration');

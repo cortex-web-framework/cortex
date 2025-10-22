@@ -3,9 +3,9 @@
  * Zero dependencies, strictest TypeScript configuration
  */
 
-import { ProjectConfig } from '../types';
-import { fileUtils } from '../utils/fs';
-import { writeFileSync } from 'fs';
+import { ProjectConfig } from '../types.js';
+import { fileUtils } from '../utils/fs.js';
+import { writeFileSync } from 'node:fs';
 
 /**
  * Create complete project structure
@@ -123,7 +123,6 @@ async function generatePackageJson(config: ProjectConfig): Promise<void> {
     license: 'MIT',
   };
   
-  const { writeFileSync } = require('fs');
   writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
 }
 
@@ -157,7 +156,6 @@ async function generateTsConfig(config: ProjectConfig): Promise<void> {
     exclude: ['node_modules', 'dist', 'tests'],
   };
   
-  const { writeFileSync } = require('fs');
   writeFileSync('tsconfig.json', JSON.stringify(tsConfig, null, 2));
 }
 
@@ -260,7 +258,6 @@ process.on('SIGINT', async () => {
 start();
 `;
 
-  const { writeFileSync } = require('fs');
   writeFileSync(`src/index.${extension}`, content);
 }
 
@@ -315,7 +312,6 @@ export class ActorSupervisor extends Actor {
 }
 `;
 
-  const { writeFileSync } = require('fs');
   writeFileSync(`src/actors/ExampleActor.${extension}`, content);
 }
 
@@ -705,6 +701,6 @@ temp/
 /**
  * Generate README
  */
-async function generateReadme(config: ProjectConfig): Promise<void> {
+async function generateReadme(_config: ProjectConfig): Promise<void> {
   // This is handled by generateDocs
 }

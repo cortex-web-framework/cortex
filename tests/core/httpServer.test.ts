@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert';
 import http from 'node:http';
 
-import { CortexHttpServer } from '../../src/core/httpServer';
+import { CortexHttpServer } from '../../src/core/httpServer.js';
 
 const PORT = 8080;
 

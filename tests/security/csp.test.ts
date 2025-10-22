@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { CSPBuilder } from '../../src/security/csp';
+import { CSPBuilder } from '../../src/security/csp.js';
 import { IncomingMessage, ServerResponse } from 'node:http';
 
 // Mock Request and Response objects for middleware testing

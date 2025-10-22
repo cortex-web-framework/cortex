@@ -1,4 +1,4 @@
-import { Actor, ActorSystem } from '../core/actorSystem';
+import { Actor, ActorSystem } from '../core/actorSystem.js';
 
 // This will be the content of the worker file
 const workerCode = `

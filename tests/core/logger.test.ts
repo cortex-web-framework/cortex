@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { Logger } from '../../src/core/logger';
+import { Logger } from '../../src/core/logger.js';
 
 test.beforeEach(() => {
   // Clear any existing Logger instance for test isolation

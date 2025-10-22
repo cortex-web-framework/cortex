@@ -1,7 +1,7 @@
-import { ResiliencePolicy } from './types';
-import { CircuitBreaker } from './circuitBreaker';
-import { RetryExecutor } from './retryExecutor';
-import { Bulkhead } from './bulkhead';
+import { ResiliencePolicy } from './types.js';
+import { CircuitBreaker } from './circuitBreaker.js';
+import { RetryExecutor } from './retryExecutor.js';
+import { Bulkhead } from './bulkhead.js';
 
 /**
  * Composite policy that combines multiple resilience patterns

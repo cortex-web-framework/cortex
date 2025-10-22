@@ -1,5 +1,5 @@
-import { EventBus } from './eventBus';
-import { ActorNotFound } from './errors';
+import { EventBus } from './eventBus.js';
+import { ActorNotFound } from './errors.js';
 
 export abstract class Actor {
   public readonly id: string;

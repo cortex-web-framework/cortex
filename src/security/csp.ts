@@ -17,7 +17,7 @@ export class CSPBuilder {
   }
 
   public static middleware(builder: CSPBuilder) {
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (_req: Request, res: Response, next: NextFunction) => {
       res.setHeader('Content-Security-Policy', builder.build());
       next();
     };

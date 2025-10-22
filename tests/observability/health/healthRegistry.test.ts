@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { HealthCheckRegistry } from '../../../src/observability/health/healthRegistry';
-import { HealthStatus } from '../../../src/observability/types';
+import { HealthCheckRegistry } from '../../../src/observability/health/healthRegistry.js';
+import { HealthStatus } from '../../../src/observability/types.js';
 
 // Mock health check for testing
 class MockHealthCheck {

@@ -1,6 +1,6 @@
 type Callback<T> = (message: T) => void;
-import { EventBusError } from './errors';
-import { Logger } from './logger';
+import { EventBusError } from './errors.js';
+import { Logger } from './logger.js';
 
 class EventBus {
   private static instance: EventBus;
