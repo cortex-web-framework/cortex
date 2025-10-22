@@ -18,7 +18,7 @@ export class Logger {
     };
 
     if (context instanceof Error) {
-      logEntry.error = {
+      logEntry["error"] = {
         name: context.name,
         message: context.message,
         stack: context.stack,
@@ -39,12 +39,12 @@ export class Logger {
   }
 
   public error(message: string, error?: Error, context?: Record<string, any>): void {
-    console.error(this.formatMessage('error', message, error || context));
+    console["error"](this.formatMessage('error', message, error || context));
   }
 
   public debug(message: string, context?: Record<string, any>): void {
     // Only log debug messages if NODE_ENV is 'development'
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env["NODE_ENV"] === 'development') {
       console.debug(this.formatMessage('debug', message, context));
     }
   }

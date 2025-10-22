@@ -1,4 +1,4 @@
-import { ResiliencePolicy } from './types.js';
+import type { ResiliencePolicy } from './types.js';
 import { TimeoutError } from './errors.js';
 
 /**

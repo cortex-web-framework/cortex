@@ -26,7 +26,7 @@ export class CortexTemplateEngine implements TemplateEngine {
     // Validate template before rendering
     const validation = this.validateTemplate(template);
     if (!validation.valid) {
-      throw new Error(`Template validation failed: ${validation.errors.map(e => e.message).join(', ')}`);
+      throw new Error(`Template validation failed: ${validation["error"]s.map(e => e.message).join(', ')}`);
     }
 
     // Render each file in the template

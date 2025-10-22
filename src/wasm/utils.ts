@@ -1,5 +1,22 @@
 import { WasmMemoryManager, createMemoryManager } from './memoryManager.js';
 
+// WebAssembly type declarations for Node.js
+declare global {
+  namespace WebAssembly {
+    interface Module {
+      // Module interface
+    }
+    
+    interface Instance {
+      exports: Record<string, any>;
+    }
+    
+    interface Imports {
+      [key: string]: any;
+    }
+  }
+}
+
 export async function loadWasmModule(wasmUrl: string): Promise<WebAssembly.Module> {
   const response = await fetch(wasmUrl);
   const buffer = await response.arrayBuffer();

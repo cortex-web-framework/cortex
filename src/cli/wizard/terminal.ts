@@ -3,7 +3,7 @@
  * Zero dependencies, strictest TypeScript configuration
  */
 
-import { TerminalConfig } from './types.js';
+import type { TerminalConfig } from './types.js';
 import { colors } from '../utils/colors.js';
 
 // Re-export for convenience

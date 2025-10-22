@@ -74,7 +74,7 @@ export class CortexHookRegistry implements HookRegistry {
         await hook.handler(context);
       } catch (error) {
         // Log error but continue with other hooks
-        console.error(`Hook '${hook.name}' failed:`, error);
+        console["error"](`Hook '${hook.name}' failed:`, error);
       }
     }
   }

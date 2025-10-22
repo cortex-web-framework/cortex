@@ -237,7 +237,7 @@ class MockCortexSecuritySandbox implements MockSecuritySandbox {
     // Check security policy
     if (plugin.securityPolicy) {
       const policyValidation = this.validateSecurityPolicy(plugin.securityPolicy);
-      errors.push(...policyValidation.errors);
+      errors.push(...policyValidation["error"]s);
       warnings.push(...policyValidation.warnings);
     }
 
@@ -462,7 +462,7 @@ describe('CortexSecuritySandbox', () => {
       const validation = sandbox.validatePlugin(testPlugin);
       
       assert.strictEqual(validation.valid, true);
-      assert.strictEqual(validation.errors.length, 0);
+      assert.strictEqual(validation["error"]s.length, 0);
       assert.strictEqual(validation.riskLevel, 'LOW');
       assert.ok(validation.recommendations.includes('Plugin appears to be secure'));
     });
@@ -482,7 +482,7 @@ describe('CortexSecuritySandbox', () => {
       const validation = sandbox.validatePlugin(dangerousPlugin);
       
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation.errors.some(e => e.type === 'DANGEROUS_COMMAND'));
+      assert.ok(validation["error"]s.some(e => e.type === 'DANGEROUS_COMMAND'));
       assert.strictEqual(validation.riskLevel, 'HIGH');
     });
 
@@ -508,7 +508,7 @@ describe('CortexSecuritySandbox', () => {
       const validation = sandbox.validatePlugin(dangerousPermissionPlugin);
       
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation.errors.some(e => e.type === 'DANGEROUS_PERMISSION'));
+      assert.ok(validation["error"]s.some(e => e.type === 'DANGEROUS_PERMISSION'));
       assert.strictEqual(validation.riskLevel, 'CRITICAL');
     });
 
@@ -638,7 +638,7 @@ describe('CortexSecuritySandbox', () => {
       assert.strictEqual(info.isActive, true);
       assert.strictEqual(info.operationCount, 2);
       assert.strictEqual(info.blockedOperations.length, 0);
-      assert.strictEqual(typeof info.memoryUsage, 'number');
+      assert.strictEqual(typeof info["memory"]Usage, 'number');
       assert.strictEqual(typeof info.cpuUsage, 'number');
     });
 
@@ -653,7 +653,7 @@ describe('CortexSecuritySandbox', () => {
       const info = sandbox.getSandboxInfo(sandboxContext);
       
       assert.strictEqual(info.operationCount, 10);
-      assert.ok(info.memoryUsage > 0);
+      assert.ok(info["memory"]Usage > 0);
       assert.ok(info.cpuUsage > 0);
     });
   });

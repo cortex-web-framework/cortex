@@ -10,7 +10,7 @@ import { createProjectStructure } from '../generators/project.js';
 import { colors } from '../utils/colors.js';
 import { fileUtils } from '../utils/fs.js';
 import { processUtils } from '../utils/process.js';
-import { CLICommand, ProjectConfig } from '../types.js';
+import type { CLICommand, ProjectConfig } from '../types.js';
 import { DEFAULT_PROJECT_CONFIG } from '../config/project.js';
 
 /**
@@ -102,7 +102,7 @@ export const createCommand: CLICommand = {
   action: async (args: string[], options: Record<string, unknown>): Promise<void> => {
     try {
       // Get project name from args or options
-      const projectName = args[0] || (options.name as string);
+      const projectName = args[0]! || (options['name'] as string);
       if (!projectName) {
         throw new Error('Project name is required');
       }
@@ -117,29 +117,29 @@ export const createCommand: CLICommand = {
         ...DEFAULT_PROJECT_CONFIG,
         name: projectName,
         typescript: {
-          enabled: options.typescript as boolean ?? true,
+          enabled: options['typescript'] as boolean ?? true,
           strict: true,
           target: 'ES2022',
         },
         testing: {
-          framework: (options.testing as 'vitest' | 'jest' | 'deno' | 'none') ?? 'vitest',
+          framework: (options['testing'] as 'vitest' | 'jest' | 'deno' | 'none') ?? 'vitest',
           coverage: true,
           e2e: true,
         },
         devServer: {
-          port: (options.port as number) ?? 3000,
+          port: (options['port'] as number) ?? 3000,
           host: 'localhost',
-          https: (options.https as boolean) ?? false,
+          https: (options['https'] as boolean) ?? false,
           hmr: true,
         },
         integrations: {
-          redis: (options.redis as boolean) ?? false,
-          postgres: (options.postgres as boolean) ?? false,
-          websocket: (options.websocket as boolean) ?? false,
-          auth: (options.auth as boolean) ?? false,
+          redis: (options['redis'] as boolean) ?? false,
+          postgres: (options['postgres'] as boolean) ?? false,
+          websocket: (options['websocket'] as boolean) ?? false,
+          auth: (options['auth'] as boolean) ?? false,
         },
         deployment: {
-          platform: (options.deploy as 'vercel' | 'aws' | 'docker' | 'kubernetes' | 'none') ?? 'none',
+          platform: (options['deploy'] as 'vercel' | 'aws' | 'docker' | 'kubernetes' | 'none') ?? 'none',
         },
       };
 
@@ -206,7 +206,7 @@ Happy coding! 🚀
       }
 
     } catch (error) {
-      console.error(colors.error('❌ Failed to create project:'), error instanceof Error ? error.message : 'Unknown error');
+      console["error"](colors["error"]('❌ Failed to create project:'), error instanceof Error ? error.message : 'Unknown error');
       process.exit(1);
     }
   },

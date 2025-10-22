@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { CompositePolicy } from '../../src/resilience/compositePolicy.js';
+import type { CompositePolicy } from '../../src/resilience/compositePolicy.js';
 import { CircuitBreaker } from '../../src/resilience/circuitBreaker.js';
 import { RetryExecutor } from '../../src/resilience/retryExecutor.js';
 import { Bulkhead } from '../../src/resilience/bulkhead.js';

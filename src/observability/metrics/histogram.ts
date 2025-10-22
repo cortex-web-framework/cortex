@@ -1,4 +1,5 @@
-import { Metric, MetricType, Labels, HistogramValue } from '../types.js';
+import type { Metric, Labels, HistogramValue } from '../types.js';
+import { MetricType } from '../types.js';
 
 /**
  * Histogram observes the distribution of values

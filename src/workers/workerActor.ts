@@ -1,5 +1,24 @@
 import { Actor, ActorSystem } from '../core/actorSystem.js';
 
+// Worker type declarations for Node.js
+declare global {
+  class Worker {
+    constructor(path: string, options: { type: string });
+    postMessage(data: unknown): void;
+    onmessage: ((event: MessageEvent) => void) | null;
+    onerror: ((event: ErrorEvent) => void) | null;
+    terminate(): void;
+  }
+  
+  interface ErrorEvent {
+    message: string;
+    filename: string;
+    lineno: number;
+    colno: number;
+    error: Error;
+  }
+}
+
 // This will be the content of the worker file
 const workerCode = `
   import { loadWasmModule, instantiateWasmModule } from './wasmUtils.js'; // Assuming wasmUtils.js is accessible
@@ -18,7 +37,7 @@ const workerCode = `
           wasmInstance = await instantiateWasmModule(wasmModule);
           console.log('Wasm module loaded and instantiated for actor ' + actorId);
         } catch (error) {
-          console.error('Failed to load Wasm module for actor ' + actorId + ':', error);
+          console["error"]('Failed to load Wasm module for actor ' + actorId + ':', error);
         }
       }
       // In a real scenario, you'd dynamically load the actor class
@@ -43,12 +62,12 @@ const workerBlob = new Blob([workerCode], { type: 'application/javascript' });
 const workerUrl = URL.createObjectURL(workerBlob);
 
 export class WorkerActor extends Actor {
-  private worker: Worker;
-  public onWasmResult: ((result: any) => void) | null = null;
+  private worker: Worker | undefined;
+  public onWasmResult: ((result: unknown) => void) | null = null;
 
   constructor(id: string, system: ActorSystem, wasmModuleUrl?: string) {
     super(id, system);
-    this.worker = new Worker(workerUrl);
+    this.worker = new Worker(workerUrl, { type: 'module' });
     this.worker.postMessage({ type: 'init', actorId: this.id, system: 'TODO: Pass a proxy for ActorSystem', wasmModuleUrl });
 
     this.worker.onmessage = (e) => {
@@ -62,18 +81,18 @@ export class WorkerActor extends Actor {
     };
 
     this.worker.onerror = (error) => {
-      console.error(`Worker error for ${this.id}:`, error);
+      console["error"](`Worker error for ${this.id}:`, error);
       // Potentially handle failure via actor system
       // this.system.handleFailure(this, error);
     };
   }
 
-  public receive(message: any): void {
+  public override receive(message: unknown): void {
     // Messages sent to WorkerActor are forwarded to the actual worker
     this.worker.postMessage({ type: 'message', message });
   }
 
-  public postStop(): void {
+  public override postStop(): void {
     this.worker.terminate();
     super.postStop();
   }

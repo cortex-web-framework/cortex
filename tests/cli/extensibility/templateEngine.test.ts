@@ -102,7 +102,7 @@ class MockCortexTemplateEngine implements MockTemplateEngine {
     // Validate template before rendering
     const validation = this.validateTemplate(template);
     if (!validation.valid) {
-      throw new Error(`Template validation failed: ${validation.errors.map(e => e.message).join(', ')}`);
+      throw new Error(`Template validation failed: ${validation["error"]s.map(e => e.message).join(', ')}`);
     }
 
     // Render each file in the template
@@ -536,42 +536,42 @@ describe('CortexTemplateEngine', () => {
     it('should validate a correct template', () => {
       const validation = engine.validateTemplate(testTemplate);
       assert.strictEqual(validation.valid, true);
-      assert.strictEqual(validation.errors.length, 0);
+      assert.strictEqual(validation["error"]s.length, 0);
     });
 
     it('should reject template without name', () => {
       const invalidTemplate = { ...testTemplate, name: '' };
       const validation = engine.validateTemplate(invalidTemplate);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation.errors.some(e => e.field === 'name'));
+      assert.ok(validation["error"]s.some(e => e.field === 'name'));
     });
 
     it('should reject template without description', () => {
       const invalidTemplate = { ...testTemplate, description: '' };
       const validation = engine.validateTemplate(invalidTemplate);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation.errors.some(e => e.field === 'description'));
+      assert.ok(validation["error"]s.some(e => e.field === 'description'));
     });
 
     it('should reject template without version', () => {
       const invalidTemplate = { ...testTemplate, version: '' };
       const validation = engine.validateTemplate(invalidTemplate);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation.errors.some(e => e.field === 'version'));
+      assert.ok(validation["error"]s.some(e => e.field === 'version'));
     });
 
     it('should reject template without author', () => {
       const invalidTemplate = { ...testTemplate, author: '' };
       const validation = engine.validateTemplate(invalidTemplate);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation.errors.some(e => e.field === 'author'));
+      assert.ok(validation["error"]s.some(e => e.field === 'author'));
     });
 
     it('should reject template without files', () => {
       const invalidTemplate = { ...testTemplate, files: [] };
       const validation = engine.validateTemplate(invalidTemplate);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation.errors.some(e => e.field === 'files'));
+      assert.ok(validation["error"]s.some(e => e.field === 'files'));
     });
 
     it('should reject template with invalid files', () => {
@@ -588,7 +588,7 @@ describe('CortexTemplateEngine', () => {
       };
       const validation = engine.validateTemplate(invalidTemplate);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation.errors.some(e => e.field === 'files[0].path'));
+      assert.ok(validation["error"]s.some(e => e.field === 'files[0].path'));
     });
 
     it('should reject template with invalid file content', () => {
@@ -605,7 +605,7 @@ describe('CortexTemplateEngine', () => {
       };
       const validation = engine.validateTemplate(invalidTemplate);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation.errors.some(e => e.field === 'files[0].content'));
+      assert.ok(validation["error"]s.some(e => e.field === 'files[0].content'));
     });
   });
 
@@ -755,7 +755,7 @@ describe('CortexTemplateEngine', () => {
       const variables = { useTypeScript: true }; // Missing projectName
       const validation = engine.validateVariables(testTemplate, variables);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation.errors.some(e => e.field === 'projectName'));
+      assert.ok(validation["error"]s.some(e => e.field === 'projectName'));
     });
 
     it('should validate optional variables', () => {
@@ -768,8 +768,8 @@ describe('CortexTemplateEngine', () => {
       const variables = { projectName: 123, useTypeScript: 'true' }; // Wrong types
       const validation = engine.validateVariables(testTemplate, variables);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation.errors.some(e => e.field === 'projectName'));
-      assert.ok(validation.errors.some(e => e.field === 'useTypeScript'));
+      assert.ok(validation["error"]s.some(e => e.field === 'projectName'));
+      assert.ok(validation["error"]s.some(e => e.field === 'useTypeScript'));
     });
 
     it('should run custom validation', () => {
@@ -796,7 +796,7 @@ describe('CortexTemplateEngine', () => {
       const invalidVariables = { age: -5 };
       const invalidValidation = engine.validateVariables(templateWithCustomValidation, invalidVariables);
       assert.strictEqual(invalidValidation.valid, false);
-      assert.ok(invalidValidation.errors.some(e => e.field === 'age'));
+      assert.ok(invalidValidation["error"]s.some(e => e.field === 'age'));
     });
   });
 

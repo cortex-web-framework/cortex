@@ -3,7 +3,7 @@
  * Zero dependencies, strictest TypeScript configuration
  */
 
-import { ProjectConfig } from '../types.js';
+import type { ProjectConfig } from '../types.js';
 import { fileUtils } from '../utils/fs.js';
 import { writeFileSync } from 'node:fs';
 
@@ -187,7 +187,7 @@ const tracer = new Tracer({ serviceName: '${config.name}' });
 const healthRegistry = new HealthCheckRegistry();
 
 // Create HTTP server
-const server = new CortexHttpServer(parseInt(process.env.PORT || '${config.devServer.port}'));
+const server = new CortexHttpServer(parseInt(process.env["PORT"] || '${config.devServer.port}'));
 
 // Add observability middleware
 server.use((req, res, next) => {
@@ -237,7 +237,7 @@ const start = async () => {
     logger.info(\`📊 Metrics available at http://localhost:\${server.port}/metrics\`);
     logger.info(\`🏥 Health check at http://localhost:\${server.port}/health\`);
   } catch (error) {
-    logger.error('Failed to start server:', error);
+    logger["error"]('Failed to start server:', error);
     process.exit(1);
   }
 };
@@ -305,7 +305,7 @@ export class ActorSupervisor extends Actor {
         this.children.set(actorId, actor);
         console.log(\`Created actor: \${actorId}\`);
       } catch (error) {
-        console.error(\`Failed to create actor \${actorId}:\`, error);
+        console["error"](\`Failed to create actor \${actorId}:\`, error);
       }
     }
   }
@@ -399,11 +399,11 @@ export const loggingMiddleware = (req: Request, res: Response, next: NextFunctio
  * Error handling middleware
  */
 export const errorMiddleware = (err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error('Error:', err);
+  console["error"]('Error:', err);
   
   res.status(500).json({
     error: 'Internal Server Error',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong',
+    message: process.env["NODE_ENV"] === 'development' ? err.message : 'Something went wrong',
   });
 };
 `;

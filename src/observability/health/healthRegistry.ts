@@ -1,4 +1,5 @@
-import { HealthCheck, HealthCheckResult, HealthStatus } from '../types.js';
+import type { HealthCheck, HealthCheckResult } from '../types.js';
+import { HealthStatus } from '../types.js';
 import { getDefaultHealthChecks } from './defaultChecks.js';
 
 /**

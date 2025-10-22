@@ -1,7 +1,7 @@
 import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert';
 import { CLIParser, createCLI } from '../../src/cli/core/cli.js';
-import { CLIConfig } from '../../src/cli/types.js';
+import type { CLIConfig } from '../../src/cli/types.js';
 
 describe('CLI Parser', () => {
   let mockOutput: any;

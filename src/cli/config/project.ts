@@ -3,7 +3,7 @@
  * Zero dependencies, strictest TypeScript configuration
  */
 
-import { ProjectConfig } from '../types.js';
+import type { ProjectConfig } from '../types.js';
 import { readFileSync, writeFileSync } from 'node:fs';
 
 /**

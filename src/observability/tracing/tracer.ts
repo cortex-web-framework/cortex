@@ -1,6 +1,8 @@
-import { Span, SpanKind, TraceContext } from '../types.js';
+import type { Span, TraceContext } from '../types.js';
+import { SpanKind } from '../types.js';
 import { SpanImpl } from './span.js';
-import { Sampler, ProbabilitySampler } from './sampler.js';
+import type { Sampler } from './sampler.js';
+import { ProbabilitySampler } from './sampler.js';
 import { generateTraceId, generateSpanId } from './ids.js';
 
 /**

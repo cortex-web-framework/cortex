@@ -21,8 +21,8 @@ export interface CLICommand {
   readonly name: string;
   readonly description: string;
   readonly action: (args: string[], options: Record<string, unknown>) => Promise<void>;
-  readonly options?: readonly CLIOption[];
-  readonly subcommands?: CLICommand[];
+  readonly options?: readonly CLIOption[] | undefined;
+  readonly subcommands?: CLICommand[] | undefined;
 }
 
 /**

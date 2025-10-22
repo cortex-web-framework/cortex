@@ -213,7 +213,7 @@ export function compression(config: CompressionConfig = {}): (req: Request, res:
         });
 
         compressionStream.on('error', (error: Error) => {
-          console.error('Compression error:', error);
+          console["error"]('Compression error:', error);
           // Fallback to uncompressed
           chunks.forEach(chunk => originalWrite(chunk));
           originalEnd();

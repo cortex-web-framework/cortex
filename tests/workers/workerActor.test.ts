@@ -10,7 +10,7 @@ class MockActorSystem extends ActorSystem {
     super(null); // Pass null for EventBus as it's not used in this test
   }
   public handleFailure(actor: any, error: any): void {
-    console.error('MockActorSystem: Actor failed', actor.id, error);
+    console["error"]('MockActorSystem: Actor failed', actor.id, error);
   }
 }
 

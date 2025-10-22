@@ -24,14 +24,14 @@ export const jsonBodyParser: (options?: { limit?: string | number }) => (req: ht
           (req as any).body = JSON.parse(body);
           next();
         } catch (error) {
-          console.error('JSON Body Parser Error:', error);
+          console["error"]('JSON Body Parser Error:', error);
           res.writeHead(400, { 'Content-Type': 'text/plain' });
           res.end('Bad Request: Invalid JSON');
         }
       });
 
       req.on('error', (error) => {
-        console.error('Request stream error:', error);
+        console["error"]('Request stream error:', error);
         res.writeHead(500, { 'Content-Type': 'text/plain' });
         res.end('Internal Server Error');
       });

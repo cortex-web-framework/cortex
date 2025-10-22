@@ -625,7 +625,7 @@ class MockCortexPerformanceOptimizer implements MockPerformanceOptimizer {
   }
 
   getMemoryUsage(): MockMemoryUsage {
-    const usage = process.memoryUsage();
+    const usage = process["memory"]Usage();
     return {
       used: usage.heapUsed,
       total: usage.heapTotal,
@@ -639,7 +639,7 @@ class MockCortexPerformanceOptimizer implements MockPerformanceOptimizer {
   }
 
   private getCurrentMemoryUsage(): number {
-    return process.memoryUsage().heapUsed;
+    return process["memory"]Usage().heapUsed;
   }
 
   enableLazyLoading(): void {
@@ -842,7 +842,7 @@ class MockCortexPerformanceOptimizer implements MockPerformanceOptimizer {
     this.profilingData.slowestFunction = '';
     this.profilingData.fastestFunction = '';
     this.profilingData.callCount = 0;
-    this.profilingData.memoryPeak = 0;
+    this.profilingData["memory"]Peak = 0;
   }
 
   enableMetrics(): void {
@@ -859,10 +859,10 @@ class MockCortexPerformanceOptimizer implements MockPerformanceOptimizer {
 
   clearMetrics(): void {
     this.metrics.performance = [];
-    this.metrics.memory = [];
+    this.metrics["memory"] = [];
     this.metrics.cache = [];
     this.metrics.operations = [];
-    this.metrics.errors = [];
+    this.metrics["error"]s = [];
     this.metrics.warnings = [];
   }
 
@@ -1019,7 +1019,7 @@ describe('CortexPerformanceOptimizer', () => {
       
       assert.strictEqual(metrics.operation, 'custom-operation');
       assert.ok(metrics.duration >= 0);
-      assert.ok(metrics.memoryUsage >= 0);
+      assert.ok(metrics["memory"]Usage >= 0);
     });
   });
 
@@ -1158,7 +1158,7 @@ describe('CortexPerformanceOptimizer', () => {
     it('should get metrics', () => {
       const metrics = optimizer.getMetrics();
       assert.ok(metrics.performance);
-      assert.ok(metrics.memory);
+      assert.ok(metrics["memory"]);
       assert.ok(metrics.cache);
     });
 

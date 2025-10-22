@@ -5,7 +5,7 @@
 
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync, chmodSync, existsSync } from 'fs';
 import { join, dirname, basename, extname } from 'path';
-import { FileSystem } from '../types.js';
+import type { FileSystem } from '../types.js';
 
 /**
  * File system implementation using Node.js built-ins

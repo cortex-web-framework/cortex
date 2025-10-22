@@ -176,7 +176,7 @@ class MockCortexPluginLoader implements MockPluginLoader {
       // Validate the plugin
       const validation = this.validatePlugin(plugin);
       if (!validation.valid) {
-        throw new Error(`Plugin validation failed: ${validation.errors.map(e => e.message).join(', ')}`);
+        throw new Error(`Plugin validation failed: ${validation["error"]s.map(e => e.message).join(', ')}`);
       }
 
       // Cache the loaded plugin
@@ -407,7 +407,7 @@ describe('CortexPluginLoader', () => {
       const invalidPlugin = { invalid: 'data' } as unknown as MockCortexPlugin;
       const validation = loader.validatePlugin(invalidPlugin);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation.errors.length > 0);
+      assert.ok(validation["error"]s.length > 0);
     });
   });
 
@@ -445,35 +445,35 @@ describe('CortexPluginLoader', () => {
     it('should validate a correct plugin', () => {
       const validation = loader.validatePlugin(testPlugin);
       assert.strictEqual(validation.valid, true);
-      assert.strictEqual(validation.errors.length, 0);
+      assert.strictEqual(validation["error"]s.length, 0);
     });
 
     it('should reject plugin without name', () => {
       const invalidPlugin = { ...testPlugin, name: '' };
       const validation = loader.validatePlugin(invalidPlugin);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation.errors.some(e => e.field === 'name'));
+      assert.ok(validation["error"]s.some(e => e.field === 'name'));
     });
 
     it('should reject plugin without version', () => {
       const invalidPlugin = { ...testPlugin, version: '' };
       const validation = loader.validatePlugin(invalidPlugin);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation.errors.some(e => e.field === 'version'));
+      assert.ok(validation["error"]s.some(e => e.field === 'version'));
     });
 
     it('should reject plugin without description', () => {
       const invalidPlugin = { ...testPlugin, description: '' };
       const validation = loader.validatePlugin(invalidPlugin);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation.errors.some(e => e.field === 'description'));
+      assert.ok(validation["error"]s.some(e => e.field === 'description'));
     });
 
     it('should reject plugin without author', () => {
       const invalidPlugin = { ...testPlugin, author: '' };
       const validation = loader.validatePlugin(invalidPlugin);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation.errors.some(e => e.field === 'author'));
+      assert.ok(validation["error"]s.some(e => e.field === 'author'));
     });
 
     it('should validate plugin with commands', () => {
@@ -506,7 +506,7 @@ describe('CortexPluginLoader', () => {
       
       const validation = loader.validatePlugin(pluginWithInvalidCommands);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation.errors.some(e => e.field === 'commands[0].name'));
+      assert.ok(validation["error"]s.some(e => e.field === 'commands[0].name'));
     });
 
     it('should validate plugin with templates', () => {
@@ -563,7 +563,7 @@ describe('CortexPluginLoader', () => {
       
       const validation = loader.validatePlugin(pluginWithInvalidTemplates);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation.errors.some(e => e.field === 'templates[0].name'));
+      assert.ok(validation["error"]s.some(e => e.field === 'templates[0].name'));
     });
 
     it('should validate plugin with hooks', () => {
@@ -598,7 +598,7 @@ describe('CortexPluginLoader', () => {
       
       const validation = loader.validatePlugin(pluginWithInvalidHooks);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation.errors.some(e => e.field === 'hooks[0].name'));
+      assert.ok(validation["error"]s.some(e => e.field === 'hooks[0].name'));
     });
 
     it('should reject plugin with invalid hook priority', () => {
@@ -616,7 +616,7 @@ describe('CortexPluginLoader', () => {
       
       const validation = loader.validatePlugin(pluginWithInvalidHookPriority);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation.errors.some(e => e.field === 'hooks[0].priority'));
+      assert.ok(validation["error"]s.some(e => e.field === 'hooks[0].priority'));
     });
   });
 

@@ -69,7 +69,7 @@ export class CortexHttpServer {
           throw new RouteNotFound(req.method as HttpMethod, req.url ?? '/');
         }
       } catch (error: any) {
-        console.error(`HTTP Request Error for ${req.method} ${req.url}:`, error);
+        console["error"](`HTTP Request Error for ${req.method} ${req.url}:`, error);
         if (error instanceof RouteNotFound) {
           res.writeHead(404, { 'Content-Type': 'text/plain' });
           res.end('Not Found');

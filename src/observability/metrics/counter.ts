@@ -1,4 +1,5 @@
-import { Metric, MetricType, Labels } from '../types.js';
+import type { Metric, Labels } from '../types.js';
+import { MetricType } from '../types.js';
 
 /**
  * Counter is a monotonically increasing metric

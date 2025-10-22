@@ -76,7 +76,7 @@ describe('ProcessOps', () => {
 
   describe('memoryUsage', () => {
     it('should return memory usage', () => {
-      const memory = processOps.memoryUsage();
+      const memory = processOps["memory"]Usage();
       assert.strictEqual(typeof memory, 'object');
       assert.strictEqual(typeof memory.heapUsed, 'number');
       assert.strictEqual(typeof memory.heapTotal, 'number');
@@ -111,125 +111,125 @@ describe('processUtils', () => {
 
   describe('isDevelopment', () => {
     it('should return true when NODE_ENV is development', () => {
-      const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'development';
+      const originalEnv = process.env["NODE_ENV"];
+      process.env["NODE_ENV"] = 'development';
       assert.strictEqual(processUtils.isDevelopment(), true);
-      process.env.NODE_ENV = originalEnv;
+      process.env["NODE_ENV"] = originalEnv;
     });
 
     it('should return true when NODE_ENV is undefined', () => {
-      const originalEnv = process.env.NODE_ENV;
-      delete process.env.NODE_ENV;
+      const originalEnv = process.env["NODE_ENV"];
+      delete process.env["NODE_ENV"];
       assert.strictEqual(processUtils.isDevelopment(), true);
-      process.env.NODE_ENV = originalEnv;
+      process.env["NODE_ENV"] = originalEnv;
     });
 
     it('should return false when NODE_ENV is production', () => {
-      const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'production';
+      const originalEnv = process.env["NODE_ENV"];
+      process.env["NODE_ENV"] = 'production';
       assert.strictEqual(processUtils.isDevelopment(), false);
-      process.env.NODE_ENV = originalEnv;
+      process.env["NODE_ENV"] = originalEnv;
     });
   });
 
   describe('isProduction', () => {
     it('should return true when NODE_ENV is production', () => {
-      const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'production';
+      const originalEnv = process.env["NODE_ENV"];
+      process.env["NODE_ENV"] = 'production';
       assert.strictEqual(processUtils.isProduction(), true);
-      process.env.NODE_ENV = originalEnv;
+      process.env["NODE_ENV"] = originalEnv;
     });
 
     it('should return false when NODE_ENV is development', () => {
-      const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'development';
+      const originalEnv = process.env["NODE_ENV"];
+      process.env["NODE_ENV"] = 'development';
       assert.strictEqual(processUtils.isProduction(), false);
-      process.env.NODE_ENV = originalEnv;
+      process.env["NODE_ENV"] = originalEnv;
     });
   });
 
   describe('isTest', () => {
     it('should return true when NODE_ENV is test', () => {
-      const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'test';
+      const originalEnv = process.env["NODE_ENV"];
+      process.env["NODE_ENV"] = 'test';
       assert.strictEqual(processUtils.isTest(), true);
-      process.env.NODE_ENV = originalEnv;
+      process.env["NODE_ENV"] = originalEnv;
     });
 
     it('should return false when NODE_ENV is not test', () => {
-      const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'development';
+      const originalEnv = process.env["NODE_ENV"];
+      process.env["NODE_ENV"] = 'development';
       assert.strictEqual(processUtils.isTest(), false);
-      process.env.NODE_ENV = originalEnv;
+      process.env["NODE_ENV"] = originalEnv;
     });
   });
 
   describe('getEnv', () => {
     it('should return environment variable value', () => {
-      const originalEnv = process.env.TEST_VAR;
-      process.env.TEST_VAR = 'test-value';
+      const originalEnv = process.env["TEST_VAR"];
+      process.env["TEST_VAR"] = 'test-value';
       assert.strictEqual(processUtils.getEnv('TEST_VAR'), 'test-value');
-      process.env.TEST_VAR = originalEnv;
+      process.env["TEST_VAR"] = originalEnv;
     });
 
     it('should return default value when variable is undefined', () => {
-      const originalEnv = process.env.TEST_VAR;
-      delete process.env.TEST_VAR;
+      const originalEnv = process.env["TEST_VAR"];
+      delete process.env["TEST_VAR"];
       assert.strictEqual(processUtils.getEnv('TEST_VAR', 'default'), 'default');
-      process.env.TEST_VAR = originalEnv;
+      process.env["TEST_VAR"] = originalEnv;
     });
   });
 
   describe('getBooleanEnv', () => {
     it('should return true for "true" value', () => {
-      const originalEnv = process.env.TEST_BOOL;
-      process.env.TEST_BOOL = 'true';
+      const originalEnv = process.env["TEST_BOOL"];
+      process.env["TEST_BOOL"] = 'true';
       assert.strictEqual(processUtils.getBooleanEnv('TEST_BOOL'), true);
-      process.env.TEST_BOOL = originalEnv;
+      process.env["TEST_BOOL"] = originalEnv;
     });
 
     it('should return true for "1" value', () => {
-      const originalEnv = process.env.TEST_BOOL;
-      process.env.TEST_BOOL = '1';
+      const originalEnv = process.env["TEST_BOOL"];
+      process.env["TEST_BOOL"] = '1';
       assert.strictEqual(processUtils.getBooleanEnv('TEST_BOOL'), true);
-      process.env.TEST_BOOL = originalEnv;
+      process.env["TEST_BOOL"] = originalEnv;
     });
 
     it('should return false for "false" value', () => {
-      const originalEnv = process.env.TEST_BOOL;
-      process.env.TEST_BOOL = 'false';
+      const originalEnv = process.env["TEST_BOOL"];
+      process.env["TEST_BOOL"] = 'false';
       assert.strictEqual(processUtils.getBooleanEnv('TEST_BOOL'), false);
-      process.env.TEST_BOOL = originalEnv;
+      process.env["TEST_BOOL"] = originalEnv;
     });
 
     it('should return default value when variable is undefined', () => {
-      const originalEnv = process.env.TEST_BOOL;
-      delete process.env.TEST_BOOL;
+      const originalEnv = process.env["TEST_BOOL"];
+      delete process.env["TEST_BOOL"];
       assert.strictEqual(processUtils.getBooleanEnv('TEST_BOOL', true), true);
-      process.env.TEST_BOOL = originalEnv;
+      process.env["TEST_BOOL"] = originalEnv;
     });
   });
 
   describe('getNumberEnv', () => {
     it('should return parsed number', () => {
-      const originalEnv = process.env.TEST_NUM;
-      process.env.TEST_NUM = '42';
+      const originalEnv = process.env["TEST_NUM"];
+      process.env["TEST_NUM"] = '42';
       assert.strictEqual(processUtils.getNumberEnv('TEST_NUM'), 42);
-      process.env.TEST_NUM = originalEnv;
+      process.env["TEST_NUM"] = originalEnv;
     });
 
     it('should return default value for invalid number', () => {
-      const originalEnv = process.env.TEST_NUM;
-      process.env.TEST_NUM = 'invalid';
+      const originalEnv = process.env["TEST_NUM"];
+      process.env["TEST_NUM"] = 'invalid';
       assert.strictEqual(processUtils.getNumberEnv('TEST_NUM', 0), 0);
-      process.env.TEST_NUM = originalEnv;
+      process.env["TEST_NUM"] = originalEnv;
     });
 
     it('should return default value when variable is undefined', () => {
-      const originalEnv = process.env.TEST_NUM;
-      delete process.env.TEST_NUM;
+      const originalEnv = process.env["TEST_NUM"];
+      delete process.env["TEST_NUM"];
       assert.strictEqual(processUtils.getNumberEnv('TEST_NUM', 10), 10);
-      process.env.TEST_NUM = originalEnv;
+      process.env["TEST_NUM"] = originalEnv;
     });
   });
 
@@ -256,7 +256,7 @@ describe('processUtils', () => {
       assert.strictEqual(typeof info.platform, 'string');
       assert.strictEqual(typeof info.arch, 'string');
       assert.strictEqual(typeof info.cwd, 'string');
-      assert.strictEqual(typeof info.memory, 'object');
+      assert.strictEqual(typeof info["memory"], 'object');
       assert.strictEqual(typeof info.uptime, 'number');
     });
   });

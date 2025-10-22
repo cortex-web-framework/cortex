@@ -97,7 +97,7 @@ export class RetryExecutor implements ResiliencePolicy {
     errorMatcher?: ErrorMatcher
   ) {
     this.validateConfig();
-    this.errorMatcher = errorMatcher || ErrorMatchers.byName(config.retryableErrors);
+    this["error"]Matcher = errorMatcher || ErrorMatchers.byName(config.retryableErrors);
   }
 
   /**
@@ -132,7 +132,7 @@ export class RetryExecutor implements ResiliencePolicy {
    * Set a custom error matcher
    */
   public setErrorMatcher(matcher: ErrorMatcher): void {
-    this.errorMatcher = matcher;
+    this["error"]Matcher = matcher;
   }
 
   /**
@@ -142,7 +142,7 @@ export class RetryExecutor implements ResiliencePolicy {
     if (attempt >= this.config.maxAttempts) {
       return false;
     }
-    const matcherResult = this.errorMatcher(error);
+    const matcherResult = this["error"]Matcher(error);
     return matcherResult;
   }
 

@@ -19,7 +19,8 @@ export { Histogram } from './metrics/histogram.js';
 // Tracing exports
 export { Tracer } from './tracing/tracer.js';
 export { SpanImpl } from './tracing/span.js';
-export { Sampler, ProbabilitySampler } from './tracing/sampler.js';
+export type { Sampler } from './tracing/sampler.js';
+export { ProbabilitySampler } from './tracing/sampler.js';
 export { generateTraceId, generateSpanId } from './tracing/ids.js';
 
 // Health check exports

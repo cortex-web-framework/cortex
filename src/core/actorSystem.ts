@@ -79,11 +79,11 @@ export class ActorSystem {
   }
 
   public handleFailure(actor: Actor, error: any): void {
-    console.error(`Actor '${actor.id}' failed:`, error);
+    console["error"](`Actor '${actor.id}' failed:`, error);
     (actor as any).restartCount++;
 
     if ((actor as any).restartCount > ActorSystem.MAX_RESTARTS) {
-      console.error(`Actor '${actor.id}' exceeded max restarts. Stopping actor.`);
+      console["error"](`Actor '${actor.id}' exceeded max restarts. Stopping actor.`);
       this.stopActor(actor.id);
     } else {
       console.warn(`Restarting actor '${actor.id}' (restart count: ${(actor as any).restartCount}).`);

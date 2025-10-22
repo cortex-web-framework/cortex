@@ -229,7 +229,7 @@ export class CortexExtensibilityManager implements ExtensibilityManager {
       event: 'template-generation',
       priority: 100,
       handler: async (context: HookContext) => {
-        console.log(`Generating template: ${context.data.templateName}`);
+        console.log(`Generating template: ${context.data["templateName"]}`);
       }
     });
   }
@@ -286,7 +286,7 @@ export class CortexExtensibilityManager implements ExtensibilityManager {
       
       console.log(`Activated plugin: ${plugin.name}`);
     } catch (error) {
-      console.error(`Failed to activate plugin ${plugin.name}:`, error);
+      console["error"](`Failed to activate plugin ${plugin.name}:`, error);
     }
   }
 
@@ -302,7 +302,7 @@ export class CortexExtensibilityManager implements ExtensibilityManager {
       
       console.log(`Deactivated plugin: ${plugin.name}`);
     } catch (error) {
-      console.error(`Failed to deactivate plugin ${plugin.name}:`, error);
+      console["error"](`Failed to deactivate plugin ${plugin.name}:`, error);
     }
   }
 
@@ -320,7 +320,7 @@ export class CortexExtensibilityManager implements ExtensibilityManager {
         debug: (message: string, ...args: unknown[]) => console.debug(`[${plugin.name}] ${message}`, ...args),
         info: (message: string, ...args: unknown[]) => console.info(`[${plugin.name}] ${message}`, ...args),
         warn: (message: string, ...args: unknown[]) => console.warn(`[${plugin.name}] ${message}`, ...args),
-        error: (message: string, ...args: unknown[]) => console.error(`[${plugin.name}] ${message}`, ...args),
+        error: (message: string, ...args: unknown[]) => console["error"](`[${plugin.name}] ${message}`, ...args),
       }
     };
   }
@@ -340,7 +340,7 @@ export class CortexExtensibilityManager implements ExtensibilityManager {
         debug: (message: string, ...args: unknown[]) => console.debug(`[Hook] ${message}`, ...args),
         info: (message: string, ...args: unknown[]) => console.info(`[Hook] ${message}`, ...args),
         warn: (message: string, ...args: unknown[]) => console.warn(`[Hook] ${message}`, ...args),
-        error: (message: string, ...args: unknown[]) => console.error(`[Hook] ${message}`, ...args),
+        error: (message: string, ...args: unknown[]) => console["error"](`[Hook] ${message}`, ...args),
       },
       data: context.data || {}
     };

@@ -3,7 +3,7 @@
  * Strictest TypeScript configuration
  */
 
-import { ProcessOps } from '../types.js';
+import type { ProcessOps } from '../types.js';
 import { execSync, spawn } from 'node:child_process';
 
 /**
@@ -74,7 +74,7 @@ export class NodeProcessOps implements ProcessOps {
    * Get memory usage
    */
   memoryUsage(): NodeJS.MemoryUsage {
-    return process.memoryUsage();
+    return process["memory"]Usage();
   }
 
   /**
@@ -98,7 +98,7 @@ export const processUtils = {
    * Check if running in CI environment
    */
   isCI(): boolean {
-    return !!(process.env.CI || process.env.CONTINUOUS_INTEGRATION || process.env.BUILD_NUMBER);
+    return !!(process.env["CI"] || process.env["CONTINUOUS_INTEGRATION"] || process.env["BUILD_NUMBER"]);
   },
 
   /**
@@ -112,21 +112,21 @@ export const processUtils = {
    * Check if running in development mode
    */
   isDevelopment(): boolean {
-    return process.env.NODE_ENV === 'development' || process.env.NODE_ENV === undefined;
+    return process.env["NODE_ENV"] === 'development' || process.env["NODE_ENV"] === undefined;
   },
 
   /**
    * Check if running in production mode
    */
   isProduction(): boolean {
-    return process.env.NODE_ENV === 'production';
+    return process.env["NODE_ENV"] === 'production';
   },
 
   /**
    * Check if running in test mode
    */
   isTest(): boolean {
-    return process.env.NODE_ENV === 'test';
+    return process.env["NODE_ENV"] === 'test';
   },
 
   /**
@@ -159,7 +159,7 @@ export const processUtils = {
    * Get available memory in MB
    */
   getAvailableMemory(): number {
-    const memUsage = process.memoryUsage();
+    const memUsage = process["memory"]Usage();
     return Math.round(memUsage.heapUsed / 1024 / 1024);
   },
 
@@ -167,7 +167,7 @@ export const processUtils = {
    * Get total memory in MB
    */
   getTotalMemory(): number {
-    const memUsage = process.memoryUsage();
+    const memUsage = process["memory"]Usage();
     return Math.round(memUsage.heapTotal / 1024 / 1024);
   },
 
@@ -187,7 +187,7 @@ export const processUtils = {
       platform: process.platform,
       arch: process.arch,
       cwd: process.cwd(),
-      memory: process.memoryUsage(),
+      memory: process["memory"]Usage(),
       uptime: process.uptime(),
     };
   },

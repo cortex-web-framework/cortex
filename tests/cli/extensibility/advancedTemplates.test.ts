@@ -361,7 +361,7 @@ class MockCortexAdvancedTemplateEngine implements MockAdvancedTemplateEngine {
 
     // Validate dependencies
     const depValidation = this.validateTemplateDependencies(template);
-    errors.push(...depValidation.errors);
+    errors.push(...depValidation["error"]s);
     warnings.push(...depValidation.warnings);
 
     return {
@@ -983,7 +983,7 @@ describe('CortexAdvancedTemplateEngine', () => {
 
       const result = engine.validateTemplate(template);
       assert.strictEqual(result.valid, true);
-      assert.strictEqual(result.errors.length, 0);
+      assert.strictEqual(result["error"]s.length, 0);
     });
 
     it('should validate template with errors', () => {
@@ -1041,7 +1041,7 @@ describe('CortexAdvancedTemplateEngine', () => {
 
       const result = engine.validateTemplate(template);
       assert.strictEqual(result.valid, false);
-      assert.ok(result.errors.length > 0);
+      assert.ok(result["error"]s.length > 0);
     });
   });
 
@@ -1173,7 +1173,7 @@ describe('CortexAdvancedTemplateEngine', () => {
       const variables = {};
       const result = engine.validateVariables(template, variables);
       assert.strictEqual(result.valid, false);
-      assert.ok(result.errors.some(e => e.type === 'REQUIRED_VARIABLE'));
+      assert.ok(result["error"]s.some(e => e.type === 'REQUIRED_VARIABLE'));
     });
   });
 
@@ -1378,7 +1378,7 @@ describe('CortexAdvancedTemplateEngine', () => {
 
       const result = engine.validateTemplate(template);
       assert.strictEqual(result.valid, false);
-      assert.ok(result.errors.some(e => e.type === 'REQUIRED_FIELD'));
+      assert.ok(result["error"]s.some(e => e.type === 'REQUIRED_FIELD'));
     });
 
     it('should handle malformed template content', () => {

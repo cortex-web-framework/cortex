@@ -1,4 +1,5 @@
-import { SamplingContext, SamplingResult, SamplingDecision } from '../types.js';
+import type { SamplingContext, SamplingResult } from '../types.js';
+import { SamplingDecision } from '../types.js';
 
 /**
  * Sampler interface for deciding whether to sample a trace

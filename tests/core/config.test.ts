@@ -49,7 +49,7 @@ test('Config should load from default.json', () => {
 });
 
 test('Config should load from environment-specific file', () => {
-  process.env.NODE_ENV = 'development';
+  process.env["NODE_ENV"] = 'development';
   createConfigFile('default.json', { app: { port: 3000 } });
   createConfigFile('development.json', { app: { port: 4000 } });
   const config = Config.getInstance(TEST_CONFIG_DIR);
@@ -57,8 +57,8 @@ test('Config should load from environment-specific file', () => {
 });
 
 test('Config should prioritize environment variables', () => {
-  process.env.NODE_ENV = 'production';
-  process.env.CORTEX_APP_PORT = '5000'; // Environment variable
+  process.env["NODE_ENV"] = 'production';
+  process.env["CORTEX_APP_PORT"] = '5000'; // Environment variable
   createConfigFile('default.json', { app: { port: 3000 } });
   createConfigFile('production.json', { app: { port: 4000 } });
   const config = Config.getInstance(TEST_CONFIG_DIR);
@@ -84,7 +84,7 @@ test('Config should handle nested properties', () => {
 
 test('Config should merge configurations correctly', () => {
   createConfigFile('default.json', { app: { name: 'Cortex' }, db: { host: 'localhost' } });
-  process.env.NODE_ENV = 'development';
+  process.env["NODE_ENV"] = 'development';
   createConfigFile('development.json', { app: { version: '1.0' }, db: { port: 5432 } });
   const config = Config.getInstance(TEST_CONFIG_DIR);
   assert.strictEqual(config.get('app.name'), 'Cortex', 'Should get app.name from default');

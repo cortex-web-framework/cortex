@@ -1,4 +1,5 @@
-import { HealthCheck, HealthCheckResult, HealthStatus } from '../types.js';
+import type { HealthCheck, HealthCheckResult } from '../types.js';
+import { HealthStatus } from '../types.js';
 
 /**
  * Memory usage health check
@@ -7,7 +8,7 @@ export class MemoryHealthCheck implements HealthCheck {
   public readonly name = 'memory';
 
   async check(): Promise<HealthCheckResult> {
-    const memUsage = process.memoryUsage();
+    const memUsage = process["memory"]Usage();
     const totalMB = memUsage.heapTotal / 1024 / 1024;
     const usedMB = memUsage.heapUsed / 1024 / 1024;
     const usagePercent = (usedMB / totalMB) * 100;

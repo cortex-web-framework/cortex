@@ -601,7 +601,7 @@ describe('CortexPluginMarketplace', () => {
     it('should fail to install non-existent plugin', async () => {
       const result = await marketplace.installPlugin('nonexistent');
       assert.strictEqual(result.success, false);
-      assert.ok(result.errors?.includes('Plugin not found'));
+      assert.ok(result["error"]s?.includes('Plugin not found'));
     });
 
     it('should install specific version', async () => {

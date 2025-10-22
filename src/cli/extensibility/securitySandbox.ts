@@ -90,7 +90,7 @@ export class CortexSecuritySandbox implements SecuritySandbox {
     // Check security policy
     if (plugin.securityPolicy) {
       const policyValidation = this.validateSecurityPolicy(plugin.securityPolicy);
-      errors.push(...policyValidation.errors);
+      errors.push(...policyValidation["error"]s);
       warnings.push(...policyValidation.warnings);
     }
 

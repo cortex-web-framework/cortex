@@ -3,7 +3,8 @@
  * Zero dependencies, strictest TypeScript configuration
  */
 
-import { CLICommand, CLIConfig, CLIError, CLIOutput, CLIInput } from '../types.js';
+import type { CLICommand, CLIConfig, CLIOutput, CLIInput } from '../types.js';
+import { CLIError } from '../types.js';
 import { colors } from '../utils/colors.js';
 import { processOps } from '../utils/process.js';
 
@@ -16,7 +17,7 @@ class DefaultCLIOutput implements CLIOutput {
   }
 
   writeError(message: string): void {
-    process.stderr.write(colors.error(message));
+    process.stderr.write(colors["error"](message));
   }
 
   writeSuccess(message: string): void {
@@ -69,7 +70,7 @@ class DefaultCLIInput implements CLIInput {
     const index = parseInt(response, 10) - 1;
     
     if (index >= 0 && index < choices.length) {
-      return choices[index];
+      return choices[index]!;
     }
     
     throw new CLIError('Invalid selection', 'INVALID_SELECTION');
@@ -87,7 +88,7 @@ class DefaultCLIInput implements CLIInput {
     const selected: string[] = [];
     for (const index of indices) {
       if (index >= 0 && index < choices.length) {
-        selected.push(choices[index]);
+        selected.push(choices[index]!);
       }
     }
     

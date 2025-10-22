@@ -510,9 +510,9 @@ export interface GitHubInstallMetadata {
   readonly commit: string;
   readonly downloadUrl: string;
   readonly size: number;
-  readonly license?: string;
-  readonly readme?: string;
-  readonly packageJson?: Record<string, unknown>;
+  readonly license?: string | undefined;
+  readonly readme?: string | undefined;
+  readonly packageJson?: Record<string, unknown> | undefined;
 }
 
 export interface GitHubInstaller {
@@ -785,7 +785,7 @@ export interface OptimizedDependency {
 }
 
 export interface ProfilingData {
-  functions: readonly FunctionProfile[];
+  functions: FunctionProfile[];
   totalTime: number;
   averageTime: number;
   slowestFunction: string;
@@ -980,9 +980,9 @@ export interface Template {
 export interface HookContext {
   readonly hookName: string;
   readonly event: string;
-  readonly command?: string;
-  readonly args?: readonly string[];
-  readonly options?: Record<string, unknown>;
+  readonly command?: string | undefined;
+  readonly args?: readonly string[] | undefined;
+  readonly options?: Record<string, unknown> | undefined;
   readonly workingDirectory: string;
   readonly logger: PluginLogger;
   readonly data: Record<string, unknown>;

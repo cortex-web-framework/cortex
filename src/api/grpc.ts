@@ -34,7 +34,7 @@ export class GrpcServer {
     return new Promise((resolve) => {
       this.server.listen(port, () => {
         // Only log in debug mode to avoid interfering with tests
-        if (process.env.DEBUG_GRPC) {
+        if (process.env['DEBUG_GRPC']) {
           console.log(`gRPC Server listening on port ${port}`);
         }
         resolve();

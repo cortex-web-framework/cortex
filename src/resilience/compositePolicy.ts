@@ -1,4 +1,4 @@
-import { ResiliencePolicy } from './types.js';
+import type { ResiliencePolicy } from './types.js';
 import { CircuitBreaker } from './circuitBreaker.js';
 import { RetryExecutor } from './retryExecutor.js';
 import { Bulkhead } from './bulkhead.js';

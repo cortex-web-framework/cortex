@@ -46,7 +46,7 @@ export class Config {
     }
 
     // 2. Load from environment-specific file (overrides default)
-    const env = process.env.NODE_ENV || 'development';
+    const env = process.env["NODE_ENV"] || 'development';
     const envConfigPath = path.join(this.configDir, `${env}.json`);
     if (fs.existsSync(envConfigPath)) {
       const envContent = fs.readFileSync(envConfigPath, 'utf-8');

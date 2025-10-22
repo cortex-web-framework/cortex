@@ -55,7 +55,7 @@ type ColorName = keyof typeof ANSI_CODES;
  */
 function shouldUseColors(): boolean {
   // Check NO_COLOR environment variable
-  if (process.env.NO_COLOR !== undefined) {
+  if (process.env["NO_COLOR"] !== undefined) {
     return false;
   }
   
@@ -65,7 +65,7 @@ function shouldUseColors(): boolean {
   }
   
   // Check TERM environment variable
-  const term = process.env.TERM;
+  const term = process.env["TERM"];
   if (term === 'dumb') {
     return false;
   }

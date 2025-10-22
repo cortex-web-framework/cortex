@@ -39,8 +39,22 @@ export const DEFAULT_MEMORY_CONFIG: Required<MemoryManagerConfig> = {
  * WebAssembly Memory Manager
  * Handles safe memory allocation, deallocation, and data transfer
  */
+
+// WebAssembly type declarations for Node.js
+declare global {
+  namespace WebAssembly {
+    interface Memory {
+      buffer: ArrayBuffer;
+      grow(delta: number): number;
+    }
+    
+    interface Instance {
+      exports: Record<string, any>;
+    }
+  }
+}
 export class WasmMemoryManager {
-  private memory: WebAssembly.Memory;
+  private memory: WebAssembly.Memory | undefined;
   private allocations: Map<number, MemoryAllocation> = new Map();
   private freeList: Set<number> = new Set();
   private nextPtr: number = 0;
@@ -48,7 +62,7 @@ export class WasmMemoryManager {
   private gcTimer: NodeJS.Timeout | null = null;
 
   constructor(instance: WebAssembly.Instance, config: MemoryManagerConfig = {}) {
-    this.memory = instance.exports.memory as WebAssembly.Memory;
+    this["memory"] = instance.exports["memory"] as WebAssembly.Memory;
     this.config = { ...DEFAULT_MEMORY_CONFIG, ...config };
     
     this.initializeMemory();
@@ -96,7 +110,7 @@ export class WasmMemoryManager {
     }
 
     // Write data to memory
-    const memoryView = new Uint8Array(this.memory.buffer, ptr, size);
+    const memoryView = new Uint8Array(this["memory"].buffer, ptr, size);
     memoryView.set(buffer);
 
     // Track allocation
@@ -123,7 +137,7 @@ export class WasmMemoryManager {
     }
 
     // Clear memory
-    const memoryView = new Uint8Array(this.memory.buffer, ptr, allocation.size);
+    const memoryView = new Uint8Array(this["memory"].buffer, ptr, allocation.size);
     memoryView.fill(0);
 
     // Remove from tracking
@@ -141,7 +155,7 @@ export class WasmMemoryManager {
     }
 
     const size = length || allocation.size;
-    const memoryView = new Uint8Array(this.memory.buffer, ptr, size);
+    const memoryView = new Uint8Array(this["memory"].buffer, ptr, size);
     const decoder = new TextDecoder();
     return decoder.decode(memoryView);
   }
@@ -172,7 +186,7 @@ export class WasmMemoryManager {
     }
 
     const size = length || allocation.size;
-    return new Uint8Array(this.memory.buffer, ptr, size);
+    return new Uint8Array(this["memory"].buffer, ptr, size);
   }
 
   /**
@@ -182,8 +196,8 @@ export class WasmMemoryManager {
     const totalAllocations = this.allocations.size;
     const totalAllocatedSize = Array.from(this.allocations.values())
       .reduce((sum, alloc) => sum + alloc.size, 0);
-    const memoryPages = this.memory.buffer.byteLength / (64 * 1024);
-    const memoryUsage = totalAllocatedSize / this.memory.buffer.byteLength;
+    const memoryPages = this["memory"].buffer.byteLength / (64 * 1024);
+    const memoryUsage = totalAllocatedSize / this["memory"].buffer.byteLength;
 
     return {
       totalAllocations,
@@ -221,7 +235,7 @@ export class WasmMemoryManager {
    */
   private initializeMemory(): void {
     // Ensure minimum memory size
-    if (this.memory.buffer.byteLength < this.config.initialPages * 64 * 1024) {
+    if (this["memory"].buffer.byteLength < this.config.initialPages * 64 * 1024) {
       this.growMemory(this.config.initialPages);
     }
   }
@@ -241,7 +255,7 @@ export class WasmMemoryManager {
 
     // Check if we need to grow memory
     const requiredSize = this.nextPtr + size;
-    const currentSize = this.memory.buffer.byteLength;
+    const currentSize = this["memory"].buffer.byteLength;
     
     if (requiredSize > currentSize) {
       const pagesNeeded = Math.ceil((requiredSize - currentSize) / (64 * 1024));
@@ -275,17 +289,17 @@ export class WasmMemoryManager {
    */
   private growMemory(pages: number): boolean {
     try {
-      const currentPages = this.memory.buffer.byteLength / (64 * 1024);
+      const currentPages = this["memory"].buffer.byteLength / (64 * 1024);
       const newPages = Math.min(currentPages + pages, this.config.maximumPages);
       
       if (newPages <= currentPages) {
         return false;
       }
 
-      this.memory.grow(newPages - currentPages);
+      this["memory"].grow(newPages - currentPages);
       return true;
     } catch (error) {
-      console.error('Failed to grow memory:', error);
+      console["error"]('Failed to grow memory:', error);
       return false;
     }
   }
@@ -305,7 +319,7 @@ export class WasmMemoryManager {
   private performGarbageCollection(): void {
     const stats = this.getMemoryStats();
     
-    if (stats.memoryUsage > this.config.gcThreshold) {
+    if (stats["memory"]Usage > this.config.gcThreshold) {
       // Clean up old allocations (older than 5 minutes)
       const cutoffTime = Date.now() - 300000;
       const toRemove: number[] = [];

@@ -39,8 +39,8 @@ describe('Colors', () => {
     });
 
     it('should return original text when colors disabled', () => {
-      const originalEnv = process.env.NO_COLOR;
-      process.env.NO_COLOR = '1';
+      const originalEnv = process.env["NO_COLOR"];
+      process.env["NO_COLOR"] = '1';
       
       const testText = 'test';
       assert.strictEqual(colors.red(testText), testText);
@@ -49,9 +49,9 @@ describe('Colors', () => {
       
       // Restore environment
       if (originalEnv === undefined) {
-        delete process.env.NO_COLOR;
+        delete process.env["NO_COLOR"];
       } else {
-        process.env.NO_COLOR = originalEnv;
+        process.env["NO_COLOR"] = originalEnv;
       }
     });
 
@@ -83,7 +83,7 @@ describe('Colors', () => {
     });
 
     it('should provide error styling', () => {
-      const result = colors.error('Error message');
+      const result = colors["error"]('Error message');
       assert.strictEqual(typeof result, 'string');
       assert.ok(result.includes('Error message'));
     });
