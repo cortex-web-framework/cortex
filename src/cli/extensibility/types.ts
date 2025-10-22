@@ -297,11 +297,25 @@ export interface TemplateMetadata {
 }
 
 export interface PerformanceMetrics {
-  readonly renderTime: number;
+  readonly duration: number;
   readonly memoryUsage: number;
-  readonly fileOperations: number;
+  readonly cpuUsage: number;
   readonly cacheHits: number;
   readonly cacheMisses: number;
+  readonly networkRequests: number;
+  readonly fileOperations: number;
+  readonly timestamp: Date;
+}
+
+export interface MemoryUsage {
+  readonly used: number;
+  readonly total: number;
+  readonly available: number;
+  readonly percentage: number;
+  readonly heapUsed: number;
+  readonly heapTotal: number;
+  readonly external: number;
+  readonly rss: number;
 }
 
 export interface SecurityMetrics {
@@ -587,6 +601,242 @@ export interface GitHubInstalledPlugin {
   readonly updateAvailable: boolean;
   readonly latestVersion: string;
   readonly metadata: GitHubInstallMetadata;
+}
+
+// Performance Optimization Types
+export interface PerformanceOptimizer {
+  optimizeTemplate(template: Template): OptimizedTemplate;
+  optimizePlugin(plugin: Plugin): OptimizedPlugin;
+  createCache(): Cache;
+  getCacheStats(): CacheStats;
+  clearCache(): void;
+  warmupCache(templates: Template[], plugins: Plugin[]): Promise<void>;
+  measurePerformance<T>(operation: () => T): PerformanceMetrics;
+  optimizeMemory(): void;
+  getMemoryUsage(): MemoryUsage;
+  enableLazyLoading(): void;
+  disableLazyLoading(): void;
+  isLazyLoadingEnabled(): boolean;
+  setCachePolicy(policy: CachePolicy): void;
+  getCachePolicy(): CachePolicy;
+  preloadResources(resources: Resource[]): Promise<void>;
+  optimizeBundle(bundle: Bundle): OptimizedBundle;
+  compressData(data: string): string;
+  decompressData(compressedData: string): string;
+  enableCompression(): void;
+  disableCompression(): void;
+  isCompressionEnabled(): boolean;
+  setCompressionLevel(level: number): void;
+  getCompressionLevel(): number;
+  enableTreeShaking(): void;
+  disableTreeShaking(): void;
+  isTreeShakingEnabled(): boolean;
+  enableCodeSplitting(): void;
+  disableCodeSplitting(): void;
+  isCodeSplittingEnabled(): boolean;
+  optimizeDependencies(dependencies: Dependency[]): OptimizedDependency[];
+  enableParallelProcessing(): void;
+  disableParallelProcessing(): void;
+  isParallelProcessingEnabled(): boolean;
+  setMaxConcurrency(concurrency: number): void;
+  getMaxConcurrency(): number;
+  enableProfiling(): void;
+  disableProfiling(): void;
+  getProfilingData(): ProfilingData;
+  clearProfilingData(): void;
+  enableMetrics(): void;
+  disableMetrics(): void;
+  getMetrics(): Metrics;
+  clearMetrics(): void;
+  optimizeForProduction(): void;
+  optimizeForDevelopment(): void;
+  getOptimizationMode(): 'production' | 'development';
+  setOptimizationMode(mode: 'production' | 'development'): void;
+}
+
+export interface OptimizedTemplate {
+  readonly template: Template;
+  readonly optimizations: readonly Optimization[];
+  readonly performance: PerformanceMetrics;
+  readonly size: number;
+  readonly loadTime: number;
+  readonly renderTime: number;
+  readonly memoryUsage: number;
+}
+
+export interface OptimizedPlugin {
+  readonly plugin: Plugin;
+  readonly optimizations: readonly Optimization[];
+  readonly performance: PerformanceMetrics;
+  readonly size: number;
+  readonly loadTime: number;
+  readonly memoryUsage: number;
+}
+
+export interface Optimization {
+  readonly type: 'compression' | 'minification' | 'tree-shaking' | 'lazy-loading' | 'caching' | 'parallel-processing';
+  readonly description: string;
+  readonly impact: 'low' | 'medium' | 'high';
+  readonly applied: boolean;
+  readonly savings: number;
+}
+
+export interface Cache {
+  readonly id: string;
+  readonly type: 'memory' | 'disk' | 'redis';
+  readonly maxSize: number;
+  readonly currentSize: number;
+  readonly hitRate: number;
+  readonly missRate: number;
+  readonly evictionPolicy: 'lru' | 'lfu' | 'fifo' | 'ttl';
+  readonly ttl: number;
+  set(key: string, value: unknown, ttl?: number): void;
+  get(key: string): unknown | null;
+  has(key: string): boolean;
+  delete(key: string): boolean;
+  clear(): void;
+  size(): number;
+  keys(): string[];
+  values(): unknown[];
+  entries(): Array<[string, unknown]>;
+  forEach(callback: (value: unknown, key: string) => void): void;
+  getStats(): CacheStats;
+}
+
+export interface CacheStats {
+  readonly hits: number;
+  readonly misses: number;
+  readonly hitRate: number;
+  readonly missRate: number;
+  readonly size: number;
+  readonly maxSize: number;
+  readonly evictions: number;
+  readonly memoryUsage: number;
+  readonly averageAccessTime: number;
+  readonly lastAccessed: Date;
+}
+
+export interface CachePolicy {
+  readonly maxSize: number;
+  readonly ttl: number;
+  readonly evictionPolicy: 'lru' | 'lfu' | 'fifo' | 'ttl';
+  readonly compressionEnabled: boolean;
+  readonly serializationEnabled: boolean;
+  readonly lazyLoadingEnabled: boolean;
+}
+
+export interface Resource {
+  readonly id: string;
+  readonly type: 'template' | 'plugin' | 'asset' | 'data';
+  readonly size: number;
+  readonly priority: number;
+  readonly dependencies: readonly string[];
+}
+
+export interface Bundle {
+  readonly id: string;
+  readonly type: 'template' | 'plugin' | 'application';
+  readonly files: readonly BundleFile[];
+  readonly dependencies: readonly string[];
+  readonly size: number;
+  readonly metadata: BundleMetadata;
+}
+
+export interface BundleFile {
+  readonly path: string;
+  readonly content: string;
+  readonly type: string;
+  readonly size: number;
+  readonly hash: string;
+}
+
+export interface BundleMetadata {
+  readonly createdAt: Date;
+  readonly version: string;
+  readonly author: string;
+  readonly description: string;
+}
+
+export interface OptimizedBundle {
+  readonly bundle: Bundle;
+  readonly optimizations: readonly Optimization[];
+  readonly size: number;
+  readonly originalSize: number;
+  readonly compressionRatio: number;
+  readonly loadTime: number;
+  readonly performance: PerformanceMetrics;
+}
+
+export interface Dependency {
+  readonly name: string;
+  readonly version: string;
+  readonly type: 'production' | 'development' | 'peer';
+  readonly size: number;
+  readonly dependencies: readonly string[];
+}
+
+export interface OptimizedDependency {
+  readonly dependency: Dependency;
+  readonly optimizations: readonly Optimization[];
+  readonly size: number;
+  readonly originalSize: number;
+  readonly loadTime: number;
+  readonly memoryUsage: number;
+}
+
+export interface ProfilingData {
+  functions: readonly FunctionProfile[];
+  totalTime: number;
+  averageTime: number;
+  slowestFunction: string;
+  fastestFunction: string;
+  callCount: number;
+  memoryPeak: number;
+}
+
+export interface FunctionProfile {
+  readonly name: string;
+  readonly calls: number;
+  readonly totalTime: number;
+  readonly averageTime: number;
+  readonly minTime: number;
+  readonly maxTime: number;
+  readonly memoryUsage: number;
+}
+
+export interface Metrics {
+  performance: PerformanceMetrics[];
+  memory: MemoryUsage[];
+  cache: CacheStats[];
+  operations: readonly OperationMetric[];
+  errors: readonly ErrorMetric[];
+  warnings: readonly WarningMetric[];
+}
+
+export interface OperationMetric {
+  readonly name: string;
+  readonly count: number;
+  readonly totalTime: number;
+  readonly averageTime: number;
+  readonly successRate: number;
+  readonly lastExecuted: Date;
+}
+
+export interface ErrorMetric {
+  readonly type: string;
+  readonly message: string;
+  readonly count: number;
+  readonly firstOccurred: Date;
+  readonly lastOccurred: Date;
+  readonly stackTrace: string;
+}
+
+export interface WarningMetric {
+  readonly type: string;
+  readonly message: string;
+  readonly count: number;
+  readonly firstOccurred: Date;
+  readonly lastOccurred: Date;
 }
 
 /**

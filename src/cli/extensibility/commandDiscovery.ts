@@ -86,6 +86,7 @@ export class CortexCommandDiscovery implements CommandDiscovery {
     // Check required properties
     if (!command.name || typeof command.name !== 'string') {
       errors.push({
+        type: 'REQUIRED_FIELD',
         field: 'name',
         message: 'Command name is required and must be a string',
         code: 'MISSING_NAME'
@@ -94,6 +95,7 @@ export class CortexCommandDiscovery implements CommandDiscovery {
     
     if (!command.description || typeof command.description !== 'string') {
       errors.push({
+        type: 'REQUIRED_FIELD',
         field: 'description',
         message: 'Command description is required and must be a string',
         code: 'MISSING_DESCRIPTION'

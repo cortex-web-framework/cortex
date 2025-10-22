@@ -337,7 +337,7 @@ export class CortexTemplateEngine implements TemplateEngine {
   /**
    * Validate a single variable rule
    */
-  private validateVariableRule(value: unknown, rule: ValidationRule): boolean {
+  private validateVariableRule(value: unknown, rule: any): boolean {
     switch (rule.type) {
       case 'required':
         return value !== undefined && value !== null && value !== '';

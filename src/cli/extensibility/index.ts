@@ -45,7 +45,6 @@ export type {
   UpdateResult,
   PluginMarketplace,
   AdvancedTemplate,
-  TemplateVariable,
   ValidationRule,
   TemplateHook,
   TemplateHelper,
@@ -53,7 +52,6 @@ export type {
   TemplatePartial,
   TemplateInclude,
   TemplateMetadata,
-  PerformanceMetrics,
   SecurityMetrics,
   CompiledTemplate,
   CompiledFile,
@@ -75,7 +73,25 @@ export type {
   GitHubTree,
   GitHubCommitParent,
   GitHubVerification,
-  GitHubInstaller
+  GitHubInstaller,
+  PerformanceOptimizer,
+  OptimizedTemplate,
+  OptimizedPlugin,
+  Optimization,
+  Cache,
+  CacheStats,
+  CachePolicy,
+  Resource,
+  Bundle,
+  OptimizedBundle,
+  Dependency,
+  OptimizedDependency,
+  ProfilingData,
+  FunctionProfile,
+  Metrics,
+  OperationMetric,
+  ErrorMetric,
+  WarningMetric
 } from './types.js';
 
 // Export all implementations
@@ -91,3 +107,4 @@ export { CortexSecuritySandbox } from './securitySandbox.js';
 export { CortexPluginMarketplace } from './pluginMarketplace.js';
 export { CortexAdvancedTemplateEngine } from './advancedTemplateEngine.js';
 export { CortexGitHubInstaller } from './githubInstaller.js';
+export { CortexPerformanceOptimizer } from './performanceOptimizer.js';
