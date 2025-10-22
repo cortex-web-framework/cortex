@@ -52,8 +52,8 @@ export function rateLimiter(options?: Partial<RateLimiterOptions>) {
 
     if (client.count >= opts.max) {
       // Support both Express and native Node.js HTTP
-      if (res.status) {
-        res.status(429)?.send?.(opts.message);
+      if (res.status && res.send) {
+        res.status!(429).send!(opts.message);
       } else {
         res.statusCode = 429;
         res.end(opts.message);

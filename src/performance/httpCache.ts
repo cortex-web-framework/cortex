@@ -44,8 +44,8 @@ export function conditionalGet(data: string | Buffer, lastModified?: Date, etag?
 
     if (isNotModified) {
       // Support both Express and native Node.js HTTP
-      if (res.status) {
-        res.status(304)?.send?.();
+      if (res.status && res.send) {
+        res.status!(304).send!();
       } else {
         res.statusCode = 304;
         res.end();
