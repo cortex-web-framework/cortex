@@ -1,4 +1,4 @@
-const { parentPort } = require('worker_threads');
+import { parentPort } from 'worker_threads';
 
 /**
  * Worker thread for processing tasks in the WorkerPool
