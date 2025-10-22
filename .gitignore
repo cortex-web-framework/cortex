@@ -46,6 +46,7 @@ typings/
 
 # TypeScript cache
 *.tsbuildinfo
+dist-tests/.tsbuildinfo
 
 # Optional npm cache directory
 .npm
@@ -106,3 +107,27 @@ typings/
 # Build output
 dist/
 dist-tests/
+
+# TypeScript incremental compilation
+*.tsbuildinfo
+dist-tests/.tsbuildinfo
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

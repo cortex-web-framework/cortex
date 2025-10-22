@@ -9,7 +9,11 @@
     "test:compile": "tsc --project tsconfig.test.json",
     "test:run": "node --test dist-tests/tests/**/*.test.js",
     "test": "npm run test:compile && npm run test:run",
-    "test:watch": "tsc --project tsconfig.test.json --watch"
+    "test:watch": "tsc --project tsconfig.test.json --watch & node --test --watch dist-tests/tests/**/*.test.js",
+    "test:debug": "node --inspect-brk --test dist-tests/tests/**/*.test.js",
+    "test:coverage": "node --test --experimental-test-coverage dist-tests/tests/**/*.test.js",
+    "test:single": "npm run test:compile && node --test",
+    "pretest": "npm run build"
   },
   "keywords": [],
   "author": "",
