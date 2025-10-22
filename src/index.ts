@@ -57,7 +57,7 @@ import { CortexHttpServer } from './core/httpServer.js';
 import { PingNeuron } from './neurons/pingNeuron.js';
 import { PongNeuron } from './neurons/pongNeuron.js';
 import { Config } from './core/config.js';
-import http from 'node:http';
+import * as http from 'node:http';
 
 async function main(): Promise<void> {
   console.log('Starting Cortex Framework...');

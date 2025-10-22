@@ -1,4 +1,4 @@
-import http from 'node:http';
+import * as http from 'node:http';
 import { Socket } from 'node:net';
 import { RouteNotFound } from './errors.js';
 
@@ -36,7 +36,7 @@ export class CortexHttpServer {
     this.server = http.createServer(this.requestListener.bind(this));
 
     // Track connections for graceful shutdown
-    this.server.on('connection', (socket) => {
+    this.server.on('connection', (socket: Socket) => {
       this.connections.add(socket);
       socket.on('close', () => this.connections.delete(socket));
     });
@@ -58,7 +58,7 @@ export class CortexHttpServer {
     runMiddleware(this.globalMiddleware, 0, () => {
       // All global middleware executed, now proceed to route handling
       try {
-        const routeMatch = this.findRoute(req.method as HttpMethod, req.url || '/', req);
+        const routeMatch = this.findRoute(req.method as HttpMethod, req.url ?? '/', req);
 
         if (routeMatch) {
           runMiddleware(routeMatch.route.middlewares, 0, () => {
@@ -66,7 +66,7 @@ export class CortexHttpServer {
             routeMatch.route.handler(req, res);
           });
         } else {
-          throw new RouteNotFound(req.method as HttpMethod, req.url || '/');
+          throw new RouteNotFound(req.method as HttpMethod, req.url ?? '/');
         }
       } catch (error: any) {
         console.error(`HTTP Request Error for ${req.method} ${req.url}:`, error);
@@ -181,7 +181,7 @@ export class CortexHttpServer {
       }
       this.connections.clear();
 
-      this.server.close((err) => {
+      this.server.close((err: Error | undefined) => {
         if (err) {
           reject(err);
         }

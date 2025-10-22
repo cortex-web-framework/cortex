@@ -1,4 +1,4 @@
-import http from 'node:http';
+import * as http from 'node:http';
 
 interface RequestExt extends http.IncomingMessage {
   ip?: string;

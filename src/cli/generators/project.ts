@@ -321,7 +321,10 @@ export class ActorSupervisor extends Actor {
 async function generateRoutes(config: ProjectConfig): Promise<void> {
   const extension = config.typescript.enabled ? 'ts' : 'js';
   
-  const content = `import { Request, Response } from 'express';
+  const content = `import http from 'node:http';
+
+type Request = http.IncomingMessage;
+type Response = http.ServerResponse;
 
 /**
  * API Routes
@@ -329,19 +332,21 @@ async function generateRoutes(config: ProjectConfig): Promise<void> {
 export const apiRoutes = (app: any) => {
   // Example API route
   app.get('/api/status', (req: Request, res: Response) => {
-    res.json({
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({
       status: 'ok',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
-    });
+    }));
   });
 
   // Example POST route
   app.post('/api/echo', (req: Request, res: Response) => {
-    res.json({
-      message: 'Echo: ' + req.body.message,
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({
+      message: 'Echo: ' + req.body?.message,
       timestamp: new Date().toISOString(),
-    });
+    }));
   });
 };
 `;
@@ -355,18 +360,22 @@ export const apiRoutes = (app: any) => {
 async function generateMiddleware(config: ProjectConfig): Promise<void> {
   const extension = config.typescript.enabled ? 'ts' : 'js';
   
-  const content = `import { Request, Response, NextFunction } from 'express';
+  const content = `import http from 'node:http';
+
+type Request = http.IncomingMessage;
+type Response = http.ServerResponse;
+type NextFunction = () => void;
 
 /**
  * CORS middleware
  */
 export const corsMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   
   if (req.method === 'OPTIONS') {
-    res.sendStatus(200);
+    res.statusCode = 200;
   } else {
     next();
   }
@@ -499,7 +508,7 @@ npm test
 src/
 ├── actors/          # Actor System components
 ├── routes/          # API routes
-├── middleware/      # Express middleware
+├── middleware/      # Node.js HTTP middleware
 ├── services/        # Business logic services
 ├── types/           # TypeScript type definitions
 └── utils/           # Utility functions

@@ -1,4 +1,4 @@
-import http from 'node:http';
+import * as http from 'node:http';
 import crypto from 'node:crypto';
 
 interface ResponseExt extends http.ServerResponse {

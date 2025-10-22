@@ -1,4 +1,4 @@
-import http from 'node:http';
+import * as http from 'node:http';
 import { createBrotliCompress, createGzip, createDeflate } from 'node:zlib';
 import { Transform } from 'node:stream';
 
