@@ -3,7 +3,7 @@
   "compilerOptions": {
     // Test-specific overrides
     "outDir": "./dist-tests",
-    "noEmit": true,
+    "noEmit": false,
     "sourceMap": true,
     "declaration": false,
     "declarationMap": false,
@@ -31,7 +31,7 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": false,
+    "allowSyntheticDefaultImports": true,
     
     // Environment - Node.js for tests (must include Node types)
     "target": "ES2016",
