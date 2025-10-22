@@ -6,7 +6,7 @@
 import type {
   PerformanceOptimizer,
   Template,
-  CortexPlugin as Plugin,
+  CortexPlugin,
   OptimizedTemplate,
   OptimizedPlugin,
   Cache,
@@ -300,7 +300,7 @@ export class CortexPerformanceOptimizer implements PerformanceOptimizer {
     const startTime = Date.now();
     const startMemory = this.getCurrentMemoryUsage();
     
-    const result = operation();
+    operation();
     
     const endTime = Date.now();
     const endMemory = this.getCurrentMemoryUsage();
@@ -615,6 +615,9 @@ export class CortexPerformanceOptimizer implements PerformanceOptimizer {
    */
   enableProfiling(): void {
     this.profilingEnabled = true;
+    if (this.profilingEnabled) {
+      console.log('Profiling enabled');
+    }
   }
 
   /**
@@ -622,6 +625,9 @@ export class CortexPerformanceOptimizer implements PerformanceOptimizer {
    */
   disableProfiling(): void {
     this.profilingEnabled = false;
+    if (!this.profilingEnabled) {
+      console.log('Profiling disabled');
+    }
   }
 
   /**
@@ -730,7 +736,7 @@ export class CortexPerformanceOptimizer implements PerformanceOptimizer {
     return JSON.stringify(template).length;
   }
 
-  private calculatePluginSize(plugin: Plugin): number {
+  private calculatePluginSize(plugin: CortexPlugin): number {
     return JSON.stringify(plugin).length;
   }
 

@@ -13,13 +13,7 @@ import type {
   GitHubRelease,
   GitHubTag,
   GitHubInstallResult,
-  GitHubInstallMetadata,
-  GitHubInstalledPlugin,
-  GitHubCommit,
-  GitHubCommitAuthor,
-  GitHubTree,
-  GitHubCommitParent,
-  GitHubVerification
+  GitHubInstalledPlugin
 } from './types.js';
 
 /**

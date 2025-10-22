@@ -606,11 +606,11 @@ export interface GitHubInstalledPlugin {
 // Performance Optimization Types
 export interface PerformanceOptimizer {
   optimizeTemplate(template: Template): OptimizedTemplate;
-  optimizePlugin(plugin: Plugin): OptimizedPlugin;
+  optimizePlugin(plugin: CortexPlugin): OptimizedPlugin;
   createCache(): Cache;
   getCacheStats(): CacheStats;
   clearCache(): void;
-  warmupCache(templates: Template[], plugins: Plugin[]): Promise<void>;
+  warmupCache(templates: Template[], plugins: CortexPlugin[]): Promise<void>;
   measurePerformance<T>(operation: () => T): PerformanceMetrics;
   optimizeMemory(): void;
   getMemoryUsage(): MemoryUsage;
@@ -665,7 +665,7 @@ export interface OptimizedTemplate {
 }
 
 export interface OptimizedPlugin {
-  readonly plugin: Plugin;
+  readonly plugin: CortexPlugin;
   readonly optimizations: readonly Optimization[];
   readonly performance: PerformanceMetrics;
   readonly size: number;
@@ -1012,7 +1012,7 @@ export interface ValidationResult {
  * Validation Error
  */
 export interface ValidationError {
-  readonly type: string;
+  readonly type?: string;
   readonly field: string;
   readonly message: string;
   readonly code: string;

@@ -86,6 +86,7 @@ export class CortexCommandDiscovery implements CommandDiscovery {
     // Check required properties
     if (!command.name || typeof command.name !== 'string') {
       errors.push({
+        
         type: 'REQUIRED_FIELD',
         field: 'name',
         message: 'Command name is required and must be a string',
@@ -95,6 +96,7 @@ export class CortexCommandDiscovery implements CommandDiscovery {
     
     if (!command.description || typeof command.description !== 'string') {
       errors.push({
+        
         type: 'REQUIRED_FIELD',
         field: 'description',
         message: 'Command description is required and must be a string',
@@ -104,6 +106,8 @@ export class CortexCommandDiscovery implements CommandDiscovery {
     
     if (!command.action || typeof command.action !== 'function') {
       errors.push({
+        
+        type: 'VALIDATION_ERROR',
         field: 'action',
         message: 'Command action is required and must be a function',
         code: 'MISSING_ACTION'
@@ -116,7 +120,8 @@ export class CortexCommandDiscovery implements CommandDiscovery {
         const option = command.options[i];
         if (!option.name || typeof option.name !== 'string') {
           errors.push({
-            field: `options[${i}].name`,
+        
+        field: `options[${i}].name`,
             message: 'Option name is required and must be a string',
             code: 'INVALID_OPTION_NAME'
           });
@@ -124,7 +129,8 @@ export class CortexCommandDiscovery implements CommandDiscovery {
         
         if (!option.description || typeof option.description !== 'string') {
           errors.push({
-            field: `options[${i}].description`,
+        
+        field: `options[${i}].description`,
             message: 'Option description is required and must be a string',
             code: 'INVALID_OPTION_DESCRIPTION'
           });
@@ -132,7 +138,8 @@ export class CortexCommandDiscovery implements CommandDiscovery {
         
         if (!option.type || typeof option.type !== 'string') {
           errors.push({
-            field: `options[${i}].type`,
+        
+        field: `options[${i}].type`,
             message: 'Option type is required and must be a string',
             code: 'INVALID_OPTION_TYPE'
           });
@@ -140,7 +147,8 @@ export class CortexCommandDiscovery implements CommandDiscovery {
         
         if (!['string', 'number', 'boolean', 'array'].includes(option.type)) {
           errors.push({
-            field: `options[${i}].type`,
+        
+        field: `options[${i}].type`,
             message: 'Option type must be one of: string, number, boolean, array',
             code: 'INVALID_OPTION_TYPE_VALUE'
           });
@@ -156,7 +164,8 @@ export class CortexCommandDiscovery implements CommandDiscovery {
         if (!subcommandValidation.valid) {
           for (const error of subcommandValidation.errors) {
             errors.push({
-              field: `subcommands[${i}].${error.field}`,
+        
+        field: `subcommands[${i}].${error.field}`,
               message: error.message,
               code: error.code
             });

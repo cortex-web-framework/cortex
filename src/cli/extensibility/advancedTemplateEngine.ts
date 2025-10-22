@@ -86,8 +86,8 @@ export class CortexAdvancedTemplateEngine implements AdvancedTemplateEngine {
     if (!template.name) {
       errors.push({
         type: 'REQUIRED_FIELD',
-        message: 'Template name is required',
         field: 'name',
+        message: 'Template name is required',
         code: 'MISSING_NAME'
       });
     }
@@ -95,14 +95,15 @@ export class CortexAdvancedTemplateEngine implements AdvancedTemplateEngine {
     if (!template.version) {
       errors.push({
         type: 'REQUIRED_FIELD',
-        message: 'Template version is required',
         field: 'version',
+        message: 'Template version is required',
         code: 'MISSING_VERSION'
       });
     }
 
     if (!template.files || template.files.length === 0) {
       errors.push({
+        
         type: 'REQUIRED_FIELD',
         message: 'Template must have at least one file',
         field: 'files',
@@ -114,9 +115,10 @@ export class CortexAdvancedTemplateEngine implements AdvancedTemplateEngine {
     for (const file of template.files) {
       if (!file.path) {
         errors.push({
+        
           type: 'INVALID_FILE',
           message: 'File path is required',
-          field: 'files.path',
+        field: 'files.path',
           code: 'MISSING_FILE_PATH'
         });
       }
@@ -126,9 +128,10 @@ export class CortexAdvancedTemplateEngine implements AdvancedTemplateEngine {
     for (const variable of template.variables) {
       if (!variable.name) {
         errors.push({
+        
           type: 'INVALID_VARIABLE',
           message: 'Variable name is required',
-          field: 'variables.name',
+        field: 'variables.name',
           code: 'MISSING_VARIABLE_NAME'
         });
       }
@@ -162,7 +165,7 @@ export class CortexAdvancedTemplateEngine implements AdvancedTemplateEngine {
    */
   processConditionals(content: string, variables: Record<string, unknown>): string {
     const conditionalRegex = /\{\{#if\s+([^}]+)\}\}([\s\S]*?)\{\{\/if\}\}/g;
-    return content.replace(conditionalRegex, (match, condition, body) => {
+    return content.replace(conditionalRegex, (_match, condition, body) => {
       const trimmed = condition.trim();
       const value = variables[trimmed];
       return value ? body : '';
@@ -174,7 +177,7 @@ export class CortexAdvancedTemplateEngine implements AdvancedTemplateEngine {
    */
   processLoops(content: string, variables: Record<string, unknown>): string {
     const loopRegex = /\{\{#each\s+([^}]+)\}\}([\s\S]*?)\{\{\/each\}\}/g;
-    return content.replace(loopRegex, (match, arrayName, body) => {
+    return content.replace(loopRegex, (_match, arrayName, body) => {
       const trimmed = arrayName.trim();
       const array = variables[trimmed];
       if (Array.isArray(array)) {
@@ -297,9 +300,10 @@ export class CortexAdvancedTemplateEngine implements AdvancedTemplateEngine {
       
       if (variable.required && value === undefined) {
         errors.push({
+        
           type: 'REQUIRED_VARIABLE',
           message: `Variable '${variable.name}' is required`,
-          field: variable.name,
+        field: variable.name,
           code: 'MISSING_REQUIRED_VARIABLE'
         });
       }
@@ -308,9 +312,10 @@ export class CortexAdvancedTemplateEngine implements AdvancedTemplateEngine {
         for (const rule of variable.validation) {
           if (!this.validateVariableRule(value, rule)) {
             errors.push({
+        
               type: 'VALIDATION_ERROR',
               message: rule.message,
-              field: variable.name,
+        field: variable.name,
               code: rule.type.toUpperCase()
             });
           }
@@ -476,9 +481,10 @@ export class CortexAdvancedTemplateEngine implements AdvancedTemplateEngine {
     for (const dep of template.dependencies) {
       if (checkCircular(dep)) {
         errors.push({
+        
           type: 'CIRCULAR_DEPENDENCY',
           message: `Circular dependency detected: ${dep}`,
-          field: 'dependencies',
+        field: 'dependencies',
           code: 'CIRCULAR_DEPENDENCY'
         });
       }

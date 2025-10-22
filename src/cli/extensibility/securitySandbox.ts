@@ -52,6 +52,7 @@ export class CortexSecuritySandbox implements SecuritySandbox {
       for (const command of plugin.commands) {
         if (this.isDangerousCommand(command.name)) {
           errors.push({
+        
             type: 'DANGEROUS_COMMAND',
             message: `Command '${command.name}' is potentially dangerous`,
             severity: 'HIGH',
@@ -76,6 +77,7 @@ export class CortexSecuritySandbox implements SecuritySandbox {
       for (const permission of plugin.permissions) {
         if (this.isDangerousPermission(permission)) {
           errors.push({
+        
             type: 'DANGEROUS_PERMISSION',
             message: `Permission '${permission}' is potentially dangerous`,
             severity: 'CRITICAL',

@@ -91,6 +91,7 @@ export class CortexPluginLoader implements PluginLoader {
     // Check required properties
     if (!plugin.name || typeof plugin.name !== 'string') {
       errors.push({
+        
         field: 'name',
         message: 'Plugin name is required and must be a string',
         code: 'MISSING_NAME'
@@ -99,6 +100,7 @@ export class CortexPluginLoader implements PluginLoader {
     
     if (!plugin.version || typeof plugin.version !== 'string') {
       errors.push({
+        
         field: 'version',
         message: 'Plugin version is required and must be a string',
         code: 'MISSING_VERSION'
@@ -107,6 +109,7 @@ export class CortexPluginLoader implements PluginLoader {
     
     if (!plugin.description || typeof plugin.description !== 'string') {
       errors.push({
+        
         field: 'description',
         message: 'Plugin description is required and must be a string',
         code: 'MISSING_DESCRIPTION'
@@ -115,6 +118,7 @@ export class CortexPluginLoader implements PluginLoader {
     
     if (!plugin.author || typeof plugin.author !== 'string') {
       errors.push({
+        
         field: 'author',
         message: 'Plugin author is required and must be a string',
         code: 'MISSING_AUTHOR'
@@ -127,7 +131,8 @@ export class CortexPluginLoader implements PluginLoader {
         const command = plugin.commands[i];
         if (!command.name || typeof command.name !== 'string') {
           errors.push({
-            field: `commands[${i}].name`,
+        
+        field: `commands[${i}].name`,
             message: 'Command name is required and must be a string',
             code: 'INVALID_COMMAND_NAME'
           });
@@ -135,7 +140,8 @@ export class CortexPluginLoader implements PluginLoader {
         
         if (!command.action || typeof command.action !== 'function') {
           errors.push({
-            field: `commands[${i}].action`,
+        
+        field: `commands[${i}].action`,
             message: 'Command action is required and must be a function',
             code: 'INVALID_COMMAND_ACTION'
           });
@@ -149,7 +155,8 @@ export class CortexPluginLoader implements PluginLoader {
         const template = plugin.templates[i];
         if (!template.name || typeof template.name !== 'string') {
           errors.push({
-            field: `templates[${i}].name`,
+        
+        field: `templates[${i}].name`,
             message: 'Template name is required and must be a string',
             code: 'INVALID_TEMPLATE_NAME'
           });
@@ -157,7 +164,8 @@ export class CortexPluginLoader implements PluginLoader {
         
         if (!template.generate || typeof template.generate !== 'function') {
           errors.push({
-            field: `templates[${i}].generate`,
+        
+        field: `templates[${i}].generate`,
             message: 'Template generate function is required and must be a function',
             code: 'INVALID_TEMPLATE_GENERATE'
           });
@@ -171,7 +179,8 @@ export class CortexPluginLoader implements PluginLoader {
         const hook = plugin.hooks[i];
         if (!hook.name || typeof hook.name !== 'string') {
           errors.push({
-            field: `hooks[${i}].name`,
+        
+        field: `hooks[${i}].name`,
             message: 'Hook name is required and must be a string',
             code: 'INVALID_HOOK_NAME'
           });
@@ -179,7 +188,8 @@ export class CortexPluginLoader implements PluginLoader {
         
         if (!hook.event || typeof hook.event !== 'string') {
           errors.push({
-            field: `hooks[${i}].event`,
+        
+        field: `hooks[${i}].event`,
             message: 'Hook event is required and must be a string',
             code: 'INVALID_HOOK_EVENT'
           });
@@ -187,7 +197,8 @@ export class CortexPluginLoader implements PluginLoader {
         
         if (!hook.handler || typeof hook.handler !== 'function') {
           errors.push({
-            field: `hooks[${i}].handler`,
+        
+        field: `hooks[${i}].handler`,
             message: 'Hook handler is required and must be a function',
             code: 'INVALID_HOOK_HANDLER'
           });
@@ -195,7 +206,8 @@ export class CortexPluginLoader implements PluginLoader {
         
         if (typeof hook.priority !== 'number') {
           errors.push({
-            field: `hooks[${i}].priority`,
+        
+        field: `hooks[${i}].priority`,
             message: 'Hook priority is required and must be a number',
             code: 'INVALID_HOOK_PRIORITY'
           });
