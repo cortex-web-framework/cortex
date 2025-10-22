@@ -110,10 +110,18 @@ test('RetryExecutor should respect max delay', async () => {
 
 test('ErrorMatchers should match by name', () => {
   const matcher = ErrorMatchers.byName(['TestError', 'AnotherError']);
-  
-  assert.strictEqual(matcher(new Error('TestError')), true);
-  assert.strictEqual(matcher(new Error('AnotherError')), true);
-  assert.strictEqual(matcher(new Error('DifferentError')), false);
+
+  const error1 = new Error('test message');
+  error1.name = 'TestError';
+  assert.strictEqual(matcher(error1), true);
+
+  const error2 = new Error('test message');
+  error2.name = 'AnotherError';
+  assert.strictEqual(matcher(error2), true);
+
+  const error3 = new Error('test message');
+  error3.name = 'DifferentError';
+  assert.strictEqual(matcher(error3), false);
 });
 
 test('ErrorMatchers should match by message pattern', () => {

@@ -37,7 +37,10 @@ export function conditionalGet(data: string | Buffer, lastModified?: Date, etag?
 
     if (lastModified && ifModifiedSince) {
       const clientModifiedDate = new Date(ifModifiedSince);
-      if (lastModified.getTime() <= clientModifiedDate.getTime()) {
+      // Compare at second level (HTTP headers don't include milliseconds)
+      const lastModifiedSeconds = Math.floor(lastModified.getTime() / 1000);
+      const clientModifiedSeconds = Math.floor(clientModifiedDate.getTime() / 1000);
+      if (lastModifiedSeconds <= clientModifiedSeconds) {
         isNotModified = true;
       }
     }
