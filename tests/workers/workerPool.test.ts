@@ -88,7 +88,7 @@ test('WorkerPool should reject tasks when queue is full', async () => {
     await pool.execute('overflow task');
     assert.fail('Should have thrown an error for queue overflow');
   } catch (error) {
-    assert.ok(error.message.includes('queue is full'));
+    assert.ok((error as Error).message.includes('queue is full'));
   }
   
   // Wait for queued tasks to complete
@@ -107,7 +107,7 @@ test('WorkerPool should handle task timeouts', async () => {
     await pool.execute('test', 50); // Even shorter timeout
     assert.fail('Should have timed out');
   } catch (error) {
-    assert.ok(error.message.includes('timeout'));
+    assert.ok((error as Error).message.includes('timeout'));
   }
   
   return pool.shutdown();
@@ -151,12 +151,12 @@ test('WorkerPool should handle custom configuration', () => {
 
 test('WorkerPool should shutdown gracefully', async () => {
   const pool = new WorkerPool({ poolSize: 2 });
-  
+
   // Start some tasks
-  const tasks = Array.from({ length: 3 }, (_, i) => 
+  Array.from({ length: 3 }, (_, i) =>
     pool.execute(`task-${i}`)
   );
-  
+
   // Shutdown immediately
   await pool.shutdown();
   
@@ -169,7 +169,7 @@ test('WorkerPool should shutdown gracefully', async () => {
     await pool.execute('new task');
     assert.fail('Should have thrown an error after shutdown');
   } catch (error) {
-    assert.ok(error.message.includes('shutting down'));
+    assert.ok((error as Error).message.includes('shutting down'));
   }
 });
 

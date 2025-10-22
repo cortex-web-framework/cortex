@@ -30,26 +30,38 @@ test('instantiateWasmModule should instantiate a Wasm module', async () => {
   assert.strictEqual(instance, mockWasmInstance, 'Should return the mocked Wasm instance');
 });
 
-test('jsToWasm should convert JS data to Wasm-compatible format (length)', () => {
+test('jsToWasm should convert JS data to Wasm-compatible format (pointer)', () => {
+  const mockWasmInstance = {
+    exports: {
+      memory: new WebAssembly.Memory({ initial: 1 })
+    }
+  } as WebAssembly.Instance;
+  const { createMemoryManager } = require('../../src/wasm/memoryManager.js');
+  const memoryManager = createMemoryManager(mockWasmInstance);
+
   const data = { a: 1, b: 'hello' };
-  const length = jsToWasm(data);
-  // The current jsToWasm returns the length of the JSON stringified data
-  assert.strictEqual(length, JSON.stringify(data).length, 'Should return the correct length');
+  const ptr = jsToWasm(data, memoryManager);
+  // jsToWasm should return a pointer (number)
+  assert.strictEqual(typeof ptr, 'number', 'Should return a pointer (number)');
+  assert.ok(ptr >= 0, 'Pointer should be non-negative');
+
+  memoryManager.destroy();
 });
 
 test('wasmToJs should convert Wasm-compatible data to JS object', () => {
+  const mockWasmInstance = {
+    exports: {
+      memory: new WebAssembly.Memory({ initial: 1 })
+    }
+  } as WebAssembly.Instance;
+  const { createMemoryManager } = require('../../src/wasm/memoryManager.js');
+  const memoryManager = createMemoryManager(mockWasmInstance);
+
   const expectedObject = { status: 'ok' };
-  const jsonString = JSON.stringify(expectedObject);
-  const encoder = new TextEncoder();
-  const encoded = encoder.encode(jsonString);
+  const ptr = memoryManager.allocateObject(expectedObject);
 
-  const mockMemoryBuffer = new ArrayBuffer(100);
-  const mockMemoryView = new Uint8Array(mockMemoryBuffer);
-  mockMemoryView.set(encoded, 0);
-
-  const mockInstance = { exports: { memory: { buffer: mockMemoryBuffer } } };
-  const ptr = 0;
-  const len = encoded.length;
-  const result = wasmToJs(mockInstance as any, ptr, len);
+  const result = wasmToJs(memoryManager, ptr, 'object');
   assert.deepStrictEqual(result, expectedObject, 'Should return the parsed JS object');
+
+  memoryManager.destroy();
 });

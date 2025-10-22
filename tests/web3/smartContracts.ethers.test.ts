@@ -3,17 +3,11 @@ import assert from 'node:assert';
 import { SmartContractClient } from '../../src/web3/smartContracts.js';
 import { MockJsonRpcProvider, MockContract } from '../mocks/ethers.js'; // Import mocks
 
-let mockProviderInstance: MockJsonRpcProvider;
 let mockContractInstance: MockContract;
 
 // Create mock ethers module
 const mockEthers = {
-  JsonRpcProvider: class extends MockJsonRpcProvider {
-    constructor(url: string) {
-      super(url);
-      mockProviderInstance = this; // Store instance for assertions
-    }
-  },
+  JsonRpcProvider: MockJsonRpcProvider,
   Contract: class extends MockContract {
     constructor(address: string, abi: any[], provider: any) {
       super(address, abi, provider);

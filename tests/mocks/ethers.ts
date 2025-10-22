@@ -19,7 +19,7 @@ export class MockJsonRpcProvider {
   public lastParams: any[] = [];
   public mockResponse: any = '0x';
 
-  constructor(url: string) {}
+  constructor(_url: string) {}
 
   async call(transaction: any): Promise<string> {
     this.callCount++;
@@ -43,7 +43,7 @@ export class MockContract {
   public mockResponse: any = '0x';
   public eventListeners: Map<string, Function[]> = new Map();
 
-  constructor(address: string, abi: any[], provider: any) {}
+  constructor(_address: string, _abi: any[], _provider: any) {}
 
   // Generic mock for contract function calls
   [key: string]: any; // Allow dynamic property access

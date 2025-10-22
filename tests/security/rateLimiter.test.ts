@@ -55,6 +55,21 @@ class MockResponse extends ServerResponse {
   }
 }
 
+// Helper function to call the limiter and return whether next was called
+async function callLimiter(middleware: any, req: any, res: any): Promise<boolean> {
+  return new Promise((resolve) => {
+    let nextWasCalled = false;
+    middleware(req, res, () => {
+      nextWasCalled = true;
+    });
+    res.setResolveCallback(() => {
+      resolve(nextWasCalled);
+    });
+    // Timeout in case next is never called
+    setTimeout(() => resolve(nextWasCalled), 100);
+  });
+}
+
 test.beforeEach(() => {
   // Clear the clients map for test isolation
   (rateLimiter as any).clients.clear(); // Access the private clients map
@@ -65,7 +80,7 @@ test('rateLimiter should allow requests within the limit', async () => {
   const req = new MockRequest();
   const res = new MockResponse();
 
-  let nextCalled = await callLimiter(limiter, req, res);
+  const nextCalled = await callLimiter(limiter, req, res);
   assert.strictEqual(nextCalled, true, 'Next should be called for allowed request');
   assert.strictEqual(res.statusCode, 200, 'Status code should be 200');
 });
@@ -76,13 +91,13 @@ test('rateLimiter should block requests exceeding the limit', async () => {
   const res = new MockResponse();
 
   // First request (allowed)
-  let nextCalled1 = await callLimiter(limiter, req, res);
+  const nextCalled1 = await callLimiter(limiter, req, res);
   assert.strictEqual(nextCalled1, true, 'Next should be called for allowed request');
   assert.strictEqual(res.statusCode, 200, 'Status code should be 200');
 
   // Second request (blocked)
   const res2 = new MockResponse();
-  let nextCalled2 = await callLimiter(limiter, req, res2);
+  const nextCalled2 = await callLimiter(limiter, req, res2);
   assert.strictEqual(nextCalled2, false, 'Next should not be called for blocked request');
   assert.strictEqual(res2.statusCode, 429, 'Status code should be 429 for blocked request');
   assert.ok(res2._data[0].includes('Too many requests'), 'Should send rate limit message');
@@ -94,7 +109,7 @@ test('rateLimiter should reset count after windowMs', async () => {
   const res = new MockResponse();
 
   // First request (allowed)
-  let nextCalled1 = await callLimiter(limiter, req, res);
+  const nextCalled1 = await callLimiter(limiter, req, res);
   assert.strictEqual(nextCalled1, true, 'Next should be called for allowed request');
 
   // Wait for windowMs to pass
@@ -102,7 +117,7 @@ test('rateLimiter should reset count after windowMs', async () => {
 
   // Second request (should be allowed after reset)
   const res2 = new MockResponse();
-  let nextCalled2 = await callLimiter(limiter, req, res2);
+  const nextCalled2 = await callLimiter(limiter, req, res2);
   assert.strictEqual(nextCalled2, true, 'Next should be called for second allowed request');
   assert.strictEqual(res2.statusCode, 200, 'Status code should be 200 for second allowed request');
 });

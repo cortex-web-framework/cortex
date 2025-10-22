@@ -50,12 +50,12 @@ test('Tracer should create child spans with parent context', () => {
 });
 
 test('Tracer should use custom sampler', () => {
-  const tracer = new Tracer({ 
+  const tracer = new Tracer({
     serviceName: 'test-service',
     sampler: new AlwaysOnSampler(),
   });
 
-  const span = tracer.startSpan('test-operation');
+  tracer.startSpan('test-operation');
   assert.strictEqual(tracer.getActiveSpans().length, 1);
 });
 

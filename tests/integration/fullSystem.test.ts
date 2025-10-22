@@ -1,6 +1,5 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { ActorSystem } from '../../src/core/actorSystem.js';
 import { EventBus } from '../../src/core/eventBus.js';
 import { Logger } from '../../src/core/logger.js';
 import { MetricsCollector } from '../../src/observability/metrics/collector.js';
@@ -24,7 +23,6 @@ function createMockWasmInstance() {
 
 test('Full System Integration: Observability + Resilience + Performance', async () => {
   // Initialize core systems
-  const actorSystem = new ActorSystem();
   const eventBus = EventBus.getInstance();
   const logger = Logger.getInstance();
   
@@ -230,7 +228,7 @@ test('Resilience Patterns Integration', async () => {
 
 test('Observability Integration', async () => {
   const metricsCollector = new MetricsCollector();
-  const tracer = new Tracer();
+  const tracer = new Tracer({ serviceName: 'test-service' });
   const healthRegistry = new HealthCheckRegistry();
   
   // Test metrics with labels

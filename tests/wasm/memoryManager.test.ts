@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { WasmMemoryManager, createMemoryManager, DEFAULT_MEMORY_CONFIG } from '../../src/wasm/memoryManager.js';
+import { WasmMemoryManager, createMemoryManager } from '../../src/wasm/memoryManager.js';
 
 // Mock WebAssembly instance for testing
 function createMockWasmInstance() {
@@ -84,9 +84,9 @@ test('WasmMemoryManager should allocate and deallocate buffer memory', () => {
 test('WasmMemoryManager should track memory statistics', () => {
   const instance = createMockWasmInstance();
   const manager = new WasmMemoryManager(instance);
-  
+
   const ptr1 = manager.allocateString('test1');
-  const ptr2 = manager.allocateString('test2');
+  manager.allocateString('test2');
   
   const stats = manager.getMemoryStats();
   assert.strictEqual(stats.totalAllocations, 2);

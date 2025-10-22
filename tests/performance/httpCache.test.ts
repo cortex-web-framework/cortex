@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
 import { setCacheControl, setEtag, setLastModified, conditionalGet } from '../../src/performance/httpCache.js';
-import { IncomingMessage, ServerResponse } from 'node:http';
+import { IncomingMessage } from 'node:http';
 
 // Mock Request and Response objects for middleware testing
 class MockRequest extends IncomingMessage {

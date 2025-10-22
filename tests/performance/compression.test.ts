@@ -21,7 +21,7 @@ function createMockRes() {
     removeHeader: (name: string) => { delete headers[name]; },
     write: (chunk: any) => { chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)); return true; },
     end: (chunk?: any) => { if (chunk) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)); },
-    writeHead: (code: number, message?: any, h?: any) => { statusCode = code; if (h) headers = { ...headers, ...h }; },
+    writeHead: (code: number, _message?: any, h?: any) => { statusCode = code; if (h) headers = { ...headers, ...h }; },
     chunks,
     headers,
     statusCode
@@ -148,11 +148,10 @@ test('gzipCompression should use gzip encoding', () => {
 test('compression middleware should handle writeHead override', () => {
   const req = createMockReq('gzip');
   const res = createMockRes();
-  let nextCalled = false;
-  
+
   const middleware = compression({ threshold: 100 });
-  
-  middleware(req, res, () => { nextCalled = true; });
+
+  middleware(req, res, () => { /* next callback */ });
   
   // Simulate writeHead call
   res.writeHead(200, { 'Content-Type': 'text/plain', 'Content-Length': '2000' });
@@ -164,14 +163,13 @@ test('compression middleware should handle writeHead override', () => {
 test('compression middleware should not compress excluded content types', () => {
   const req = createMockReq('gzip');
   const res = createMockRes();
-  let nextCalled = false;
-  
-  const middleware = compression({ 
+
+  const middleware = compression({
     threshold: 100,
     excludeContentTypes: ['image/jpeg']
   });
-  
-  middleware(req, res, () => { nextCalled = true; });
+
+  middleware(req, res, () => { /* next callback */ });
   
   res.setHeader('Content-Length', '2000');
   res.setHeader('Content-Type', 'image/jpeg');

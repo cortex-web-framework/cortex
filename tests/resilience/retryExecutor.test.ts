@@ -40,13 +40,6 @@ test('RetryExecutor should fail after max attempts', async () => {
   assert.strictEqual(attemptCount, 2);
 });
 
-class CustomRetryableError extends Error {
-  constructor(message?: string) {
-    super(message);
-    this.name = 'RetryableError';
-  }
-}
-
 class CustomNonRetryableError extends Error {
   constructor(message?: string) {
     super(message);
