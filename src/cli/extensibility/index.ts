@@ -27,7 +27,14 @@ export type {
   CommandExtension,
   PluginLoader,
   TemplateEngine,
-  ExtensibilityManager
+  ExtensibilityManager,
+  SecurityPolicy,
+  SandboxContext,
+  SandboxInfo,
+  SecurityError,
+  SecurityWarning,
+  SecurityValidationResult,
+  SecuritySandbox
 } from './types.js';
 
 // Export all implementations
@@ -39,3 +46,4 @@ export { CortexTemplateEngine } from './templateEngine.js';
 export { CortexCommandDiscovery } from './commandDiscovery.js';
 export { CortexCommandComposer } from './commandComposer.js';
 export { CortexExtensibilityManager } from './extensibilityManager.js';
+export { CortexSecuritySandbox } from './securitySandbox.js';

@@ -8,6 +8,73 @@ import type { CLICommand, CLIOption } from '../types.js';
 // Re-export CLI types for extensibility system
 export type { CLICommand, CLIOption };
 
+// Security Sandbox Types
+export interface SecurityPolicy {
+  readonly allowedOperations: readonly string[];
+  readonly blockedOperations: readonly string[];
+  readonly maxMemoryUsage: number;
+  readonly maxCpuUsage: number;
+  readonly maxExecutionTime: number;
+  readonly networkAccess: boolean;
+  readonly fileSystemAccess: boolean;
+  readonly environmentAccess: boolean;
+}
+
+export interface SandboxContext {
+  readonly pluginName: string;
+  readonly permissions: Set<string>;
+  isActive: boolean;
+  readonly createdAt: Date;
+  lastAccessed: Date;
+  operationCount: number;
+  blockedOperations: string[];
+}
+
+export interface SandboxInfo {
+  readonly pluginName: string;
+  readonly permissions: readonly string[];
+  readonly isActive: boolean;
+  readonly createdAt: Date;
+  readonly lastAccessed: Date;
+  readonly operationCount: number;
+  readonly blockedOperations: readonly string[];
+  readonly memoryUsage: number;
+  readonly cpuUsage: number;
+}
+
+export interface SecurityError {
+  readonly type: string;
+  readonly message: string;
+  readonly severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  readonly code: string;
+}
+
+export interface SecurityWarning {
+  readonly type: string;
+  readonly message: string;
+  readonly severity: 'LOW' | 'MEDIUM' | 'HIGH';
+  readonly code: string;
+}
+
+export interface SecurityValidationResult {
+  readonly valid: boolean;
+  readonly errors: readonly SecurityError[];
+  readonly warnings: readonly SecurityWarning[];
+  readonly riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  readonly recommendations: readonly string[];
+}
+
+export interface SecuritySandbox {
+  createSandbox(pluginName: string, permissions: readonly string[]): SandboxContext;
+  validatePlugin(plugin: CortexPlugin): SecurityValidationResult;
+  executeInSandbox<T>(sandbox: SandboxContext, operation: () => T): T;
+  checkPermission(sandbox: SandboxContext, permission: string): boolean;
+  addPermission(sandbox: SandboxContext, permission: string): void;
+  removePermission(sandbox: SandboxContext, permission: string): void;
+  getSandboxInfo(sandbox: SandboxContext): SandboxInfo;
+  destroySandbox(sandbox: SandboxContext): void;
+}
+
 /**
  * Plugin Context
  */
@@ -61,6 +128,8 @@ export interface CortexPlugin {
   readonly commands?: readonly CLICommand[];
   readonly templates?: readonly Template[];
   readonly hooks?: readonly Hook[];
+  readonly permissions?: readonly string[];
+  readonly securityPolicy?: SecurityPolicy;
   
   install?(context: PluginContext): Promise<void>;
   uninstall?(context: PluginContext): Promise<void>;
