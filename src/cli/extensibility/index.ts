@@ -34,7 +34,16 @@ export type {
   SecurityError,
   SecurityWarning,
   SecurityValidationResult,
-  SecuritySandbox
+  SecuritySandbox,
+  PluginListing,
+  InstalledPlugin,
+  PluginVersion,
+  SearchFilters,
+  Category,
+  PluginReview,
+  InstallResult,
+  UpdateResult,
+  PluginMarketplace
 } from './types.js';
 
 // Export all implementations
@@ -47,3 +56,4 @@ export { CortexCommandDiscovery } from './commandDiscovery.js';
 export { CortexCommandComposer } from './commandComposer.js';
 export { CortexExtensibilityManager } from './extensibilityManager.js';
 export { CortexSecuritySandbox } from './securitySandbox.js';
+export { CortexPluginMarketplace } from './pluginMarketplace.js';

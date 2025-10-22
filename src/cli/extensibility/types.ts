@@ -75,6 +75,125 @@ export interface SecuritySandbox {
   destroySandbox(sandbox: SandboxContext): void;
 }
 
+// Plugin Marketplace Types
+export interface PluginListing {
+  readonly id: string;
+  readonly name: string;
+  readonly description: string;
+  readonly version: string;
+  readonly author: string;
+  readonly downloads: number;
+  readonly rating: number;
+  readonly reviewCount: number;
+  readonly lastUpdated: Date;
+  readonly createdAt: Date;
+  readonly categories: readonly string[];
+  readonly tags: readonly string[];
+  readonly license: string;
+  readonly homepage?: string;
+  readonly repository?: string;
+  readonly documentation?: string;
+  readonly isInstalled: boolean;
+  readonly isVerified: boolean;
+  readonly securityScore: number;
+  readonly size: number;
+  readonly dependencies: readonly string[];
+}
+
+export interface InstalledPlugin {
+  readonly id: string;
+  readonly name: string;
+  readonly version: string;
+  readonly installedAt: Date;
+  readonly lastUsed: Date;
+  readonly isEnabled: boolean;
+  readonly updateAvailable: boolean;
+  readonly latestVersion: string;
+}
+
+export interface PluginVersion {
+  readonly version: string;
+  readonly releaseDate: Date;
+  readonly changelog: string;
+  readonly isStable: boolean;
+  readonly isPrerelease: boolean;
+  readonly downloadCount: number;
+}
+
+export interface SearchFilters {
+  readonly category?: string;
+  readonly tags?: readonly string[];
+  readonly minRating?: number;
+  readonly maxRating?: number;
+  readonly minDownloads?: number;
+  readonly maxDownloads?: number;
+  readonly isVerified?: boolean;
+  readonly isInstalled?: boolean;
+  readonly license?: string;
+  readonly author?: string;
+  readonly sortBy?: 'name' | 'rating' | 'downloads' | 'updated' | 'created';
+  readonly sortOrder?: 'asc' | 'desc';
+  readonly limit?: number;
+  readonly offset?: number;
+}
+
+export interface Category {
+  readonly id: string;
+  readonly name: string;
+  readonly description: string;
+  readonly pluginCount: number;
+  readonly icon?: string;
+}
+
+export interface PluginReview {
+  readonly id: string;
+  readonly pluginId: string;
+  readonly author: string;
+  readonly rating: number;
+  readonly title: string;
+  readonly content: string;
+  readonly createdAt: Date;
+  readonly isVerified: boolean;
+  readonly helpful: number;
+  readonly notHelpful: number;
+}
+
+export interface InstallResult {
+  readonly success: boolean;
+  readonly pluginId: string;
+  readonly version: string;
+  readonly installedAt: Date;
+  readonly errors?: readonly string[];
+  readonly warnings?: readonly string[];
+}
+
+export interface UpdateResult {
+  readonly success: boolean;
+  readonly pluginId: string;
+  readonly fromVersion: string;
+  readonly toVersion: string;
+  readonly updatedAt: Date;
+  readonly errors?: readonly string[];
+  readonly warnings?: readonly string[];
+}
+
+export interface PluginMarketplace {
+  searchPlugins(query: string, filters?: SearchFilters): Promise<readonly PluginListing[]>;
+  getPlugin(id: string): Promise<PluginListing | null>;
+  installPlugin(id: string, version?: string): Promise<InstallResult>;
+  uninstallPlugin(id: string): Promise<boolean>;
+  getInstalledPlugins(): readonly InstalledPlugin[];
+  updatePlugin(id: string): Promise<UpdateResult>;
+  getPluginVersions(id: string): Promise<readonly PluginVersion[]>;
+  getPopularPlugins(limit?: number): Promise<readonly PluginListing[]>;
+  getRecentPlugins(limit?: number): Promise<readonly PluginListing[]>;
+  getPluginCategories(): Promise<readonly Category[]>;
+  getPluginsByCategory(category: string): Promise<readonly PluginListing[]>;
+  ratePlugin(id: string, rating: number, review?: string): Promise<boolean>;
+  getPluginReviews(id: string): Promise<readonly PluginReview[]>;
+  reportPlugin(id: string, reason: string, description?: string): Promise<boolean>;
+}
+
 /**
  * Plugin Context
  */
@@ -130,6 +249,7 @@ export interface CortexPlugin {
   readonly hooks?: readonly Hook[];
   readonly permissions?: readonly string[];
   readonly securityPolicy?: SecurityPolicy;
+  readonly createdAt?: Date;
   
   install?(context: PluginContext): Promise<void>;
   uninstall?(context: PluginContext): Promise<void>;
