@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { SmartContractClient } from '../../src/web3/smartContracts';
+import { SmartContractClient } from '../../src/web3/smartContracts.js';
 import { MockJsonRpcProvider, MockContract } from '../mocks/ethers.js';
 
 let mockContractInstance: MockContract;
@@ -27,7 +27,7 @@ test('SmartContractClient should call a contract function', async () => {
   const functionName = 'myFunction';
   const args = [123];
 
-  mockContractInstance.mockResponse = '0x000000000000000000000000000000000000000000000000000000000000007b'; // Mock encoded result for 123
+  MockContract.setNextResponse('0x000000000000000000000000000000000000000000000000000000000000007b'); // Mock encoded result for 123
 
   const result = await client.callContractFunction(contractAddress, abi, functionName, args);
 

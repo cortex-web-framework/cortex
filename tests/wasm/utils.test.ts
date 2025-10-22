@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
 import { loadWasmModule, instantiateWasmModule, jsToWasm, wasmToJs } from '../../src/wasm/utils.js';
+import { createMemoryManager } from '../../src/wasm/memoryManager.js';
 
 // Mock WebAssembly for testing
 const mockWasmModule = new WebAssembly.Module(new Uint8Array([0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00]));
@@ -36,7 +37,6 @@ test('jsToWasm should convert JS data to Wasm-compatible format (pointer)', () =
       memory: new WebAssembly.Memory({ initial: 1 })
     }
   } as WebAssembly.Instance;
-  const { createMemoryManager } = require('../../src/wasm/memoryManager.js');
   const memoryManager = createMemoryManager(mockWasmInstance);
 
   const data = { a: 1, b: 'hello' };
@@ -54,7 +54,6 @@ test('wasmToJs should convert Wasm-compatible data to JS object', () => {
       memory: new WebAssembly.Memory({ initial: 1 })
     }
   } as WebAssembly.Instance;
-  const { createMemoryManager } = require('../../src/wasm/memoryManager.js');
   const memoryManager = createMemoryManager(mockWasmInstance);
 
   const expectedObject = { status: 'ok' };

@@ -144,7 +144,8 @@ export function compression(config: CompressionConfig = {}): (req: Request, res:
   const finalConfig = { ...DEFAULT_COMPRESSION_CONFIG, ...config };
 
   return (req: Request, res: Response, next: NextFunction): void => {
-    const acceptEncoding = (req.headers?.['accept-encoding'] as string) || '';
+    // Support both standard Node.js req.headers and Express-style req.get()
+    const acceptEncoding = ((req as any).get?.('Accept-Encoding') || (req.headers?.['accept-encoding'] as string) || '') as string;
     const supportedEncodings = parseAcceptEncoding(acceptEncoding);
     const selectedEncoding = selectEncoding(supportedEncodings);
 

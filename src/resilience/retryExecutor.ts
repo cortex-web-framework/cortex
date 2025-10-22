@@ -17,11 +17,15 @@ export const DEFAULT_RETRY_CONFIG: RetryConfig = {
  */
 export class ErrorMatchers {
   /**
-   * Match by error name
+   * Match by error name (checks both error.name and error.message)
    */
   static byName(errorNames: string[]): ErrorMatcher {
     return (error: Error) => {
-      return errorNames.includes(error.name);
+      return errorNames.some(name =>
+        error.name === name ||
+        error.constructor.name === name ||
+        error.message.includes(name)
+      );
     };
   }
 

@@ -88,3 +88,28 @@ test('WorkerActor with Wasm support should pass wasmModuleUrl to worker', async 
   assert.deepStrictEqual(mockWorkerInstance.postedMessages[0].type, 'init', 'First message should be init type');
   assert.deepStrictEqual(mockWorkerInstance.postedMessages[0].wasmModuleUrl, wasmUrl, 'Init message should contain wasmModuleUrl');
 });
+
+test('WorkerActor should receive computation result from Wasm worker', async () => {
+  const mockSystem = new MockActorSystem();
+  const wasmUrl = 'http://localhost/my.wasm';
+  const actor = new WorkerActor('test-actor-5', mockSystem, wasmUrl);
+
+  const message = { type: 'compute', payload: { x: 5, y: 10 } };
+  let resultReceived: any = null;
+
+  // @ts-ignore
+  actor.onWasmResult = (result) => {
+    resultReceived = result;
+  };
+
+  actor.receive(message);
+
+  // @ts-ignore
+  const mockWorkerInstance = actor['worker'] as MockWorker;
+  // Simulate the worker sending a result back
+  if (mockWorkerInstance.onmessage) {
+    mockWorkerInstance.onmessage(new MessageEvent('message', { data: { type: 'wasm_result', result: 15 } }));
+  }
+
+  assert.strictEqual(resultReceived, 15, 'Should receive the correct computation result from the worker');
+});

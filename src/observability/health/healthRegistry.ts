@@ -1,4 +1,5 @@
 import { HealthCheck, HealthCheckResult, HealthStatus } from '../types.js';
+import { getDefaultHealthChecks } from './defaultChecks.js';
 
 /**
  * HealthCheckRegistry manages and executes health checks
@@ -13,6 +14,13 @@ import { HealthCheck, HealthCheckResult, HealthStatus } from '../types.js';
  */
 export class HealthCheckRegistry {
   private checks: Map<string, HealthCheck> = new Map();
+
+  constructor() {
+    // Register default health checks
+    getDefaultHealthChecks().forEach(check => {
+      this.checks.set(check.name, check);
+    });
+  }
 
   /**
    * Register a health check

@@ -11,14 +11,14 @@ const workerCode = `
     const { type, message, actorId, system, wasmModuleUrl } = e.data;
 
     if (type === 'init') {
-      console.log(\`Worker initialized for actor \${actorId}\`);
+      console.log('Worker initialized for actor ' + actorId);
       if (wasmModuleUrl) {
         try {
           const wasmModule = await loadWasmModule(wasmModuleUrl);
           wasmInstance = await instantiateWasmModule(wasmModule);
-          console.log(\`Wasm module loaded and instantiated for actor \${actorId}\`);
+          console.log('Wasm module loaded and instantiated for actor ' + actorId);
         } catch (error) {
-          console.error(\`Failed to load Wasm module for actor \${actorId}:\`, error);
+          console.error('Failed to load Wasm module for actor ' + actorId + ':', error);
         }
       }
       // In a real scenario, you'd dynamically load the actor class
@@ -33,7 +33,7 @@ const workerCode = `
         const result = (wasmInstance.exports.receive as Function)(message);
         self.postMessage({ type: 'wasm_result', result });
       } else {
-        console.warn(\`Actor instance or Wasm receive method not ready for \${actorId}\`);
+        console.warn('Actor instance or Wasm receive method not ready for ' + actorId);
       }
     }
   };
@@ -44,6 +44,7 @@ const workerUrl = URL.createObjectURL(workerBlob);
 
 export class WorkerActor extends Actor {
   private worker: Worker;
+  public onWasmResult: ((result: any) => void) | null = null;
 
   constructor(id: string, system: ActorSystem, wasmModuleUrl?: string) {
     super(id, system);
@@ -51,8 +52,13 @@ export class WorkerActor extends Actor {
     this.worker.postMessage({ type: 'init', actorId: this.id, system: 'TODO: Pass a proxy for ActorSystem', wasmModuleUrl });
 
     this.worker.onmessage = (e) => {
-      // Handle messages from the worker if needed
-      console.log(`Message from worker for ${this.id}:`, e.data);
+      if (e.data.type === 'wasm_result') {
+        if (this.onWasmResult) {
+          this.onWasmResult(e.data.result);
+        }
+      } else {
+        console.log(`Message from worker for ${this.id}:`, e.data);
+      }
     };
 
     this.worker.onerror = (error) => {

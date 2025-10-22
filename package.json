@@ -6,9 +6,10 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "build": "tsc",
-    "build:test": "tsc -p tsconfig.test.json",
-    "test": "npm run build:test && node --test $(find dist/tests -name '*.test.js' -not -path '*/smartContracts.test.js' | tr '\\n' ' ')",
-    "test:quick": "npm run build:test && node --test $(find dist/tests -name '*.test.js' -not -path '*/smartContracts.test.js' | tr '\\n' ' ') --test-timeout 300000"
+    "test:compile": "tsc --project tsconfig.test.json",
+    "test:run": "node --test dist-tests/tests/**/*.test.js",
+    "test": "npm run test:compile && npm run test:run",
+    "test:watch": "tsc --project tsconfig.test.json --watch"
   },
   "keywords": [],
   "author": "",
