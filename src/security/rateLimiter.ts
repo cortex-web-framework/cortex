@@ -1,4 +1,17 @@
-import { Request, Response, NextFunction } from 'express';
+import http from 'node:http';
+
+interface RequestExt extends http.IncomingMessage {
+  ip?: string;
+}
+
+interface ResponseExt extends http.ServerResponse {
+  status?: (code: number) => ResponseExt;
+  send?: (body?: any) => ResponseExt;
+}
+
+type Request = RequestExt;
+type Response = ResponseExt;
+type NextFunction = () => void;
 
 interface RateLimiterOptions {
   windowMs: number; // Window size in milliseconds
@@ -13,6 +26,12 @@ const defaultOptions: RateLimiterOptions = {
 };
 
 const clients = new Map<string, { count: number; lastReset: number }>();
+
+// Export for testing purposes
+export const __testing__ = {
+  getClients: () => clients,
+  clearClients: () => clients.clear(),
+};
 
 export function rateLimiter(options?: Partial<RateLimiterOptions>) {
   const opts = { ...defaultOptions, ...options };
@@ -32,7 +51,13 @@ export function rateLimiter(options?: Partial<RateLimiterOptions>) {
     }
 
     if (client.count >= opts.max) {
-      res.status(429).send(opts.message);
+      // Support both Express and native Node.js HTTP
+      if (res.status) {
+        res.status(429)?.send?.(opts.message);
+      } else {
+        res.statusCode = 429;
+        res.end(opts.message);
+      }
       return;
     }
 

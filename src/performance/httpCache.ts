@@ -1,5 +1,14 @@
-import { Request, Response, NextFunction } from 'express';
-import crypto from 'crypto';
+import http from 'node:http';
+import crypto from 'node:crypto';
+
+interface ResponseExt extends http.ServerResponse {
+  status?: (code: number) => ResponseExt;
+  send?: (data?: any) => ResponseExt;
+}
+
+type Request = http.IncomingMessage;
+type Response = ResponseExt;
+type NextFunction = () => void;
 
 export function setCacheControl(res: Response, maxAge: number, isPublic: boolean = false): void {
   const cacheType = isPublic ? 'public' : 'private';
@@ -34,7 +43,13 @@ export function conditionalGet(data: string | Buffer, lastModified?: Date, etag?
     }
 
     if (isNotModified) {
-      res.status(304).send();
+      // Support both Express and native Node.js HTTP
+      if (res.status) {
+        res.status(304)?.send?.();
+      } else {
+        res.statusCode = 304;
+        res.end();
+      }
       return;
     } else {
       if (lastModified) setLastModified(res, lastModified);

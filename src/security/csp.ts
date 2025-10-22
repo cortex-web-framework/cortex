@@ -1,4 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
+import http from 'node:http';
+
+type Request = http.IncomingMessage;
+type Response = http.ServerResponse;
+type NextFunction = () => void;
 
 export class CSPBuilder {
   private policies: string[] = [];

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { rateLimiter } from '../../src/security/rateLimiter.js';
+import { rateLimiter, __testing__ } from '../../src/security/rateLimiter.js';
 import { IncomingMessage, ServerResponse } from 'node:http';
 
 // Mock Request and Response objects for middleware testing
@@ -72,7 +72,7 @@ async function callLimiter(middleware: any, req: any, res: any): Promise<boolean
 
 test.beforeEach(() => {
   // Clear the clients map for test isolation
-  (rateLimiter as any).clients.clear(); // Access the private clients map
+  __testing__.clearClients();
 });
 
 test('rateLimiter should allow requests within the limit', async () => {
