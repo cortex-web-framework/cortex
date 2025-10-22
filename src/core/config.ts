@@ -68,14 +68,14 @@ export class Config {
     const parts = key.split('.');
     let current: Record<string, any> = this.config;
     for (let i = 0; i < parts.length; i++) {
-      const part = parts[i];
+      const part = parts[i]!;
       if (i === parts.length - 1) {
         current[part] = value;
       } else {
         if (!current[part] || typeof current[part] !== 'object') {
           current[part] = {};
         }
-        current = current[part];
+        current = current[part] as Record<string, unknown>;
       }
     }
   }

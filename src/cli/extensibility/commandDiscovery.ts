@@ -117,7 +117,7 @@ export class CortexCommandDiscovery implements CommandDiscovery {
     // Validate options if provided
     if (command.options) {
       for (let i = 0; i < command.options.length; i++) {
-        const option = command.options[i];
+        const option = command.options[i]!;
         if (!option.name || typeof option.name !== 'string') {
           errors.push({
         
@@ -127,7 +127,7 @@ export class CortexCommandDiscovery implements CommandDiscovery {
           });
         }
         
-        if (!option.description || typeof option.description !== 'string') {
+        if (!option?.description || typeof option.description !== 'string') {
           errors.push({
         
         field: `options[${i}].description`,
@@ -136,7 +136,7 @@ export class CortexCommandDiscovery implements CommandDiscovery {
           });
         }
         
-        if (!option.type || typeof option.type !== 'string') {
+        if (!option?.type || typeof option.type !== 'string') {
           errors.push({
         
         field: `options[${i}].type`,
@@ -145,7 +145,7 @@ export class CortexCommandDiscovery implements CommandDiscovery {
           });
         }
         
-        if (!['string', 'number', 'boolean', 'array'].includes(option.type)) {
+        if (!['string', 'number', 'boolean', 'array'].includes(option?.type || '')) {
           errors.push({
         
         field: `options[${i}].type`,
@@ -159,7 +159,7 @@ export class CortexCommandDiscovery implements CommandDiscovery {
     // Validate subcommands if provided
     if (command.subcommands) {
       for (let i = 0; i < command.subcommands.length; i++) {
-        const subcommand = command.subcommands[i];
+        const subcommand = command.subcommands[i]!;
         const subcommandValidation = this.validateCommand(subcommand);
         if (!subcommandValidation.valid) {
           for (const error of subcommandValidation.errors) {

@@ -49,7 +49,7 @@ export class CortexHttpServer {
   private requestListener(req: http.IncomingMessage, res: http.ServerResponse): void {
     const runMiddleware = (middlewareStack: Middleware[], index: number, callback: () => void) => {
       if (index < middlewareStack.length) {
-        middlewareStack[index](req, res, () => runMiddleware(middlewareStack, index + 1, callback));
+        middlewareStack[index]!(req, res, () => runMiddleware(middlewareStack, index + 1, callback));
       } else {
         callback();
       }
@@ -89,7 +89,7 @@ export class CortexHttpServer {
           const params: Record<string, string> = {};
           route.paramNames.forEach((name, index) => {
             if (match && match[index + 1]) {
-              params[name] = match[index + 1];
+              params[name] = match[index + 1]!;
             }
           });
           req.params = params;

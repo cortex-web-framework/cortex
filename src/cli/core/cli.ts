@@ -121,7 +121,7 @@ export class CLIParser {
         return;
       }
 
-      const command = commandArgs[0];
+      const command = commandArgs[0]!;
       const commandArgs_ = commandArgs.slice(1);
       
       await this.executeCommand(command, commandArgs_);
@@ -166,7 +166,7 @@ export class CLIParser {
     let i = 0;
 
     while (i < args.length) {
-      const arg = args[i];
+      const arg = args[i]!;
       
       if (arg.startsWith('--')) {
         const optionName = arg.slice(2);
@@ -178,7 +178,7 @@ export class CLIParser {
           } else {
             i++;
             if (i < args.length) {
-              result[optionName] = this.convertValue(args[i], option.type);
+              result[optionName] = this.convertValue(args[i]!, option.type);
             } else {
               throw new CLIError(`Option --${optionName} requires a value`, 'MISSING_OPTION_VALUE');
             }
@@ -196,7 +196,7 @@ export class CLIParser {
           } else {
             i++;
             if (i < args.length) {
-              result[option.name] = this.convertValue(args[i], option.type);
+              result[option.name] = this.convertValue(args[i]!, option.type);
             } else {
               throw new CLIError(`Option -${alias} requires a value`, 'MISSING_OPTION_VALUE');
             }

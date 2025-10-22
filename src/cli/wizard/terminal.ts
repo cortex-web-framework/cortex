@@ -183,12 +183,12 @@ export class TerminalUI {
       
       if (i === selectedIndex) {
         if (this.colors) {
-          result += colors.cyan('> ') + colors.bold(options[i]);
+          result += colors.cyan('> ') + colors.bold(options[i]!);
         } else {
-          result += '> ' + options[i];
+          result += '> ' + options[i]!;
         }
       } else {
-        result += '  ' + options[i];
+        result += '  ' + options[i]!;
       }
     }
     
@@ -209,7 +209,7 @@ export class TerminalUI {
     
     for (let i = 0; i < data.length; i++) {
       result += this.moveCursor(x, y + (headers ? 1 : 0) + i);
-      result += this.drawTableRow(data[i], false);
+      result += this.drawTableRow(data[i]!, false);
       result += '\n';
     }
     
@@ -228,9 +228,9 @@ export class TerminalUI {
       }
       
       if (isHeader && this.colors) {
-        result += colors.bold(row[i]);
+        result += colors.bold(row[i]!);
       } else {
-        result += row[i];
+        result += row[i]!;
       }
     }
     

@@ -21,7 +21,7 @@ export class SpanImpl implements Span {
   constructor(options: {
     traceId: string;
     spanId: string;
-    parentSpanId?: string;
+    parentSpanId?: string | undefined;
     name: string;
     kind: SpanKind;
     startTime: number;
@@ -29,7 +29,7 @@ export class SpanImpl implements Span {
   }) {
     this.traceId = options.traceId;
     this.spanId = options.spanId;
-    this.parentSpanId = options.parentSpanId;
+    this.parentSpanId = options.parentSpanId || undefined;
     this.name = options.name;
     this.kind = options.kind;
     this.startTime = options.startTime;
@@ -50,7 +50,7 @@ export class SpanImpl implements Span {
     this.events.push({
       name,
       timestamp: Date.now(),
-      attributes,
+      attributes: attributes || {},
     });
   }
 

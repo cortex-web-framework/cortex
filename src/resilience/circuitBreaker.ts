@@ -1,4 +1,5 @@
-import { CircuitState, CircuitBreakerConfig, ResiliencePolicy } from './types.js';
+import type { CircuitBreakerConfig, ResiliencePolicy } from './types.js';
+import { CircuitState } from './types.js';
 import { CircuitBreakerOpenError } from './errors.js';
 
 /**

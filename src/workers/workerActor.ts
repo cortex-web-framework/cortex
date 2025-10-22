@@ -89,11 +89,11 @@ export class WorkerActor extends Actor {
 
   public override receive(message: unknown): void {
     // Messages sent to WorkerActor are forwarded to the actual worker
-    this.worker.postMessage({ type: 'message', message });
+    this.worker!.postMessage({ type: 'message', message });
   }
 
   public override postStop(): void {
-    this.worker.terminate();
+    this.worker!.terminate();
     super.postStop();
   }
 }

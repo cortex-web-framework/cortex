@@ -1,4 +1,4 @@
-import type { Span, TraceContext } from '../types.js';
+import type { Span, TraceContext, SamplingContext } from '../types.js';
 import { SpanKind } from '../types.js';
 import { SpanImpl } from './span.js';
 import type { Sampler } from './sampler.js';
@@ -57,10 +57,10 @@ export class Tracer {
     const parentSpanId = options.parent?.spanId;
 
     // Check if we should sample this span
-    const samplingContext = {
+    const samplingContext: SamplingContext = {
       traceId,
       spanId,
-      parentContext: options.parent,
+      parentContext: options.parent || undefined,
       attributes: options.attributes || {},
     };
 

@@ -1,4 +1,4 @@
-import { BulkheadConfig, ResiliencePolicy } from './types.js';
+import type { BulkheadConfig, ResiliencePolicy } from './types.js';
 import { BulkheadRejectError } from './errors.js';
 
 /**

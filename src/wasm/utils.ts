@@ -20,14 +20,14 @@ declare global {
 export async function loadWasmModule(wasmUrl: string): Promise<WebAssembly.Module> {
   const response = await fetch(wasmUrl);
   const buffer = await response.arrayBuffer();
-  return WebAssembly.compile(buffer);
+  return (WebAssembly as any).compile(buffer);
 }
 
 export async function instantiateWasmModule(
   module: WebAssembly.Module,
   imports?: WebAssembly.Imports
 ): Promise<WebAssembly.Instance> {
-  return WebAssembly.instantiate(module, imports);
+  return (WebAssembly as any).instantiate(module, imports);
 }
 
 /**

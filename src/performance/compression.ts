@@ -66,7 +66,7 @@ export function parseAcceptEncoding(acceptEncoding: string): string[] {
   
   return acceptEncoding
     .split(',')
-    .map(encoding => encoding.trim().split(';')[0])
+    .map(encoding => encoding.trim().split(';')[0]!)
     .filter(encoding => encoding.length > 0);
 }
 
@@ -85,7 +85,7 @@ export function selectEncoding(supportedEncodings: string[]): string | null {
  * Check if content should be compressed
  */
 export function isCompressible(contentType: string, config: CompressionConfig): boolean {
-  const type = contentType.split(';')[0].toLowerCase();
+  const type = contentType.split(';')[0]!.toLowerCase();
 
   // Check excluded types first (blacklist takes priority)
   if (config.excludeContentTypes?.some(excluded =>

@@ -128,7 +128,7 @@ export class CortexPluginLoader implements PluginLoader {
     // Validate commands if provided
     if (plugin.commands) {
       for (let i = 0; i < plugin.commands.length; i++) {
-        const command = plugin.commands[i];
+        const command = plugin.commands[i]!;
         if (!command.name || typeof command.name !== 'string') {
           errors.push({
         
@@ -138,7 +138,7 @@ export class CortexPluginLoader implements PluginLoader {
           });
         }
         
-        if (!command.action || typeof command.action !== 'function') {
+        if (!command?.action || typeof command.action !== 'function') {
           errors.push({
         
         field: `commands[${i}].action`,
@@ -152,7 +152,7 @@ export class CortexPluginLoader implements PluginLoader {
     // Validate templates if provided
     if (plugin.templates) {
       for (let i = 0; i < plugin.templates.length; i++) {
-        const template = plugin.templates[i];
+        const template = plugin.templates[i]!;
         if (!template.name || typeof template.name !== 'string') {
           errors.push({
         
@@ -162,7 +162,7 @@ export class CortexPluginLoader implements PluginLoader {
           });
         }
         
-        if (!template.generate || typeof template.generate !== 'function') {
+        if (!template?.generate || typeof template.generate !== 'function') {
           errors.push({
         
         field: `templates[${i}].generate`,
@@ -176,7 +176,7 @@ export class CortexPluginLoader implements PluginLoader {
     // Validate hooks if provided
     if (plugin.hooks) {
       for (let i = 0; i < plugin.hooks.length; i++) {
-        const hook = plugin.hooks[i];
+        const hook = plugin.hooks[i]!;
         if (!hook.name || typeof hook.name !== 'string') {
           errors.push({
         
@@ -186,7 +186,7 @@ export class CortexPluginLoader implements PluginLoader {
           });
         }
         
-        if (!hook.event || typeof hook.event !== 'string') {
+        if (!hook?.event || typeof hook.event !== 'string') {
           errors.push({
         
         field: `hooks[${i}].event`,
@@ -195,7 +195,7 @@ export class CortexPluginLoader implements PluginLoader {
           });
         }
         
-        if (!hook.handler || typeof hook.handler !== 'function') {
+        if (!hook?.handler || typeof hook.handler !== 'function') {
           errors.push({
         
         field: `hooks[${i}].handler`,

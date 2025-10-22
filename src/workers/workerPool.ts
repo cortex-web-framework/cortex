@@ -44,7 +44,7 @@ interface WorkerInfo {
   worker: Worker;
   id: string;
   isBusy: boolean;
-  currentTask?: WorkerTask;
+  currentTask?: WorkerTask | undefined;
   restartCount: number;
   lastUsed: number;
 }
@@ -299,7 +299,7 @@ export class WorkerPool extends EventEmitter {
         workerInfo.currentTask.reject(new Error('Task timeout'));
         this.busyWorkers.delete(taskId);
         workerInfo.isBusy = false;
-        workerInfo.currentTask = undefined;
+        workerInfo.currentTask = undefined as WorkerTask | undefined;
         this.availableWorkers.push(workerId);
         this.processQueue();
       }

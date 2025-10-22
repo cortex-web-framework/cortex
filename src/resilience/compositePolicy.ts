@@ -67,7 +67,7 @@ export class CompositePolicy implements ResiliencePolicy {
     for (let i = this.policies.length - 1; i >= 0; i--) {
       const policy = this.policies[i];
       const wrappedOperation = currentOperation;
-      currentOperation = () => policy.execute(wrappedOperation);
+      currentOperation = () => policy!.execute(wrappedOperation);
     }
 
     return currentOperation();

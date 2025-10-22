@@ -37,8 +37,8 @@ export class CortexGitHubInstaller implements GitHubInstaller {
     for (const pattern of patterns) {
       const match = repository.match(pattern);
       if (match) {
-        const owner = match[1];
-        const name = match[2];
+        const owner = match[1]!;
+        const name = match[2]!;
         return {
           owner,
           name,

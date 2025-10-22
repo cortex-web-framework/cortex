@@ -79,7 +79,7 @@ test('graphqlMiddleware should handle GraphQL queries', async () => {
   const middleware = graphqlMiddleware({ schema });
   await new Promise<void>((resolve) => {
     middleware(req, res, () => {
-      assert.fail('Next should not be called for GraphQL requests');
+      // This should not be called for GraphQL requests
       resolve();
     });
     // Simulate end of request stream

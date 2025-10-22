@@ -110,7 +110,7 @@ export class WasmMemoryManager {
     }
 
     // Write data to memory
-    const memoryView = new Uint8Array(this["memory"].buffer, ptr, size);
+    const memoryView = new Uint8Array(this["memory"]!.buffer, ptr, size);
     memoryView.set(buffer);
 
     // Track allocation
@@ -137,7 +137,7 @@ export class WasmMemoryManager {
     }
 
     // Clear memory
-    const memoryView = new Uint8Array(this["memory"].buffer, ptr, allocation.size);
+    const memoryView = new Uint8Array(this["memory"]!.buffer, ptr, allocation.size);
     memoryView.fill(0);
 
     // Remove from tracking
@@ -155,7 +155,7 @@ export class WasmMemoryManager {
     }
 
     const size = length || allocation.size;
-    const memoryView = new Uint8Array(this["memory"].buffer, ptr, size);
+    const memoryView = new Uint8Array(this["memory"]!.buffer, ptr, size);
     const decoder = new TextDecoder();
     return decoder.decode(memoryView);
   }
@@ -186,7 +186,7 @@ export class WasmMemoryManager {
     }
 
     const size = length || allocation.size;
-    return new Uint8Array(this["memory"].buffer, ptr, size);
+    return new Uint8Array(this["memory"]!.buffer, ptr, size);
   }
 
   /**
@@ -196,8 +196,8 @@ export class WasmMemoryManager {
     const totalAllocations = this.allocations.size;
     const totalAllocatedSize = Array.from(this.allocations.values())
       .reduce((sum, alloc) => sum + alloc.size, 0);
-    const memoryPages = this["memory"].buffer.byteLength / (64 * 1024);
-    const memoryUsage = totalAllocatedSize / this["memory"].buffer.byteLength;
+    const memoryPages = this["memory"]!.buffer.byteLength / (64 * 1024);
+    const memoryUsage = totalAllocatedSize / this["memory"]!.buffer.byteLength;
 
     return {
       totalAllocations,
@@ -235,7 +235,7 @@ export class WasmMemoryManager {
    */
   private initializeMemory(): void {
     // Ensure minimum memory size
-    if (this["memory"].buffer.byteLength < this.config.initialPages * 64 * 1024) {
+    if (this["memory"]!.buffer.byteLength < this.config.initialPages * 64 * 1024) {
       this.growMemory(this.config.initialPages);
     }
   }
@@ -255,7 +255,7 @@ export class WasmMemoryManager {
 
     // Check if we need to grow memory
     const requiredSize = this.nextPtr + size;
-    const currentSize = this["memory"].buffer.byteLength;
+    const currentSize = this["memory"]!.buffer.byteLength;
     
     if (requiredSize > currentSize) {
       const pagesNeeded = Math.ceil((requiredSize - currentSize) / (64 * 1024));
@@ -289,14 +289,14 @@ export class WasmMemoryManager {
    */
   private growMemory(pages: number): boolean {
     try {
-      const currentPages = this["memory"].buffer.byteLength / (64 * 1024);
+      const currentPages = this["memory"]!.buffer.byteLength / (64 * 1024);
       const newPages = Math.min(currentPages + pages, this.config.maximumPages);
       
       if (newPages <= currentPages) {
         return false;
       }
 
-      this["memory"].grow(newPages - currentPages);
+      (this["memory"] as any).grow(newPages - currentPages);
       return true;
     } catch (error) {
       console["error"]('Failed to grow memory:', error);
@@ -319,7 +319,7 @@ export class WasmMemoryManager {
   private performGarbageCollection(): void {
     const stats = this.getMemoryStats();
     
-    if (stats["memory"]Usage > this.config.gcThreshold) {
+    if (stats.memoryUsage > this.config.gcThreshold) {
       // Clean up old allocations (older than 5 minutes)
       const cutoffTime = Date.now() - 300000;
       const toRemove: number[] = [];
@@ -356,8 +356,8 @@ export async function loadWasmWithMemory(
 ): Promise<{ instance: WebAssembly.Instance; memoryManager: WasmMemoryManager }> {
   const response = await fetch(wasmUrl);
   const buffer = await response.arrayBuffer();
-  const module = await WebAssembly.compile(buffer);
-  const instance = await WebAssembly.instantiate(module);
+  const module = await (WebAssembly as any).compile(buffer);
+  const instance = await (WebAssembly as any).instantiate(module);
   
   const memoryManager = createMemoryManager(instance, config);
   

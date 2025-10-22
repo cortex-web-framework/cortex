@@ -35,7 +35,7 @@ export class CortexAdvancedTemplateEngine implements AdvancedTemplateEngine {
     // Render each file
     for (const file of template.files) {
       const content = await this.renderFile(file, context);
-      const filePath = join(context.options.outputPath as string || '.', file.path);
+      const filePath = join(context.options["outputPath"] as string || '.', file.path);
       
       // Ensure directory exists
       await mkdir(dirname(filePath), { recursive: true });
@@ -199,9 +199,9 @@ export class CortexAdvancedTemplateEngine implements AdvancedTemplateEngine {
     
     const matches = Array.from(content.matchAll(includeRegex));
     for (const match of matches) {
-      const includeName = match[1].trim();
+      const includeName = match[1]!.trim();
       const includeContent = context.includes[includeName] || '';
-      processed = processed.replace(match[0], includeContent);
+      processed = processed.replace(match[0]!, includeContent);
     }
     
     return processed;
@@ -216,9 +216,9 @@ export class CortexAdvancedTemplateEngine implements AdvancedTemplateEngine {
     
     const matches = Array.from(content.matchAll(partialRegex));
     for (const match of matches) {
-      const partialName = match[1].trim();
+      const partialName = match[1]!.trim();
       const partialContent = context.partials[partialName] || '';
-      processed = processed.replace(match[0], partialContent);
+      processed = processed.replace(match[0]!, partialContent);
     }
     
     return processed;
@@ -233,13 +233,13 @@ export class CortexAdvancedTemplateEngine implements AdvancedTemplateEngine {
     
     const matches = Array.from(content.matchAll(helperRegex));
     for (const match of matches) {
-      const helperName = match[1];
-      const args = match[2].split(',').map(arg => arg.trim());
+      const helperName = match[1]!;
+      const args = match[2]!.split(',').map(arg => arg.trim());
       const helper = context.helpers[helperName];
       
       if (helper) {
         const result = await helper(...args);
-        processed = processed.replace(match[0], result);
+        processed = processed.replace(match[0]!, result);
       }
     }
     
@@ -255,9 +255,9 @@ export class CortexAdvancedTemplateEngine implements AdvancedTemplateEngine {
     
     const matches = Array.from(content.matchAll(filterRegex));
     for (const match of matches) {
-      const value = match[1].trim();
-      const filterName = match[2];
-      const args = match[3] ? match[3].split(',').map(arg => arg.trim()) : [];
+      const value = match[1]!.trim();
+      const filterName = match[2]!;
+      const args = match[3] ? match[3]!.split(',').map(arg => arg.trim()) : [];
       const filter = context.filters[filterName];
       
       if (filter) {
@@ -279,7 +279,7 @@ export class CortexAdvancedTemplateEngine implements AdvancedTemplateEngine {
     const variableRegex = /\{\{([^#\/][^}]+)\}\}/g;
     let match;
     while ((match = variableRegex.exec(content)) !== null) {
-      const variableName = match[1].trim().split('|')[0].trim();
+      const variableName = match[1]!.trim().split('|')[0]!.trim();
       if (!variableName.startsWith('if ') && !variableName.startsWith('each ')) {
         variables.add(variableName);
       }
@@ -426,7 +426,7 @@ export class CortexAdvancedTemplateEngine implements AdvancedTemplateEngine {
       content = await this.processHelpers(content, context);
       content = await this.processFilters(content, context);
       
-      const filePath = join(context.options.outputPath as string || '.', file.path);
+      const filePath = join(context.options["outputPath"] as string || '.', file.path);
       await mkdir(dirname(filePath), { recursive: true });
       await writeFile(filePath, content, { encoding: 'utf8' });
     }
