@@ -12,8 +12,10 @@ import type {
   Category,
   PluginReview,
   InstallResult,
-  UpdateResult
+  UpdateResult,
+  GitHubInstallResult
 } from './types.js';
+import { CortexGitHubInstaller } from './githubInstaller.js';
 
 /**
  * Plugin Marketplace Implementation
@@ -23,8 +25,10 @@ export class CortexPluginMarketplace implements PluginMarketplace {
   private readonly installedPlugins = new Map<string, InstalledPlugin>();
   private readonly categories = new Map<string, Category>();
   private readonly reviews = new Map<string, PluginReview[]>();
+  public readonly githubInstaller: CortexGitHubInstaller;
 
   constructor() {
+    this.githubInstaller = new CortexGitHubInstaller();
     this.initializeDefaultData();
   }
 
@@ -350,6 +354,62 @@ export class CortexPluginMarketplace implements PluginMarketplace {
     // In a real implementation, this would send to a moderation system
     console.log(`Plugin ${id} reported: ${reason} - ${description || 'No description'}`);
     return true;
+  }
+
+  /**
+   * Install plugin from GitHub repository
+   */
+  async installFromGitHub(repository: string, version?: string): Promise<GitHubInstallResult> {
+    return this.githubInstaller.installFromRepository(repository, version);
+  }
+
+  /**
+   * Validate GitHub repository
+   */
+  async validateGitHubRepository(repository: string) {
+    return this.githubInstaller.validateRepository(repository);
+  }
+
+  /**
+   * Get GitHub repository information
+   */
+  async getGitHubRepositoryInfo(repository: string) {
+    return this.githubInstaller.getRepositoryInfo(repository);
+  }
+
+  /**
+   * Get GitHub repository releases
+   */
+  async getGitHubReleases(repository: string) {
+    return this.githubInstaller.getRepositoryReleases(repository);
+  }
+
+  /**
+   * Get GitHub repository tags
+   */
+  async getGitHubTags(repository: string) {
+    return this.githubInstaller.getRepositoryTags(repository);
+  }
+
+  /**
+   * Get plugins installed from GitHub
+   */
+  getGitHubInstalledPlugins() {
+    return this.githubInstaller.getInstalledFromGitHub();
+  }
+
+  /**
+   * Update plugin from GitHub
+   */
+  async updateFromGitHub(pluginId: string) {
+    return this.githubInstaller.updateFromGitHub(pluginId);
+  }
+
+  /**
+   * Uninstall plugin from GitHub
+   */
+  async uninstallFromGitHub(pluginId: string) {
+    return this.githubInstaller.uninstallFromGitHub(pluginId);
   }
 
   /**

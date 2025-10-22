@@ -298,7 +298,7 @@ export class CortexTemplateEngine implements TemplateEngine {
       }
       
       // Run custom validation
-      if (variableDef.validation && !variableDef.validation(value)) {
+      if (variableDef.validation && !this.validateVariableRule(value, variableDef.validation)) {
         errors.push({
           field: variableDef.name,
           message: `Variable '${variableDef.name}' failed custom validation`,
@@ -329,6 +329,28 @@ export class CortexTemplateEngine implements TemplateEngine {
         return Array.isArray(value);
       case 'object':
         return typeof value === 'object' && value !== null && !Array.isArray(value);
+      default:
+        return true;
+    }
+  }
+
+  /**
+   * Validate a single variable rule
+   */
+  private validateVariableRule(value: unknown, rule: ValidationRule): boolean {
+    switch (rule.type) {
+      case 'required':
+        return value !== undefined && value !== null && value !== '';
+      case 'type':
+        return typeof value === rule.value;
+      case 'min':
+        return typeof value === 'number' && value >= (rule.value as number);
+      case 'max':
+        return typeof value === 'number' && value <= (rule.value as number);
+      case 'pattern':
+        return typeof value === 'string' && new RegExp(rule.value as string).test(value);
+      case 'custom':
+        return rule.validator ? rule.validator(value) : true;
       default:
         return true;
     }

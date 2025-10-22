@@ -43,7 +43,39 @@ export type {
   PluginReview,
   InstallResult,
   UpdateResult,
-  PluginMarketplace
+  PluginMarketplace,
+  AdvancedTemplate,
+  TemplateVariable,
+  ValidationRule,
+  TemplateHook,
+  TemplateHelper,
+  TemplateFilter,
+  TemplatePartial,
+  TemplateInclude,
+  TemplateMetadata,
+  PerformanceMetrics,
+  SecurityMetrics,
+  CompiledTemplate,
+  CompiledFile,
+  CompiledMetadata,
+  TemplatePreview,
+  PreviewFile,
+  PreviewMetadata,
+  AdvancedTemplateEngine,
+  GitHubRepository,
+  GitHubRepositoryInfo,
+  GitHubValidationResult,
+  GitHubRelease,
+  GitHubTag,
+  GitHubInstallResult,
+  GitHubInstallMetadata,
+  GitHubInstalledPlugin,
+  GitHubCommit,
+  GitHubCommitAuthor,
+  GitHubTree,
+  GitHubCommitParent,
+  GitHubVerification,
+  GitHubInstaller
 } from './types.js';
 
 // Export all implementations
@@ -57,3 +89,5 @@ export { CortexCommandComposer } from './commandComposer.js';
 export { CortexExtensibilityManager } from './extensibilityManager.js';
 export { CortexSecuritySandbox } from './securitySandbox.js';
 export { CortexPluginMarketplace } from './pluginMarketplace.js';
+export { CortexAdvancedTemplateEngine } from './advancedTemplateEngine.js';
+export { CortexGitHubInstaller } from './githubInstaller.js';

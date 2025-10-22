@@ -194,6 +194,401 @@ export interface PluginMarketplace {
   reportPlugin(id: string, reason: string, description?: string): Promise<boolean>;
 }
 
+// Advanced Template Types
+export interface AdvancedTemplate {
+  readonly name: string;
+  readonly version: string;
+  readonly description: string;
+  readonly author: string;
+  readonly files: readonly TemplateFile[];
+  readonly config: TemplateConfig;
+  readonly variables: readonly TemplateVariable[];
+  readonly dependencies: readonly string[];
+  readonly hooks: readonly TemplateHook[];
+  readonly helpers: readonly TemplateHelper[];
+  readonly filters: readonly TemplateFilter[];
+  readonly partials: readonly TemplatePartial[];
+  readonly includes: readonly TemplateInclude[];
+  readonly metadata: TemplateMetadata;
+}
+
+export interface TemplateVariable {
+  readonly name: string;
+  readonly type: 'string' | 'number' | 'boolean' | 'array' | 'object' | 'function';
+  readonly description: string;
+  readonly required: boolean;
+  readonly default?: unknown;
+  readonly validation?: readonly ValidationRule[];
+  readonly options?: readonly unknown[];
+  readonly group?: string;
+  readonly order?: number;
+}
+
+export interface ValidationRule {
+  readonly type: 'min' | 'max' | 'pattern' | 'custom' | 'required' | 'type';
+  readonly value?: unknown;
+  readonly message: string;
+  readonly validator?: (value: unknown) => boolean;
+}
+
+export interface TemplateHook {
+  readonly name: string;
+  readonly type: 'pre-render' | 'post-render' | 'pre-validate' | 'post-validate' | 'pre-install' | 'post-install';
+  readonly handler: (context: TemplateContext) => void | Promise<void>;
+  readonly priority: number;
+  readonly async: boolean;
+}
+
+export interface TemplateHelper {
+  readonly name: string;
+  readonly handler: (...args: unknown[]) => string | Promise<string>;
+  readonly description: string;
+  readonly parameters: readonly HelperParameter[];
+  readonly returnType: string;
+  readonly async: boolean;
+}
+
+export interface HelperParameter {
+  readonly name: string;
+  readonly type: string;
+  readonly required: boolean;
+  readonly description: string;
+}
+
+export interface TemplateFilter {
+  readonly name: string;
+  readonly handler: (value: unknown, ...args: unknown[]) => string | Promise<string>;
+  readonly description: string;
+  readonly parameters: readonly FilterParameter[];
+  readonly returnType: string;
+  readonly async: boolean;
+}
+
+export interface FilterParameter {
+  readonly name: string;
+  readonly type: string;
+  readonly required: boolean;
+  readonly description: string;
+}
+
+export interface TemplatePartial {
+  readonly name: string;
+  readonly content: string;
+  readonly variables: readonly string[];
+  readonly description: string;
+}
+
+export interface TemplateInclude {
+  readonly name: string;
+  readonly path: string;
+  readonly variables: readonly string[];
+  readonly description: string;
+  readonly optional: boolean;
+}
+
+export interface TemplateMetadata {
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
+  readonly size: number;
+  readonly fileCount: number;
+  readonly complexity: 'low' | 'medium' | 'high';
+  readonly performance: PerformanceMetrics;
+  readonly security: SecurityMetrics;
+}
+
+export interface PerformanceMetrics {
+  readonly renderTime: number;
+  readonly memoryUsage: number;
+  readonly fileOperations: number;
+  readonly cacheHits: number;
+  readonly cacheMisses: number;
+}
+
+export interface SecurityMetrics {
+  readonly riskLevel: 'low' | 'medium' | 'high' | 'critical';
+  readonly vulnerabilities: readonly string[];
+  readonly permissions: readonly string[];
+  readonly sandboxRequired: boolean;
+}
+
+export interface CompiledTemplate {
+  readonly template: AdvancedTemplate;
+  readonly compiledFiles: readonly CompiledFile[];
+  readonly compiledHelpers: Record<string, (...args: unknown[]) => string | Promise<string>>;
+  readonly compiledFilters: Record<string, (value: unknown, ...args: unknown[]) => string | Promise<string>>;
+  readonly compiledHooks: Record<string, (context: TemplateContext) => void | Promise<void>>;
+  readonly dependencies: readonly string[];
+  readonly metadata: CompiledMetadata;
+}
+
+export interface CompiledFile {
+  readonly path: string;
+  readonly compiledContent: string;
+  readonly type: 'text' | 'binary' | 'template';
+  readonly variables: readonly string[];
+  readonly dependencies: readonly string[];
+  readonly checksum: string;
+}
+
+export interface CompiledMetadata {
+  readonly compiledAt: Date;
+  readonly compileTime: number;
+  readonly size: number;
+  readonly optimizationLevel: 'none' | 'basic' | 'advanced' | 'maximum';
+  readonly cacheable: boolean;
+}
+
+export interface TemplatePreview {
+  readonly files: readonly PreviewFile[];
+  readonly variables: Record<string, unknown>;
+  readonly metadata: PreviewMetadata;
+  readonly warnings: readonly string[];
+  readonly errors: readonly string[];
+}
+
+export interface PreviewFile {
+  readonly path: string;
+  readonly content: string;
+  readonly type: 'text' | 'binary' | 'template';
+  readonly size: number;
+  readonly preview: string;
+}
+
+export interface PreviewMetadata {
+  readonly generatedAt: Date;
+  readonly fileCount: number;
+  readonly totalSize: number;
+  readonly complexity: 'low' | 'medium' | 'high';
+}
+
+export interface AdvancedTemplateEngine {
+  renderTemplate(template: AdvancedTemplate, context: TemplateContext): Promise<void>;
+  renderFile(file: TemplateFile, context: TemplateContext): Promise<string>;
+  validateTemplate(template: AdvancedTemplate): ValidationResult;
+  applyVariables(content: string, variables: Record<string, unknown>): string;
+  processConditionals(content: string, variables: Record<string, unknown>): string;
+  processLoops(content: string, variables: Record<string, unknown>): string;
+  processIncludes(content: string, context: TemplateContext): Promise<string>;
+  processPartials(content: string, context: TemplateContext): Promise<string>;
+  processHelpers(content: string, context: TemplateContext): Promise<string>;
+  processFilters(content: string, context: TemplateContext): Promise<string>;
+  extractVariables(content: string): string[];
+  validateVariables(template: AdvancedTemplate, variables: Record<string, unknown>): ValidationResult;
+  compileTemplate(template: AdvancedTemplate): CompiledTemplate;
+  executeCompiledTemplate(compiled: CompiledTemplate, context: TemplateContext): Promise<void>;
+  getTemplateDependencies(template: AdvancedTemplate): string[];
+  validateTemplateDependencies(template: AdvancedTemplate): ValidationResult;
+  processTemplateHooks(template: AdvancedTemplate, context: TemplateContext, hookType: string): Promise<void>;
+  generateTemplatePreview(template: AdvancedTemplate, context: TemplateContext): Promise<TemplatePreview>;
+}
+
+// GitHub Integration Types
+export interface GitHubRepository {
+  readonly id: number;
+  readonly name: string;
+  readonly fullName: string;
+  readonly description: string;
+  readonly owner: GitHubUser;
+  readonly htmlUrl: string;
+  readonly cloneUrl: string;
+  readonly sshUrl: string;
+  readonly defaultBranch: string;
+  readonly language: string;
+  readonly stargazersCount: number;
+  readonly forksCount: number;
+  readonly openIssuesCount: number;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
+  readonly pushedAt: Date;
+  readonly size: number;
+  readonly isPrivate: boolean;
+  readonly isFork: boolean;
+  readonly isArchived: boolean;
+  readonly isDisabled: boolean;
+  readonly topics: readonly string[];
+  readonly license?: GitHubLicense;
+  readonly permissions: GitHubPermissions;
+}
+
+export interface GitHubUser {
+  readonly id: number;
+  readonly login: string;
+  readonly name: string;
+  readonly email: string;
+  readonly avatarUrl: string;
+  readonly htmlUrl: string;
+  readonly type: 'User' | 'Organization';
+  readonly siteAdmin: boolean;
+  readonly company?: string;
+  readonly blog?: string;
+  readonly location?: string;
+  readonly bio?: string;
+  readonly publicRepos: number;
+  readonly publicGists: number;
+  readonly followers: number;
+  readonly following: number;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
+}
+
+export interface GitHubLicense {
+  readonly key: string;
+  readonly name: string;
+  readonly spdxId: string;
+  readonly url: string;
+  readonly nodeId: string;
+}
+
+export interface GitHubPermissions {
+  readonly admin: boolean;
+  readonly maintain: boolean;
+  readonly push: boolean;
+  readonly triage: boolean;
+  readonly pull: boolean;
+}
+
+export interface GitHubRelease {
+  readonly id: number;
+  readonly tagName: string;
+  readonly name: string;
+  readonly body: string;
+  readonly draft: boolean;
+  readonly prerelease: boolean;
+  readonly createdAt: Date;
+  readonly publishedAt: Date;
+  readonly author: GitHubUser;
+  readonly assets: readonly GitHubAsset[];
+  readonly tarballUrl: string;
+  readonly zipballUrl: string;
+  readonly htmlUrl: string;
+}
+
+export interface GitHubAsset {
+  readonly id: number;
+  readonly name: string;
+  readonly label: string;
+  readonly contentType: string;
+  readonly state: string;
+  readonly size: number;
+  readonly downloadCount: number;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
+  readonly browserDownloadUrl: string;
+}
+
+export interface GitHubInstallResult {
+  readonly success: boolean;
+  readonly repository: string;
+  readonly version: string;
+  readonly installedAt: Date;
+  readonly pluginId: string;
+  readonly errors?: readonly string[];
+  readonly warnings?: readonly string[];
+  readonly metadata: GitHubInstallMetadata;
+}
+
+export interface GitHubInstallMetadata {
+  readonly source: 'github';
+  readonly repository: string;
+  readonly owner: string;
+  readonly name: string;
+  readonly branch: string;
+  readonly commit: string;
+  readonly downloadUrl: string;
+  readonly size: number;
+  readonly license?: string;
+  readonly readme?: string;
+  readonly packageJson?: Record<string, unknown>;
+}
+
+export interface GitHubInstaller {
+  parseRepositoryUrl(repository: string): GitHubRepositoryInfo | null;
+  validateRepository(repository: string): Promise<GitHubValidationResult>;
+  getRepositoryInfo(repository: string): Promise<GitHubRepository | null>;
+  getRepositoryReleases(repository: string): Promise<readonly GitHubRelease[]>;
+  getRepositoryTags(repository: string): Promise<readonly GitHubTag[]>;
+  installFromRepository(repository: string, version?: string): Promise<GitHubInstallResult>;
+  installFromRelease(repository: string, release: string): Promise<GitHubInstallResult>;
+  installFromTag(repository: string, tag: string): Promise<GitHubInstallResult>;
+  installFromBranch(repository: string, branch: string): Promise<GitHubInstallResult>;
+  getInstalledFromGitHub(): readonly GitHubInstalledPlugin[];
+  updateFromGitHub(pluginId: string): Promise<GitHubInstallResult>;
+  uninstallFromGitHub(pluginId: string): Promise<boolean>;
+}
+
+export interface GitHubRepositoryInfo {
+  readonly owner: string;
+  readonly name: string;
+  readonly fullName: string;
+  readonly url: string;
+}
+
+export interface GitHubValidationResult {
+  readonly valid: boolean;
+  readonly repository: string;
+  readonly errors: readonly string[];
+  readonly warnings: readonly string[];
+  readonly info?: GitHubRepositoryInfo;
+}
+
+export interface GitHubTag {
+  readonly name: string;
+  readonly commit: GitHubCommit;
+  readonly zipballUrl: string;
+  readonly tarballUrl: string;
+  readonly nodeId: string;
+}
+
+export interface GitHubCommit {
+  readonly sha: string;
+  readonly url: string;
+  readonly htmlUrl: string;
+  readonly author: GitHubCommitAuthor;
+  readonly committer: GitHubCommitAuthor;
+  readonly message: string;
+  readonly tree: GitHubTree;
+  readonly parents: readonly GitHubCommitParent[];
+  readonly verification: GitHubVerification;
+}
+
+export interface GitHubCommitAuthor {
+  readonly name: string;
+  readonly email: string;
+  readonly date: Date;
+}
+
+export interface GitHubTree {
+  readonly sha: string;
+  readonly url: string;
+}
+
+export interface GitHubCommitParent {
+  readonly sha: string;
+  readonly url: string;
+  readonly htmlUrl: string;
+}
+
+export interface GitHubVerification {
+  readonly verified: boolean;
+  readonly reason: string;
+  readonly signature?: string;
+  readonly payload?: string;
+}
+
+export interface GitHubInstalledPlugin {
+  readonly id: string;
+  readonly name: string;
+  readonly version: string;
+  readonly repository: string;
+  readonly owner: string;
+  readonly installedAt: Date;
+  readonly lastUpdated: Date;
+  readonly isEnabled: boolean;
+  readonly updateAvailable: boolean;
+  readonly latestVersion: string;
+  readonly metadata: GitHubInstallMetadata;
+}
+
 /**
  * Plugin Context
  */
@@ -263,7 +658,11 @@ export interface CortexPlugin {
 export interface TemplateFile {
   readonly path: string;
   readonly content: string | TemplateContentFunction;
+  readonly type: 'text' | 'binary' | 'template';
   readonly permissions?: number;
+  readonly encoding?: string;
+  readonly size?: number;
+  readonly checksum?: string;
   readonly executable?: boolean;
 }
 
@@ -281,6 +680,13 @@ export interface TemplateContext {
   readonly variables: Record<string, unknown>;
   readonly workingDirectory: string;
   readonly logger: PluginLogger;
+  readonly metadata: Record<string, unknown>;
+  readonly options: Record<string, unknown>;
+  readonly helpers: Record<string, (...args: unknown[]) => string | Promise<string>>;
+  readonly filters: Record<string, (value: unknown, ...args: unknown[]) => string | Promise<string>>;
+  readonly partials: Record<string, string>;
+  readonly includes: Record<string, string>;
+  readonly hooks: Record<string, (context: TemplateContext) => void | Promise<void>>;
 }
 
 /**
@@ -300,15 +706,6 @@ export interface TemplateConfig {
 /**
  * Template Variable
  */
-export interface TemplateVariable {
-  readonly name: string;
-  readonly description: string;
-  readonly type: 'string' | 'number' | 'boolean' | 'array' | 'object';
-  readonly required: boolean;
-  readonly default?: unknown;
-  readonly validation?: (value: unknown) => boolean;
-  readonly prompt?: string;
-}
 
 /**
  * Template Interface
@@ -365,6 +762,7 @@ export interface ValidationResult {
  * Validation Error
  */
 export interface ValidationError {
+  readonly type: string;
   readonly field: string;
   readonly message: string;
   readonly code: string;
