@@ -60,7 +60,7 @@ test('createGraphQLSchema should return a GraphQLSchema object', () => {
   assert.strictEqual(schema.query.hello(), 'Hello world!', 'Resolver should be linked');
 });
 
-test('graphqlMiddleware should handle GraphQL queries', async (_t, done) => {
+test('graphqlMiddleware should handle GraphQL queries', async () => {
   const typeDefs = `
     type Query {
       hello: String
@@ -92,10 +92,9 @@ test('graphqlMiddleware should handle GraphQL queries', async (_t, done) => {
   assert.ok((res as any)._endCalled, 'Response should be ended');
   const responseBody = JSON.parse((res as any)._data[0].toString());
   assert.deepStrictEqual(responseBody, { data: { hello: 'Hello from GraphQL!' } }, 'Response body should contain GraphQL result');
-  done();
 });
 
-test('graphqlMiddleware should call next for non-GraphQL requests', async (t, done) => {
+test('graphqlMiddleware should call next for non-GraphQL requests', async () => {
   const typeDefs = `
     type Query {
       hello: String
@@ -124,5 +123,4 @@ test('graphqlMiddleware should call next for non-GraphQL requests', async (t, do
   assert.strictEqual(nextCalled, true, 'Next should be called for non-GraphQL requests');
   assert.strictEqual(res.statusCode, 200, 'Status code should be 200');
   assert.strictEqual((res as any)._endCalled, false, 'Response should not be ended');
-  done();
 });
