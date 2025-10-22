@@ -24,36 +24,32 @@ class MockIPFSHTTPClient {
   }
 }
 
-// Mock the create function from ipfs-http-client
-const mockCreate = (_options: { url: string }) => {
-  // @ts-ignore
-  return new MockIPFSHTTPClient();
-};
-
 test('IPFSClient should add content to IPFS', async () => {
+  const mockInstance = new MockIPFSHTTPClient();
+  const mockCreate = (_options: { url: string }) => mockInstance;
+
   const client = new IPFSClient(mockCreate, 'http://localhost:5001');
   const content = 'Hello IPFS!';
   const expectedCid = 'QmMockCid';
 
   const cid = await client.addContent(content);
 
-  // @ts-ignore
-  assert.strictEqual(mockCreate().addCalled, true, 'add method should be called');
-  // @ts-ignore
-  assert.strictEqual(mockCreate().addedContent, content, 'Correct content should be added');
+  assert.strictEqual(mockInstance.addCalled, true, 'add method should be called');
+  assert.strictEqual(mockInstance.addedContent, content, 'Correct content should be added');
   assert.strictEqual(cid, expectedCid, 'Should return the correct CID');
 });
 
 test('IPFSClient should get content from IPFS', async () => {
+  const mockInstance = new MockIPFSHTTPClient();
+  const mockCreate = (_options: { url: string }) => mockInstance;
+
   const client = new IPFSClient(mockCreate, 'http://localhost:5001');
   const cid = 'QmTestCid';
   const expectedContent = Buffer.from('mock content');
 
   const content = await client.getContent(cid);
 
-  // @ts-ignore
-  assert.strictEqual(mockCreate().catCalled, true, 'cat method should be called');
-  // @ts-ignore
-  assert.strictEqual(mockCreate().catCid, cid, 'Correct CID should be used to get content');
+  assert.strictEqual(mockInstance.catCalled, true, 'cat method should be called');
+  assert.strictEqual(mockInstance.catCid, cid, 'Correct CID should be used to get content');
   assert.deepStrictEqual(content, expectedContent, 'Should return the correct content');
 });
