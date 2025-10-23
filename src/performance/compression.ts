@@ -169,10 +169,12 @@ export function compression(config: CompressionConfig = {}): (req: Request, res:
       // Extract headers from writeHead arguments
       // Signature: writeHead(statusCode, [statusMessage], [headers])
       let headersArg: Record<string, any> = {};
+      let headersArgIndex = -1;
       if (args.length > 0) {
         const lastArg = args[args.length - 1];
         if (typeof lastArg === 'object' && lastArg !== null && !Array.isArray(lastArg)) {
           headersArg = lastArg;
+          headersArgIndex = args.length - 1;
         }
       }
 
@@ -190,6 +192,13 @@ export function compression(config: CompressionConfig = {}): (req: Request, res:
         shouldCompress = true;
         res.setHeader('Content-Encoding', selectedEncoding);
         res.removeHeader('Content-Length'); // Remove original content length
+
+        // Remove Content-Length from args if it was passed in writeHead call
+        if (headersArgIndex >= 0 && headersArg['Content-Length']) {
+          const newHeaders = { ...headersArg };
+          delete newHeaders['Content-Length'];
+          args[headersArgIndex] = newHeaders;
+        }
       }
 
       return originalWriteHead(statusCode, ...args);
