@@ -235,12 +235,12 @@ export function compression(config: CompressionConfig = {}): (req: Request, res:
  * Brotli compression middleware
  */
 export function brotliCompression(config: CompressionConfig = {}): (req: Request, res: Response, next: NextFunction) => void {
-  return compression({ ...config, contentTypes: ['br'] });
+  return compression(config);
 }
 
 /**
  * Gzip compression middleware
  */
 export function gzipCompression(config: CompressionConfig = {}): (req: Request, res: Response, next: NextFunction) => void {
-  return compression({ ...config, contentTypes: ['gzip'] });
+  return compression(config);
 }
