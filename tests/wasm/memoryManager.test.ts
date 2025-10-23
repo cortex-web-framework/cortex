@@ -190,12 +190,171 @@ test('WasmMemoryManager should handle garbage collection', () => {
 test('WasmMemoryManager should clean up on destroy', () => {
   const instance = createMockWasmInstance();
   const manager = new WasmMemoryManager(instance);
-  
+
   const ptr = manager.allocateString('test');
   manager.destroy();
-  
+
   // Should not be able to read after destroy
   assert.throws(() => {
     manager.readString(ptr);
   }, /Cannot read: pointer/);
+});
+
+test('WasmMemoryManager should allocate aligned memory', () => {
+  const instance = createMockWasmInstance();
+  const manager = new WasmMemoryManager(instance);
+
+  const testBuffer = new Uint8Array([1, 2, 3, 4, 5]);
+  const ptr = manager.allocateAligned(testBuffer, 16);
+
+  // Pointer should be aligned to 16-byte boundary
+  assert.strictEqual(ptr % 16, 0, 'Pointer should be aligned to 16-byte boundary');
+
+  const readBuffer = manager.readBuffer(ptr);
+  assert.deepStrictEqual(Array.from(readBuffer), Array.from(testBuffer));
+
+  manager.deallocate(ptr);
+});
+
+test('WasmMemoryManager should enforce alignment constraints', () => {
+  const instance = createMockWasmInstance();
+  const manager = new WasmMemoryManager(instance);
+
+  const testBuffer = new Uint8Array([1, 2, 3, 4, 5]);
+
+  // Test various valid alignments
+  const alignments = [1, 2, 4, 8, 16, 32, 64];
+  const pointers: number[] = [];
+
+  for (const alignment of alignments) {
+    const ptr = manager.allocateAligned(testBuffer, alignment);
+    pointers.push(ptr);
+    assert.strictEqual(
+      ptr % alignment,
+      0,
+      `Pointer should be aligned to ${alignment}-byte boundary`
+    );
+    manager.deallocate(ptr);
+  }
+});
+
+test('WasmMemoryManager should reject invalid alignment', () => {
+  const instance = createMockWasmInstance();
+  const manager = new WasmMemoryManager(instance);
+
+  const testBuffer = new Uint8Array([1, 2, 3, 4, 5]);
+
+  // Test invalid alignments (not powers of 2)
+  const invalidAlignments = [3, 5, 7, 9, 15];
+
+  for (const alignment of invalidAlignments) {
+    assert.throws(
+      () => manager.allocateAligned(testBuffer, alignment),
+      /Alignment must be a power of 2/,
+      `Should reject alignment of ${alignment}`
+    );
+  }
+
+  // Test invalid alignment values
+  assert.throws(
+    () => manager.allocateAligned(testBuffer, 0),
+    /Alignment must be a power of 2/
+  );
+
+  assert.throws(
+    () => manager.allocateAligned(testBuffer, -8),
+    /Alignment must be a power of 2/
+  );
+});
+
+test('WasmMemoryManager should detect memory overflow', () => {
+  const instance = createMockWasmInstance();
+  const manager = new WasmMemoryManager(instance);
+
+  const testBuffer = new Uint8Array([1, 2, 3, 4, 5]);
+  const ptr = manager.allocateAligned(testBuffer, 8);
+
+  // Check for overflow (should be none)
+  const result = manager.checkOverflow();
+  assert.strictEqual(result.overflowed, false, 'Should not detect overflow');
+  assert.strictEqual(result.violations.length, 0, 'Should have no violations');
+
+  manager.deallocate(ptr);
+});
+
+test('WasmMemoryManager should track multiple aligned allocations', () => {
+  const instance = createMockWasmInstance();
+  const manager = new WasmMemoryManager(instance);
+
+  const pointers: number[] = [];
+
+  // Allocate multiple aligned buffers
+  for (let i = 0; i < 5; i++) {
+    const buffer = new Uint8Array([i, i + 1, i + 2]);
+    const ptr = manager.allocateAligned(buffer, 8);
+    pointers.push(ptr);
+
+    // Verify alignment
+    assert.strictEqual(ptr % 8, 0);
+  }
+
+  // Verify all are tracked
+  const stats = manager.getMemoryStats();
+  assert.strictEqual(stats.totalAllocations, 5);
+
+  // Deallocate all
+  pointers.forEach(ptr => manager.deallocate(ptr));
+
+  const finalStats = manager.getMemoryStats();
+  assert.strictEqual(finalStats.totalAllocations, 0);
+});
+
+test('WasmMemoryManager should reuse aligned memory', () => {
+  const instance = createMockWasmInstance();
+  const manager = new WasmMemoryManager(instance);
+
+  const buffer = new Uint8Array([1, 2, 3, 4, 5]);
+  const ptr1 = manager.allocateAligned(buffer, 16);
+
+  manager.deallocate(ptr1);
+
+  // Allocate again with same alignment
+  const ptr2 = manager.allocateAligned(buffer, 16);
+
+  // Should reuse the freed aligned memory
+  assert.strictEqual(ptr2, ptr1);
+  assert.strictEqual(ptr2 % 16, 0);
+
+  manager.deallocate(ptr2);
+});
+
+test('WasmMemoryManager should handle alignment with varying buffer sizes', () => {
+  const instance = createMockWasmInstance();
+  const manager = new WasmMemoryManager(instance);
+
+  const sizes = [1, 8, 16, 32, 64, 128, 256];
+  const pointers: { size: number; ptr: number }[] = [];
+
+  for (const size of sizes) {
+    const buffer = new Uint8Array(size);
+    const ptr = manager.allocateAligned(buffer, 8);
+    pointers.push({ size, ptr });
+
+    // Verify alignment is maintained
+    assert.strictEqual(ptr % 8, 0);
+
+    // Verify we can read the data back
+    const readBuffer = manager.readBuffer(ptr);
+    assert.strictEqual(readBuffer.length, size);
+  }
+
+  // Verify all are tracked correctly
+  const stats = manager.getMemoryStats();
+  assert.strictEqual(stats.totalAllocations, sizes.length);
+
+  // Deallocate all
+  pointers.forEach(({ ptr }) => manager.deallocate(ptr));
+
+  const finalStats = manager.getMemoryStats();
+  assert.strictEqual(finalStats.totalAllocations, 0);
 });

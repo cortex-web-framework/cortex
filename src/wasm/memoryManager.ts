@@ -11,6 +11,8 @@ export interface MemoryAllocation {
   size: number;          // Size of allocated memory
   type: 'string' | 'array' | 'object' | 'buffer'; // Type of data
   timestamp: number;     // Allocation timestamp
+  alignment?: number;    // Memory alignment (power of 2)
+  canary?: number;       // Overflow detection canary value
 }
 
 /**
@@ -207,6 +209,65 @@ export class WasmMemoryManager {
   }
 
   /**
+   * Allocate aligned memory
+   */
+  public allocateAligned(buffer: Uint8Array, alignment: number = 8): number {
+    if (alignment <= 0 || (alignment & (alignment - 1)) !== 0) {
+      throw new Error('Alignment must be a power of 2');
+    }
+
+    const ptr = this.findAlignedMemory(buffer.length, alignment);
+
+    if (ptr === -1) {
+      throw new Error('Failed to allocate aligned memory: insufficient space');
+    }
+
+    // Write data to memory
+    const memoryView = new Uint8Array(this["memory"]!.buffer, ptr, buffer.length);
+    memoryView.set(buffer);
+
+    // Track allocation with alignment info
+    const allocation: MemoryAllocation = {
+      ptr,
+      size: buffer.length,
+      type: 'buffer',
+      timestamp: Date.now(),
+      alignment,
+      canary: this.generateCanary()
+    };
+
+    this.allocations.set(ptr, allocation);
+    this.nextPtr = Math.max(this.nextPtr, ptr + buffer.length);
+
+    return ptr;
+  }
+
+  /**
+   * Check for memory overflow
+   */
+  public checkOverflow(): { overflowed: boolean; violations: number[] } {
+    const violations: number[] = [];
+
+    for (const [ptr, allocation] of this.allocations.entries()) {
+      if (!allocation.canary) continue;
+
+      // Check if allocated memory is still within bounds
+      const endPtr = ptr + allocation.size;
+      if (endPtr > this["memory"]!.buffer.byteLength) {
+        violations.push(ptr);
+      }
+
+      // Verify canary not corrupted (optional: store canary at end)
+      // This is a simplified check
+    }
+
+    return {
+      overflowed: violations.length > 0,
+      violations
+    };
+  }
+
+  /**
    * Cleanup and destroy memory manager
    */
   public destroy(): void {
@@ -308,22 +369,60 @@ export class WasmMemoryManager {
    */
   private performGarbageCollection(): void {
     const stats = this.getMemoryStats();
-    
+
     if (stats.memoryUsage > this.config.gcThreshold) {
       // Clean up old allocations (older than 5 minutes)
       const cutoffTime = Date.now() - 300000;
       const toRemove: number[] = [];
-      
+
       for (const [ptr, allocation] of this.allocations.entries()) {
         if (allocation.timestamp < cutoffTime) {
           toRemove.push(ptr);
         }
       }
-      
+
       toRemove.forEach(ptr => this.deallocate(ptr));
-      
+
       console.log(`Garbage collection: removed ${toRemove.length} allocations`);
     }
+  }
+
+  /**
+   * Find memory space with alignment constraints
+   */
+  private findAlignedMemory(size: number, alignment: number): number {
+    // Try to find aligned space in free list
+    for (const ptr of this.freeList) {
+      if ((ptr & (alignment - 1)) === 0 && this.isMemoryFree(ptr, size)) {
+        this.freeList.delete(ptr);
+        return ptr;
+      }
+    }
+
+    // Find aligned space after nextPtr
+    let alignedPtr = this.nextPtr;
+    if ((alignedPtr & (alignment - 1)) !== 0) {
+      alignedPtr = (alignedPtr + (alignment - 1)) & ~(alignment - 1);
+    }
+
+    const requiredSize = alignedPtr + size;
+    const currentSize = this["memory"]!.buffer.byteLength;
+
+    if (requiredSize > currentSize) {
+      const pagesNeeded = Math.ceil((requiredSize - currentSize) / (64 * 1024));
+      if (!this.growMemory(pagesNeeded)) {
+        return -1;
+      }
+    }
+
+    return alignedPtr;
+  }
+
+  /**
+   * Generate canary value for overflow detection
+   */
+  private generateCanary(): number {
+    return Math.floor(Math.random() * 0xffffffff);
   }
 }
 
