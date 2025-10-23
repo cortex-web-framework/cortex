@@ -6,7 +6,7 @@
 
 import {
   DataTypeHint,
-  TypeInformation,
+  type TypeInformation,
   detectDataType,
   isSerializable,
   ErrorCode
