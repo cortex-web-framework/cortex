@@ -60,13 +60,22 @@ class MockResponse extends ServerResponse {
 async function callLimiter(middleware: any, req: any, res: any): Promise<boolean> {
   return new Promise((resolve) => {
     let nextWasCalled = false;
-    middleware(req, res, () => {
-      nextWasCalled = true;
-    });
+
+    // Set the resolve callback BEFORE calling middleware to catch synchronous end() calls
     res.setResolveCallback(() => {
       resolve(nextWasCalled);
     });
-    // Timeout in case next is never called
+
+    middleware(req, res, () => {
+      nextWasCalled = true;
+    });
+
+    // If next() was called, it will be synchronous, so resolve after a tick
+    if (nextWasCalled) {
+      setTimeout(() => resolve(nextWasCalled), 0);
+    }
+
+    // Timeout in case response never ends and next was not called
     setTimeout(() => resolve(nextWasCalled), 100);
   });
 }
