@@ -115,22 +115,25 @@ test('HealthCheckRegistry should calculate overall status correctly', async () =
   // All UP
   const check1 = new MockHealthCheck('check1', false, false);
   registry.register(check1);
-  
-  let status = await registry.getOverallStatus();
+
+  let results = await registry.checkAll();
+  let status = registry.getOverallStatus(results);
   assert.strictEqual(status, HealthStatus.UP);
 
   // One DEGRADED
   const check2 = new MockHealthCheck('check2', false, true);
   registry.register(check2);
-  
-  status = await registry.getOverallStatus();
+
+  results = await registry.checkAll();
+  status = registry.getOverallStatus(results);
   assert.strictEqual(status, HealthStatus.DEGRADED);
 
   // One DOWN
   const check3 = new MockHealthCheck('check3', true, false);
   registry.register(check3);
-  
-  status = await registry.getOverallStatus();
+
+  results = await registry.checkAll();
+  status = registry.getOverallStatus(results);
   assert.strictEqual(status, HealthStatus.DOWN);
 });
 

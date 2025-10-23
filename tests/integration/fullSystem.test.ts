@@ -88,8 +88,8 @@ test('Full System Integration: Observability + Resilience + Performance', async 
   // Test health checks
   const healthResult = await healthRegistry.checkAll();
   assert.ok(healthResult.size > 0);
-  
-  const overallStatus = await healthRegistry.getOverallStatus();
+
+  const overallStatus = healthRegistry.getOverallStatus(healthResult);
   assert.ok(['up', 'down', 'degraded'].includes(overallStatus));
   
   // Test resilience patterns
@@ -267,8 +267,8 @@ test('Observability Integration', async () => {
   // Test health checks
   const healthResults = await healthRegistry.checkAll();
   assert.ok(healthResults.size > 0);
-  
-  const overallHealth = await healthRegistry.getOverallStatus();
+
+  const overallHealth = healthRegistry.getOverallStatus(healthResults);
   assert.ok(['up', 'down', 'degraded'].includes(overallHealth));
 });
 

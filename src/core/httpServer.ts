@@ -1,6 +1,8 @@
 import * as http from 'node:http';
 import { Socket } from 'node:net';
 import { RouteNotFound } from './errors.js';
+import type { MetricsCollector } from '../observability/metrics/collector.js';
+import type { HealthCheckRegistry } from '../observability/health/healthRegistry.js';
 
 declare module 'node:http' {
   interface IncomingMessage {
@@ -195,5 +197,60 @@ export class CortexHttpServer {
 
   public isRunning(): boolean {
     return this.running;
+  }
+
+  /**
+   * Register the /metrics endpoint for Prometheus-format metrics
+   *
+   * @param metricsCollector - MetricsCollector instance
+   */
+  public registerMetricsEndpoint(metricsCollector: MetricsCollector): void {
+    this.get('/metrics', (_req: http.IncomingMessage, res: http.ServerResponse) => {
+      res.writeHead(200, {
+        'Content-Type': 'text/plain; version=0.0.4; charset=utf-8',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+      });
+      res.end(metricsCollector.toPrometheusFormat());
+    });
+  }
+
+  /**
+   * Register the /health endpoint for health check results
+   *
+   * @param healthRegistry - HealthCheckRegistry instance
+   */
+  public registerHealthEndpoint(healthRegistry: HealthCheckRegistry): void {
+    this.get('/health', async (_req: http.IncomingMessage, res: http.ServerResponse) => {
+      try {
+        const results = await healthRegistry.checkAll();
+        const overallStatus = healthRegistry.getOverallStatus(results);
+
+        const response = {
+          status: overallStatus,
+          timestamp: Date.now(),
+          checks: Object.fromEntries(results.entries()),
+        };
+
+        res.writeHead(overallStatus === 'up' ? 200 : overallStatus === 'degraded' ? 503 : 503, {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+        });
+        res.end(JSON.stringify(response, null, 2));
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        res.writeHead(503, {
+          'Content-Type': 'application/json',
+        });
+        res.end(JSON.stringify(
+          {
+            status: 'down',
+            timestamp: Date.now(),
+            error: errorMessage,
+          },
+          null,
+          2
+        ));
+      }
+    });
   }
 }

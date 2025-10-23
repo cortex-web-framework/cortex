@@ -97,13 +97,12 @@ export class HealthCheckRegistry {
   }
 
   /**
-   * Get overall health status
+   * Get overall health status from check results
    *
+   * @param results - Health check results map
    * @returns Overall status (UP if all checks pass, DOWN if any fail, DEGRADED if any degraded)
    */
-  public async getOverallStatus(): Promise<HealthStatus> {
-    const results = await this.checkAll();
-
+  public getOverallStatus(results: Map<string, HealthCheckResult>): HealthStatus {
     let hasDown = false;
     let hasDegraded = false;
 
