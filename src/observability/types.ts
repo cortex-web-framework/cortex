@@ -97,7 +97,7 @@ export interface SpanEvent {
 export interface Span {
   readonly traceId: string;
   readonly spanId: string;
-  readonly parentSpanId?: string;
+  readonly parentSpanId?: string | undefined;
 
   name: string;
   kind: SpanKind;
@@ -130,7 +130,7 @@ export enum SamplingDecision {
 export interface SamplingContext {
   traceId: string;
   spanId: string;
-  parentContext?: TraceContext;
+  parentContext?: TraceContext | undefined;
   attributes: Record<string, AttributeValue>;
 }
 

@@ -4,7 +4,7 @@
  */
 
 import assert from 'node:assert/strict';
-import { describe, it, beforeEach, afterEach } from 'node:test';
+import { describe, it, beforeEach } from 'node:test';
 
 // Mock types for now - these will be replaced with actual imports
 interface MockAdvancedTemplateEngine {
@@ -265,7 +265,7 @@ type MockHookFunction = (context: MockTemplateContext) => void | Promise<void>;
 // Mock implementation for testing
 class MockCortexAdvancedTemplateEngine implements MockAdvancedTemplateEngine {
   private readonly compiledTemplates = new Map<string, MockCompiledTemplate>();
-  private readonly templateCache = new Map<string, string>();
+  // private readonly templateCache = new Map<string, string>();
 
   async renderTemplate(template: MockAdvancedTemplate, context: MockTemplateContext): Promise<void> {
     // Process template hooks
@@ -273,7 +273,7 @@ class MockCortexAdvancedTemplateEngine implements MockAdvancedTemplateEngine {
     
     // Render each file
     for (const file of template.files) {
-      const content = await this.renderFile(file, context);
+      // const content = await this.renderFile(file, context);
       // In real implementation, this would write to filesystem
       console.log(`Rendered file: ${file.path}`);
     }
@@ -361,7 +361,7 @@ class MockCortexAdvancedTemplateEngine implements MockAdvancedTemplateEngine {
 
     // Validate dependencies
     const depValidation = this.validateTemplateDependencies(template);
-    errors.push(...depValidation["error"]s);
+    errors.push(...depValidation.errors);
     warnings.push(...depValidation.warnings);
 
     return {
@@ -409,9 +409,9 @@ class MockCortexAdvancedTemplateEngine implements MockAdvancedTemplateEngine {
     
     const matches = Array.from(content.matchAll(includeRegex));
     for (const match of matches) {
-      const includeName = match[1].trim();
+      const includeName = match[1]!.trim();
       const includeContent = context.includes[includeName] || '';
-      processed = processed.replace(match[0], includeContent);
+      processed = processed.replace(match[0]!, includeContent);
     }
     
     return processed;
@@ -423,9 +423,9 @@ class MockCortexAdvancedTemplateEngine implements MockAdvancedTemplateEngine {
     
     const matches = Array.from(content.matchAll(partialRegex));
     for (const match of matches) {
-      const partialName = match[1].trim();
+      const partialName = match[1]!.trim();
       const partialContent = context.partials[partialName] || '';
-      processed = processed.replace(match[0], partialContent);
+      processed = processed.replace(match[0]!, partialContent);
     }
     
     return processed;
@@ -438,8 +438,8 @@ class MockCortexAdvancedTemplateEngine implements MockAdvancedTemplateEngine {
     const matches = Array.from(content.matchAll(helperRegex));
     for (const match of matches) {
       const helperName = match[1];
-      const args = match[2].split(',').map(arg => arg.trim());
-      const helper = context.helpers[helperName];
+      const args = match[2]!.split(',').map(arg => arg.trim());
+      const helper = context.helpers[helperName!];
       
       if (helper) {
         const result = await helper(...args);
@@ -456,9 +456,9 @@ class MockCortexAdvancedTemplateEngine implements MockAdvancedTemplateEngine {
     
     const matches = Array.from(content.matchAll(filterRegex));
     for (const match of matches) {
-      const value = match[1].trim();
-      const filterName = match[2];
-      const args = match[3] ? match[3].split(',').map(arg => arg.trim()) : [];
+      const value = match[1]!.trim();
+      const filterName = match[2]!;
+      const args = match[3] ? match[3]!.split(',').map(arg => arg.trim()) : [];
       const filter = context.filters[filterName];
       
       if (filter) {
@@ -475,10 +475,11 @@ class MockCortexAdvancedTemplateEngine implements MockAdvancedTemplateEngine {
     
     // Extract simple variables
     const variableRegex = /\{\{([^#\/][^}]+)\}\}/g;
-    let match;
+    let match: RegExpExecArray | null;
     while ((match = variableRegex.exec(content)) !== null) {
-      const variableName = match[1].trim().split('|')[0].trim();
-      if (!variableName.startsWith('if ') && !variableName.startsWith('each ')) {
+      // @ts-ignore - Type narrowing issue with array indices
+      const variableName = (match[1] as string).trim().split('|')[0].trim();
+      if (variableName && !variableName.startsWith('if ') && !variableName.startsWith('each ')) {
         variables.add(variableName);
       }
     }
@@ -983,7 +984,7 @@ describe('CortexAdvancedTemplateEngine', () => {
 
       const result = engine.validateTemplate(template);
       assert.strictEqual(result.valid, true);
-      assert.strictEqual(result["error"]s.length, 0);
+      assert.strictEqual(result.errors.length, 0);
     });
 
     it('should validate template with errors', () => {
@@ -1041,7 +1042,7 @@ describe('CortexAdvancedTemplateEngine', () => {
 
       const result = engine.validateTemplate(template);
       assert.strictEqual(result.valid, false);
-      assert.ok(result["error"]s.length > 0);
+      assert.ok(result.errors.length > 0);
     });
   });
 
@@ -1173,7 +1174,7 @@ describe('CortexAdvancedTemplateEngine', () => {
       const variables = {};
       const result = engine.validateVariables(template, variables);
       assert.strictEqual(result.valid, false);
-      assert.ok(result["error"]s.some(e => e.type === 'REQUIRED_VARIABLE'));
+      assert.ok(result.errors.some(e => e.type === 'REQUIRED_VARIABLE'));
     });
   });
 
@@ -1378,7 +1379,7 @@ describe('CortexAdvancedTemplateEngine', () => {
 
       const result = engine.validateTemplate(template);
       assert.strictEqual(result.valid, false);
-      assert.ok(result["error"]s.some(e => e.type === 'REQUIRED_FIELD'));
+      assert.ok(result.errors.some(e => e.type === 'REQUIRED_FIELD'));
     });
 
     it('should handle malformed template content', () => {

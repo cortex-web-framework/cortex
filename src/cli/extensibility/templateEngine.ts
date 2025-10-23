@@ -26,7 +26,7 @@ export class CortexTemplateEngine implements TemplateEngine {
     // Validate template before rendering
     const validation = this.validateTemplate(template);
     if (!validation.valid) {
-      throw new Error(`Template validation failed: ${validation["error"]s.map(e => e.message).join(', ')}`);
+      throw new Error(`Template validation failed: ${validation.errors.map(e => e.message).join(', ')}`);
     }
 
     // Render each file in the template
@@ -80,7 +80,6 @@ export class CortexTemplateEngine implements TemplateEngine {
     // Check required properties
     if (!template.name || typeof template.name !== 'string') {
       errors.push({
-        
         field: 'name',
         message: 'Template name is required and must be a string',
         code: 'MISSING_NAME'
@@ -89,7 +88,6 @@ export class CortexTemplateEngine implements TemplateEngine {
     
     if (!template.description || typeof template.description !== 'string') {
       errors.push({
-        
         field: 'description',
         message: 'Template description is required and must be a string',
         code: 'MISSING_DESCRIPTION'
@@ -98,7 +96,6 @@ export class CortexTemplateEngine implements TemplateEngine {
     
     if (!template.version || typeof template.version !== 'string') {
       errors.push({
-        
         field: 'version',
         message: 'Template version is required and must be a string',
         code: 'MISSING_VERSION'
@@ -107,7 +104,6 @@ export class CortexTemplateEngine implements TemplateEngine {
     
     if (!template.author || typeof template.author !== 'string') {
       errors.push({
-        
         field: 'author',
         message: 'Template author is required and must be a string',
         code: 'MISSING_AUTHOR'
@@ -116,7 +112,6 @@ export class CortexTemplateEngine implements TemplateEngine {
     
     if (!template.files || !Array.isArray(template.files)) {
       errors.push({
-        
         field: 'files',
         message: 'Template files are required and must be an array',
         code: 'MISSING_FILES'
@@ -128,8 +123,7 @@ export class CortexTemplateEngine implements TemplateEngine {
         
         if (!file.path || typeof file.path !== 'string') {
           errors.push({
-        
-        field: `files[${i}].path`,
+            field: `files[${i}].path`,
             message: 'File path is required and must be a string',
             code: 'INVALID_FILE_PATH'
           });
@@ -137,8 +131,7 @@ export class CortexTemplateEngine implements TemplateEngine {
         
         if (!file.content || (typeof file.content !== 'string' && typeof file.content !== 'function')) {
           errors.push({
-        
-        field: `files[${i}].content`,
+            field: `files[${i}].content`,
             message: 'File content is required and must be a string or function',
             code: 'INVALID_FILE_CONTENT'
           });
@@ -150,8 +143,7 @@ export class CortexTemplateEngine implements TemplateEngine {
     if (template.config) {
       if (!template.config.name || typeof template.config.name !== 'string') {
         errors.push({
-        
-        field: 'config.name',
+          field: 'config.name',
           message: 'Template config name is required and must be a string',
           code: 'INVALID_CONFIG_NAME'
         });
@@ -159,8 +151,7 @@ export class CortexTemplateEngine implements TemplateEngine {
       
       if (!template.config.variables || !Array.isArray(template.config.variables)) {
         errors.push({
-        
-        field: 'config.variables',
+          field: 'config.variables',
           message: 'Template config variables are required and must be an array',
           code: 'INVALID_CONFIG_VARIABLES'
         });
@@ -250,21 +241,21 @@ export class CortexTemplateEngine implements TemplateEngine {
     const variableRegex = /\{\{(\w+)\}\}/g;
     let variableMatch;
     while ((variableMatch = variableRegex.exec(content)) !== null) {
-      variables.add(variableMatch[1]);
+      variables.add(variableMatch[1]!);
     }
     
     // Find {{#if variableName}} patterns
     const conditionalRegex = /\{\{#if\s+(\w+)\}\}/g;
     let conditionalMatch;
     while ((conditionalMatch = conditionalRegex.exec(content)) !== null) {
-      variables.add(conditionalMatch[1]);
+      variables.add(conditionalMatch[1]!);
     }
     
     // Find {{#each arrayName}} patterns
     const loopRegex = /\{\{#each\s+(\w+)\}\}/g;
     let loopMatch;
     while ((loopMatch = loopRegex.exec(content)) !== null) {
-      variables.add(loopMatch[1]);
+      variables.add(loopMatch[1]!);
     }
     
     return Array.from(variables);
@@ -286,8 +277,7 @@ export class CortexTemplateEngine implements TemplateEngine {
       // Check required variables
       if (variableDef.required && (value === undefined || value === null)) {
         errors.push({
-        
-        field: variableDef.name,
+          field: variableDef.name,
           message: `Required variable '${variableDef.name}' is missing`,
           code: 'MISSING_REQUIRED_VARIABLE'
         });
@@ -302,8 +292,7 @@ export class CortexTemplateEngine implements TemplateEngine {
       // Check type
       if (!this.validateVariableType(value, variableDef.type)) {
         errors.push({
-        
-        field: variableDef.name,
+          field: variableDef.name,
           message: `Variable '${variableDef.name}' must be of type ${variableDef.type}`,
           code: 'INVALID_VARIABLE_TYPE'
         });
@@ -312,8 +301,7 @@ export class CortexTemplateEngine implements TemplateEngine {
       // Run custom validation
       if (variableDef.validation && !this.validateVariableRules(value, variableDef.validation)) {
         errors.push({
-        
-        field: variableDef.name,
+          field: variableDef.name,
           message: `Variable '${variableDef.name}' failed custom validation`,
           code: 'VARIABLE_VALIDATION_FAILED'
         });

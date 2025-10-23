@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import type { CompositePolicy } from '../../src/resilience/compositePolicy.js';
+import { CompositePolicy } from '../../src/resilience/compositePolicy.js';
 import { CircuitBreaker } from '../../src/resilience/circuitBreaker.js';
 import { RetryExecutor } from '../../src/resilience/retryExecutor.js';
 import { Bulkhead } from '../../src/resilience/bulkhead.js';
@@ -94,8 +94,11 @@ test('CompositePolicy should get policies', () => {
   const policies = policy.getPolicies();
   
   assert.strictEqual(policies.length, 3);
+  assert.ok(policies[0], 'First policy should exist');
   assert.strictEqual(policies[0].name, 'CircuitBreaker');
+  assert.ok(policies[1], 'Second policy should exist');
   assert.strictEqual(policies[1].name, 'RetryExecutor');
+  assert.ok(policies[2], 'Third policy should exist');
   assert.strictEqual(policies[2].name, 'Bulkhead');
 });
 
@@ -145,6 +148,8 @@ test('CompositePolicy should chain method calls', () => {
     .clear()
     .withCircuitBreaker(circuitBreaker);
   
-  assert.strictEqual(policy.getPolicies().length, 1);
-  assert.strictEqual(policy.getPolicies()[0].name, 'CircuitBreaker');
+  const policies = policy.getPolicies();
+  assert.strictEqual(policies.length, 1);
+  assert.ok(policies[0], 'First policy should exist');
+  assert.strictEqual(policies[0].name, 'CircuitBreaker');
 });

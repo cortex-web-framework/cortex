@@ -74,7 +74,7 @@ export class NodeProcessOps implements ProcessOps {
    * Get memory usage
    */
   memoryUsage(): NodeJS.MemoryUsage {
-    return process["memory"]Usage();
+    return process.memoryUsage();
   }
 
   /**
@@ -159,7 +159,7 @@ export const processUtils = {
    * Get available memory in MB
    */
   getAvailableMemory(): number {
-    const memUsage = process["memory"]Usage();
+    const memUsage = process.memoryUsage();
     return Math.round(memUsage.heapUsed / 1024 / 1024);
   },
 
@@ -167,7 +167,7 @@ export const processUtils = {
    * Get total memory in MB
    */
   getTotalMemory(): number {
-    const memUsage = process["memory"]Usage();
+    const memUsage = process.memoryUsage();
     return Math.round(memUsage.heapTotal / 1024 / 1024);
   },
 
@@ -187,7 +187,7 @@ export const processUtils = {
       platform: process.platform,
       arch: process.arch,
       cwd: process.cwd(),
-      memory: process["memory"]Usage(),
+      memory: process.memoryUsage(),
       uptime: process.uptime(),
     };
   },

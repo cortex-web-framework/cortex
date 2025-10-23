@@ -8,7 +8,7 @@ import { HealthCheckRegistry } from '../../src/observability/health/healthRegist
 import { CircuitBreaker } from '../../src/resilience/circuitBreaker.js';
 import { RetryExecutor } from '../../src/resilience/retryExecutor.js';
 import { Bulkhead } from '../../src/resilience/bulkhead.js';
-import type { CompositePolicy } from '../../src/resilience/compositePolicy.js';
+import { CompositePolicy } from '../../src/resilience/compositePolicy.js';
 import { compression } from '../../src/performance/compression.js';
 import { WorkerPool } from '../../src/workers/workerPool.js';
 import { createMemoryManager } from '../../src/wasm/memoryManager.js';

@@ -5,10 +5,10 @@ import { IncomingMessage } from 'node:http';
 
 // Mock Request and Response objects for middleware testing
 class MockRequest extends IncomingMessage {
-  public headers: Record<string, string> = {};
   constructor() {
     super({} as any);
   }
+  public override headers: Record<string, string> = {};
 }
 
 class MockResponse {

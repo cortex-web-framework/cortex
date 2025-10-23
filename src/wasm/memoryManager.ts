@@ -42,16 +42,6 @@ export const DEFAULT_MEMORY_CONFIG: Required<MemoryManagerConfig> = {
 
 // WebAssembly type declarations for Node.js
 declare global {
-  namespace WebAssembly {
-    interface Memory {
-      buffer: ArrayBuffer;
-      grow(delta: number): number;
-    }
-    
-    interface Instance {
-      exports: Record<string, any>;
-    }
-  }
 }
 export class WasmMemoryManager {
   private memory: WebAssembly.Memory | undefined;
@@ -62,7 +52,7 @@ export class WasmMemoryManager {
   private gcTimer: NodeJS.Timeout | null = null;
 
   constructor(instance: WebAssembly.Instance, config: MemoryManagerConfig = {}) {
-    this["memory"] = instance.exports["memory"] as WebAssembly.Memory;
+    this.memory = instance.exports["memory"] as WebAssembly.Memory;
     this.config = { ...DEFAULT_MEMORY_CONFIG, ...config };
     
     this.initializeMemory();
@@ -356,8 +346,8 @@ export async function loadWasmWithMemory(
 ): Promise<{ instance: WebAssembly.Instance; memoryManager: WasmMemoryManager }> {
   const response = await fetch(wasmUrl);
   const buffer = await response.arrayBuffer();
-  const module = await (WebAssembly as any).compile(buffer);
-  const instance = await (WebAssembly as any).instantiate(module);
+  const module = await (globalThis as { WebAssembly: typeof WebAssembly }).WebAssembly.compile(buffer);
+  const instance = await (globalThis as { WebAssembly: typeof WebAssembly }).WebAssembly.instantiate(module);
   
   const memoryManager = createMemoryManager(instance, config);
   

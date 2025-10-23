@@ -4,7 +4,7 @@
  */
 
 import assert from 'node:assert/strict';
-import { describe, it, beforeEach, afterEach } from 'node:test';
+import { describe, it, beforeEach } from 'node:test';
 import { writeFile, mkdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 
@@ -94,6 +94,7 @@ interface MockTemplateEngine {
   validateTemplate(template: MockTemplate): MockValidationResult;
   extractVariables(content: string): string[];
   validateVariables(template: MockTemplate, variables: Record<string, unknown>): MockValidationResult;
+  applyVariables(content: string, variables: Record<string, unknown>): string;
 }
 
 // Mock implementation for testing
@@ -102,7 +103,7 @@ class MockCortexTemplateEngine implements MockTemplateEngine {
     // Validate template before rendering
     const validation = this.validateTemplate(template);
     if (!validation.valid) {
-      throw new Error(`Template validation failed: ${validation["error"]s.map(e => e.message).join(', ')}`);
+      throw new Error(`Template validation failed: ${validation.errors.map(e => e.message).join(', ')}`);
     }
 
     // Render each file in the template
@@ -189,7 +190,7 @@ class MockCortexTemplateEngine implements MockTemplateEngine {
     } else {
       // Validate each file
       for (let i = 0; i < template.files.length; i++) {
-        const file = template.files[i];
+        const file = template.files[i]!;
         
         if (!file.path || typeof file.path !== 'string') {
           errors.push({
@@ -255,18 +256,18 @@ class MockCortexTemplateEngine implements MockTemplateEngine {
   }
 
   private processConditionals(content: string, variables: Record<string, unknown>): string {
-    const conditionalRegex = /\{\{#if\s+(\w+)\}\}(.*?)\{\{\/if\}\}/gs;
-    
+    const conditionalRegex = /\{\{#if\s+(\w+)\}\}([\s\S]*?)\{\{\/if\}\}/gm;
+
     return content.replace(conditionalRegex, (match, variableName, blockContent) => {
       const value = variables[variableName];
       const shouldInclude = Boolean(value);
-      
+
       return shouldInclude ? blockContent : '';
     });
   }
 
   private processLoops(content: string, variables: Record<string, unknown>): string {
-    const loopRegex = /\{\{#each\s+(\w+)\}\}(.*?)\{\{\/each\}\}/gs;
+    const loopRegex = /\{\{#each\s+(\w+)\}\}([\s\S]*?)\{\{\/each\}\}/gm;
     
     return content.replace(loopRegex, (match, arrayName, blockContent) => {
       const value = variables[arrayName];
@@ -285,7 +286,7 @@ class MockCortexTemplateEngine implements MockTemplateEngine {
         itemContent = itemContent.replace(/\{\{index\}\}/g, String(index));
         
         // Replace {{@index}} with the current index (alternative syntax)
-        itemContent = itemContent.replace(/\{\{@index\}\}/g, String(index));
+        itemContent = itemContent.replace(/\{\\{@index\}\}/g, String(index));
         
         return itemContent;
       }).join('');
@@ -294,26 +295,26 @@ class MockCortexTemplateEngine implements MockTemplateEngine {
 
   extractVariables(content: string): string[] {
     const variables = new Set<string>();
-    
+
     // Find {{variableName}} patterns
     const variableRegex = /\{\{(\w+)\}\}/g;
     let match;
     while ((match = variableRegex.exec(content)) !== null) {
-      variables.add(match[1]);
+      if (match[1]) variables.add(match[1]);
     }
-    
+
     // Find {{#if variableName}} patterns
     const conditionalRegex = /\{\{#if\s+(\w+)\}\}/g;
     while ((match = conditionalRegex.exec(content)) !== null) {
-      variables.add(match[1]);
+      if (match[1]) variables.add(match[1]);
     }
-    
+
     // Find {{#each arrayName}} patterns
     const loopRegex = /\{\{#each\s+(\w+)\}\}/g;
     while ((match = loopRegex.exec(content)) !== null) {
-      variables.add(match[1]);
+      if (match[1]) variables.add(match[1]);
     }
-    
+
     return Array.from(variables);
   }
 
@@ -447,15 +448,16 @@ describe('CortexTemplateEngine', () => {
             default: true
           }
         ]
-      }
+      },
+      generate: async () => {}
     };
   });
 
   describe('renderTemplate', () => {
     it('should render a valid template successfully', async () => {
       // Mock the file system operations
-      const mockMkdir = mock.fn(() => Promise.resolve());
-      const mockWriteFile = mock.fn(() => Promise.resolve());
+      // const mockMkdir = mock.fn(() => Promise.resolve());
+      // const mockWriteFile = mock.fn(() => Promise.resolve());
       
       // This would require mocking the file system operations
       // For now, we'll test the validation logic
@@ -494,8 +496,8 @@ describe('CortexTemplateEngine', () => {
       };
       
       // Mock file system operations
-      const mockMkdir = mock.fn(() => Promise.resolve());
-      const mockWriteFile = mock.fn(() => Promise.resolve());
+      // const mockMkdir = mock.fn(() => Promise.resolve());
+      // const mockWriteFile = mock.fn(() => Promise.resolve());
       
       // This would require mocking the file system operations
       // For now, we'll test the content processing
@@ -506,7 +508,7 @@ describe('CortexTemplateEngine', () => {
     it('should render file with function content', async () => {
       const file: MockTemplateFile = {
         path: 'test.txt',
-        content: (context: MockTemplateContext) => `Hello ${context.variables.projectName}!`,
+        content: (context: MockTemplateContext) => `Hello ${String(context.variables['projectName'])}!`, 
         permissions: 0o644,
         executable: false
       };
@@ -520,7 +522,7 @@ describe('CortexTemplateEngine', () => {
     it('should handle executable files', async () => {
       const file: MockTemplateFile = {
         path: 'script.sh',
-        content: '#!/bin/bash\necho "Hello {{projectName}}"',
+        content: '#!/bin/bash\necho "Hello {{projectName}}" ',
         permissions: 0o755,
         executable: true
       };
@@ -528,7 +530,7 @@ describe('CortexTemplateEngine', () => {
       // This would require mocking the file system operations
       // For now, we'll test the content processing
       const processedContent = engine.applyVariables(file.content as string, testContext.variables);
-      assert.strictEqual(processedContent, '#!/bin/bash\necho "Hello Test Project"');
+      assert.strictEqual(processedContent, '#!/bin/bash\necho "Hello Test Project" ');
     });
   });
 
@@ -536,42 +538,42 @@ describe('CortexTemplateEngine', () => {
     it('should validate a correct template', () => {
       const validation = engine.validateTemplate(testTemplate);
       assert.strictEqual(validation.valid, true);
-      assert.strictEqual(validation["error"]s.length, 0);
+      assert.strictEqual(validation.errors.length, 0);
     });
 
     it('should reject template without name', () => {
       const invalidTemplate = { ...testTemplate, name: '' };
       const validation = engine.validateTemplate(invalidTemplate);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation["error"]s.some(e => e.field === 'name'));
+      assert.ok(validation.errors.some(e => e.field === 'name'));
     });
 
     it('should reject template without description', () => {
       const invalidTemplate = { ...testTemplate, description: '' };
       const validation = engine.validateTemplate(invalidTemplate);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation["error"]s.some(e => e.field === 'description'));
+      assert.ok(validation.errors.some(e => e.field === 'description'));
     });
 
     it('should reject template without version', () => {
       const invalidTemplate = { ...testTemplate, version: '' };
       const validation = engine.validateTemplate(invalidTemplate);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation["error"]s.some(e => e.field === 'version'));
+      assert.ok(validation.errors.some(e => e.field === 'version'));
     });
 
     it('should reject template without author', () => {
       const invalidTemplate = { ...testTemplate, author: '' };
       const validation = engine.validateTemplate(invalidTemplate);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation["error"]s.some(e => e.field === 'author'));
+      assert.ok(validation.errors.some(e => e.field === 'author'));
     });
 
     it('should reject template without files', () => {
       const invalidTemplate = { ...testTemplate, files: [] };
       const validation = engine.validateTemplate(invalidTemplate);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation["error"]s.some(e => e.field === 'files'));
+      assert.ok(validation.errors.some(e => e.field === 'files'));
     });
 
     it('should reject template with invalid files', () => {
@@ -588,7 +590,7 @@ describe('CortexTemplateEngine', () => {
       };
       const validation = engine.validateTemplate(invalidTemplate);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation["error"]s.some(e => e.field === 'files[0].path'));
+      assert.ok(validation.errors.some(e => e.field === 'files[0].path'));
     });
 
     it('should reject template with invalid file content', () => {
@@ -605,7 +607,7 @@ describe('CortexTemplateEngine', () => {
       };
       const validation = engine.validateTemplate(invalidTemplate);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation["error"]s.some(e => e.field === 'files[0].content'));
+      assert.ok(validation.errors.some(e => e.field === 'files[0].content'));
     });
   });
 
@@ -755,7 +757,7 @@ describe('CortexTemplateEngine', () => {
       const variables = { useTypeScript: true }; // Missing projectName
       const validation = engine.validateVariables(testTemplate, variables);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation["error"]s.some(e => e.field === 'projectName'));
+      assert.ok(validation.errors.some(e => e.field === 'projectName'));
     });
 
     it('should validate optional variables', () => {
@@ -768,8 +770,8 @@ describe('CortexTemplateEngine', () => {
       const variables = { projectName: 123, useTypeScript: 'true' }; // Wrong types
       const validation = engine.validateVariables(testTemplate, variables);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation["error"]s.some(e => e.field === 'projectName'));
-      assert.ok(validation["error"]s.some(e => e.field === 'useTypeScript'));
+      assert.ok(validation.errors.some(e => e.field === 'projectName'));
+      assert.ok(validation.errors.some(e => e.field === 'useTypeScript'));
     });
 
     it('should run custom validation', () => {
@@ -786,7 +788,8 @@ describe('CortexTemplateEngine', () => {
               validation: (value) => typeof value === 'number' && value > 0
             }
           ]
-        }
+        },
+        generate: async () => {}
       };
       
       const validVariables = { age: 25 };
@@ -796,7 +799,7 @@ describe('CortexTemplateEngine', () => {
       const invalidVariables = { age: -5 };
       const invalidValidation = engine.validateVariables(templateWithCustomValidation, invalidVariables);
       assert.strictEqual(invalidValidation.valid, false);
-      assert.ok(invalidValidation["error"]s.some(e => e.field === 'age'));
+      assert.ok(invalidValidation.errors.some(e => e.field === 'age'));
     });
   });
 
@@ -875,8 +878,8 @@ describe('CortexTemplateEngine', () => {
       for (let i = 0; i < 100; i++) {
         variables[`level${i}`] = true;
       }
-      
-      const result = engine.applyVariables(content, variables);
+
+      void engine.applyVariables(content, variables);
       const endTime = Date.now();
       const duration = endTime - startTime;
       

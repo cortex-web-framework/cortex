@@ -20,7 +20,7 @@ test('WasmMemoryManager should initialize with default config', () => {
   const stats = manager.getMemoryStats();
   assert.strictEqual(stats.totalAllocations, 0);
   assert.strictEqual(stats.totalAllocatedSize, 0);
-  assert.strictEqual(stats["memory"]Pages, 1);
+  assert.strictEqual(stats.memoryPages, 1);
 });
 
 test('WasmMemoryManager should allocate and deallocate string memory', () => {
@@ -164,8 +164,8 @@ test('createMemoryManager should create manager with custom config', () => {
   
   const manager = createMemoryManager(instance, customConfig);
   const stats = manager.getMemoryStats();
-  
-  assert.strictEqual(stats["memory"]Pages, 2);
+
+  assert.strictEqual(stats.memoryPages, 2);
 });
 
 test('WasmMemoryManager should handle garbage collection', () => {

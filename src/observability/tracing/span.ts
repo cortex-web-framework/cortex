@@ -7,7 +7,7 @@ import { SpanKind, SpanStatusCode } from '../types.js';
 export class SpanImpl implements Span {
   public readonly traceId: string;
   public readonly spanId: string;
-  public readonly parentSpanId?: string;
+  public readonly parentSpanId?: string | undefined;
 
   public name: string;
   public kind: SpanKind;
@@ -29,7 +29,7 @@ export class SpanImpl implements Span {
   }) {
     this.traceId = options.traceId;
     this.spanId = options.spanId;
-    this.parentSpanId = options.parentSpanId || undefined;
+    this.parentSpanId = options.parentSpanId;
     this.name = options.name;
     this.kind = options.kind;
     this.startTime = options.startTime;

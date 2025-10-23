@@ -1,352 +1,150 @@
-# Cortex Framework - Master Implementation Plan
+# Plan: Full System Stabilization and Refactoring
 
-## 1. Executive Summary
+**Objective:** To create a rock-solid, production-ready foundation for the Cortex Framework by first eliminating all existing test failures and then implementing significant architectural improvements based on prior research.
 
-This plan outlines the complete roadmap for the Cortex Framework, consolidating all identified tasks from extensive research into a granular, actionable, and prioritized sequence. The framework aims to be a production-ready, zero-dependency actor framework for TypeScript. This plan covers everything from foundational testing infrastructure to advanced enterprise features, ensuring stability, mitigating risks, and comprehensive documentation.
+---
 
-## 2. Master Task Plan
+## Phase 1: Codebase Stabilization (Fix All Failing Tests)
 
-The tasks are organized into phases, ordered by priority and dependencies. Each phase builds upon the previous one, ensuring a structured and efficient development process.
+**Goal:** Achieve a 100% passing test suite. Each failing test will be addressed individually in the order specified in `TODO.md`.
 
-### Phase 1: Testing Infrastructure Migration (High Priority)
+**Methodology for each task:**
+1.  **Isolate and Analyze:** Read the test file and corresponding source code. Run only the failing test to reproduce the error and analyze the output.
+2.  **Hypothesize:** Form a clear hypothesis about the root cause.
+3.  **Implement Fix:** Apply the minimal necessary code changes to fix the issue.
+4.  **Verify:** Run the single test again to confirm it passes.
+5.  **Regression Check:** Run all tests within the affected module to ensure no new issues were introduced.
 
-**Goal:** Migrate the testing framework from `ts-node/esm` to a compile-first approach to eliminate experimental warnings and improve performance.
+---
 
-*   **Task 1.1: Create `tsconfig.test.json`**
-    *   **Details:** Create a new `tsconfig.test.json` file that extends the base `tsconfig.json`, configures it to include all `*.ts` files in `src` and `tests`, outputs compiled JavaScript to `dist-tests`, and enables `sourceMap`.
-    *   **Estimated Time:** 10 minutes
-*   **Task 1.2: Update `package.json` Test Scripts**
-    *   **Details:** Modify `package.json` to include `test:compile`, `test:run`, `test:watch` scripts, and update the main `test` script to use the compile-first approach.
-    *   **Estimated Time:** 10 minutes
-*   **Task 1.3: Validate New Test Setup**
-    *   **Details:** Run `npm test` to verify all 262 tests execute, 251 pass, 11 fail (baseline), and no "ExperimentalWarning" messages are present.
-    *   **Estimated Time:** 15 minutes
-*   **Task 1.4: Update `.gitignore`**
-    *   **Details:** Add `dist-tests/` and `*.tsbuildinfo` to the `.gitignore` file.
-    *   **Estimated Time:** 5 minutes
+*   **Task 1.1: Fix `tests/api/grpc.test.ts`**
+    *   **Analysis:** The failure is likely due to incorrect mocking of gRPC dependencies or issues with dynamic imports after the test compilation setup.
+    *   **Action:** Review the gRPC mock setup and ensure all necessary components are available in the test environment.
 
-### Phase 2: Zero-Dependency Compliance (High Priority)
+*   **Task 1.2: Fix `tests/integration/fullSystem.test.ts`**
+    *   **Analysis:** An "uncaught exception" suggests an error is being thrown asynchronously that isn't being caught by the test's `try/catch` blocks. This often happens with un-awaited Promises or event emitter errors.
+    *   **Action:** Trace the execution flow, paying close attention to the `EventBus` and `ActorSystem` interactions. Ensure all asynchronous operations are properly awaited.
 
-**Goal:** Remove all Express type dependencies from core modules to maintain zero-dependency compliance.
+*   **Task 1.3: Fix `tests/observability/tracing/tracer.test.ts`**
+    *   **Analysis:** Similar to the integration test, an uncaught exception points to an unhandled asynchronous error, likely within the `Span` lifecycle or export process.
+    *   **Action:** Review the `startSpan` and `end` methods in the `Tracer` and `Span` implementations for any unhandled Promise rejections.
 
-*   **Task 2.1: Identify Express Import Locations**
-    *   **Details:** Locate all files importing from 'express' in the `src/` directory.
-    *   **Estimated Time:** 5 minutes
-*   **Task 2.2: Refactor `rateLimiter.ts`**
-    *   **Details:** Analyze Express usage in `src/security/rateLimiter.ts`, replace Express types with `node:http` equivalents, and update corresponding tests.
-    *   **Estimated Time:** 45 minutes
-*   **Task 2.3: Refactor `httpCache.ts`**
-    *   **Details:** Analyze Express usage in `src/performance/httpCache.ts`, replace Express types with `node:http` equivalents, and update corresponding tests.
-    *   **Estimated Time:** 45 minutes
-*   **Task 2.4: Refactor `csp.ts`**
-    *   **Details:** Analyze Express usage in `src/security/csp.ts`, replace Express types with `node:http` equivalents, and update corresponding tests.
-    *   **Estimated Time:** 30 minutes
-*   **Task 2.5: Refactor `project.ts` (CLI Generator)**
-    *   **Details:** Analyze Express usage in `src/cli/generators/project.ts`. Determine if Express is truly needed or if it can be removed/replaced, or documented as an exception.
-    *   **Estimated Time:** 40 minutes
-*   **Task 2.6: Verify Zero-Dependency & Circular Dependencies**
-    *   **Details:** Run `grep -r "from 'express'" src/` to ensure no Express imports remain. Check for circular dependencies using `npx madge --circular --extensions ts src/` and fix any found. Verify all tests still pass.
-    *   **Estimated Time:** 45 minutes
+*   **Task 1.4: Fix `tests/performance/compression.test.ts`**
+    *   **Analysis:** The `MASTER_PLAN.md` clearly identifies this as a failure in the streaming implementation. The current code buffers the entire response.
+    *   **Action:** Implement a true streaming solution using Node.js `Transform` streams (`zlib.createGzip`, `zlib.createBrotliCompress`). The compression stream must be piped to the response stream as data is written.
 
-### Phase 3: Fix Existing Failing Tests (High Priority)
+*   **Task 1.5: Fix `tests/performance/httpCache.test.ts`**
+    *   **Analysis:** Failures likely stem from the Phase 2 refactoring where Express types were removed. The mock request/response objects may no longer behave as the `httpCache` middleware expects.
+    *   **Action:** Update the test mocks to perfectly replicate the behavior of `node:http` `IncomingMessage` and `ServerResponse`, especially regarding headers.
 
-**Goal:** Resolve all 11 baseline test failures to achieve a fully passing test suite.
+*   **Task 1.6: Fix `tests/resilience/retryExecutor.test.ts`**
+    *   **Analysis:** An uncaught exception in a retry mechanism often involves an error in the final attempt's error propagation or a problem in the delay logic.
+    *   **Action:** Scrutinize the loop condition and the final `throw lastError!` statement. Ensure the sleep/delay function is correctly implemented and awaited.
 
-*   **Task 3.1: Fix `grpc.test.ts`**
-    *   **Details:** Analyze and fix the failure in `tests/api/grpc.test.ts` (gRPC import issues).
-    *   **Estimated Time:** 75 minutes
-*   **Task 3.2: Fix `fullSystem.test.ts`**
-    *   **Details:** Analyze and fix the failure in `tests/integration/fullSystem.test.ts` (uncaught exception).
-    *   **Estimated Time:** 110 minutes
-*   **Task 3.3: Fix `tracer.test.ts`**
-    *   **Details:** Analyze and fix the failure in `tests/observability/tracing/tracer.test.ts` (uncaught exception).
-    *   **Estimated Time:** 45 minutes
-*   **Task 3.4: Fix `compression.test.ts`**
-    *   **Details:** Analyze and fix the failure in `tests/performance/compression.test.ts` (uncaught exception, likely related to streaming).
-    *   **Estimated Time:** 60 minutes
-*   **Task 3.5: Fix `httpCache.test.ts`**
-    *   **Details:** Analyze and fix the failure in `tests/performance/httpCache.test.ts` (post-refactor issues from Phase 2).
-    *   **Estimated Time:** 40 minutes
-*   **Task 3.6: Fix `retryExecutor.test.ts`**
-    *   **Details:** Analyze and fix the failure in `tests/resilience/retryExecutor.test.ts` (uncaught exception).
-    *   **Estimated Time:** 45 minutes
-*   **Task 3.7: Fix `rateLimiter.test.ts`**
-    *   **Details:** Analyze and fix the failure in `tests/security/rateLimiter.test.ts` (post-refactor issues from Phase 2).
-    *   **Estimated Time:** 40 minutes
-*   **Task 3.8: Fix `memoryManager.test.ts`**
-    *   **Details:** Analyze and fix the failure in `tests/wasm/memoryManager.test.ts` (WASM memory issues).
-    *   **Estimated Time:** 65 minutes
-*   **Task 3.9: Fix `utils.test.ts` (WASM)**
-    *   **Details:** Analyze and fix the failure in `tests/wasm/utils.test.ts` (WASM loading issues).
-    *   **Estimated Time:** 45 minutes
-*   **Task 3.10: Fix `smartContracts.ethers.test.ts`**
-    *   **Details:** Analyze and fix the failure in `tests/web3/smartContracts.ethers.test.ts` (mock issues).
-    *   **Estimated Time:** 60 minutes
-*   **Task 3.11: Fix `workerPool.test.ts`**
-    *   **Details:** Analyze and fix the failure in `tests/workers/workerPool.test.ts` (worker pool issues).
-    *   **Estimated Time:** 80 minutes
-*   **Task 3.12: Verify Full Test Suite & Coverage**
-    *   **Details:** Run `npm test` to ensure all 262 tests pass. Verify test coverage is >= 95%.
-    *   **Estimated Time:** 15 minutes
+*   **Task 1.7: Fix `tests/security/rateLimiter.test.ts`**
+    *   **Analysis:** Like `httpCache`, this is probably a result of the Express type removal. The test mocks for request IP and headers are the primary suspects.
+    *   **Action:** Adjust test mocks to align with the `node:http` API for accessing request information.
 
-### Phase 4: Risk Mitigation (High Priority)
+*   **Task 1.8: Fix `tests/wasm/memoryManager.test.ts`**
+    *   **Analysis:** WASM memory issues can be complex, often related to incorrect pointer arithmetic, buffer overflows, or alignment issues.
+    *   **Action:** Add verbose logging to the `allocate`, `deallocate`, `read`, and `write` methods to trace memory blocks and pointers. Verify that buffer sizes match the allocated memory segments precisely.
 
-**Goal:** Address critical security and stability risks identified in the architecture.
+*   **Task 1.9: Fix `tests/wasm/utils.test.ts`**
+    *   **Analysis:** A WASM loading issue in tests points to a problem with how the test runner handles file paths or binary data.
+    *   **Action:** Ensure the path to the `.wasm` file is correctly resolved from the `dist-tests/` directory. Use `fs.readFileSync` with `path.resolve` to be explicit.
 
-*   **Task 4.1: Document Worker Serialization Issue**
-    *   **Details:** Add TODO comments in `src/workers/workerActor.ts` regarding serialization.
-    *   **Estimated Time:** 10 minutes
-*   **Task 4.2: Design Worker Message Protocol**
-    *   **Details:** Create a protocol specification for worker messages (design doc or code comments).
-    *   **Estimated Time:** 30 minutes
-*   **Task 4.3: Implement Structured Cloning for Workers**
-    *   **Details:** Refactor `src/workers/workerActor.ts` to use structured cloning for message passing.
-    *   **Estimated Time:** 60 minutes
-*   **Task 4.4: Add Worker Serialization Tests**
-    *   **Details:** Add tests in `tests/workers/workerActor.test.ts` to verify complex data types work.
-    *   **Estimated Time:** 30 minutes
-*   **Task 4.5: Create WASM Memory Alignment Tests**
-    *   **Details:** Add tests in `tests/wasm/memoryManager.test.ts` covering various byte alignments.
-    *   **Estimated Time:** 45 minutes
-*   **Task 4.6: Add WASM Memory Overflow Detection**
-    *   **Details:** Implement overflow checks in `src/wasm/memoryManager.ts`.
-    *   **Estimated Time:** 45 minutes
-*   **Task 4.7: Verify No `eval: true` in Codebase**
-    *   **Details:** Run `grep -r "eval:" . --include="*.ts"` to ensure no `eval: true` is used in production code.
-    *   **Estimated Time:** 5 minutes
-*   **Task 4.8: Run Security Audit & Document Exceptions**
-    *   **Details:** Run `npm audit` and fix any vulnerabilities. Create/update `SECURITY.md` to document known security exceptions.
-    *   **Estimated Time:** 25 minutes
+*   **Task 1.10: Fix `tests/web3/smartContracts.ethers.test.ts`**
+    *   **Analysis:** The `ethers.ts` mock is likely incomplete or incorrect, failing to simulate the behavior of the real `ethers` library as expected by the `SmartContractClient`.
+    *   **Action:** Expand the mock to include all properties and methods being accessed by the client under test.
 
-### Phase 5: New Feature Implementation - Observability (Medium Priority)
+*   **Task 1.11: Fix `tests/workers/workerPool.test.ts`**
+    *   **Analysis:** Worker pool issues often relate to incorrect message passing, worker script termination, or race conditions in task queues.
+    *   **Action:** Implement robust event listeners for `online`, `message`, `error`, and `exit` on each worker thread to diagnose its lifecycle.
 
-**Goal:** Implement a production-grade observability stack including metrics, tracing, and health checks.
+---
 
-*   **Task 5.1: Create Observability Type Definitions**
-    *   **Details:** Create `src/observability/types.ts` with metric, trace, and health check interfaces and enums.
-    *   **Estimated Time:** 15 minutes
-*   **Task 5.2: Implement Counter Metric**
-    *   **Details:** Implement `Counter` class in `src/observability/metrics/counter.ts` and write corresponding tests.
-    *   **Estimated Time:** 30 minutes
-*   **Task 5.3: Implement Gauge Metric**
-    *   **Details:** Implement `Gauge` class in `src/observability/metrics/gauge.ts` and write corresponding tests.
-    *   **Estimated Time:** 20 minutes
-*   **Task 5.4: Implement Histogram Metric**
-    *   **Details:** Implement `Histogram` class in `src/observability/metrics/histogram.ts` and write corresponding tests.
-    *   **Estimated Time:** 45 minutes
-*   **Task 5.5: Create MetricsCollector**
-    *   **Details:** Implement `MetricsCollector` in `src/observability/metrics/collector.ts` (registry pattern, Prometheus export) and write corresponding tests.
-    *   **Estimated Time:** 30 minutes
-*   **Task 5.6: Create Metrics Module Exports**
-    *   **Details:** Create `src/observability/metrics/index.ts` to export metrics components.
-    *   **Estimated Time:** 5 minutes
-*   **Task 5.7: Implement Span Class**
-    *   **Details:** Implement `SpanImpl` class in `src/observability/tracing/span.ts` (attributes, events, status, end) and write corresponding tests.
-    *   **Estimated Time:** 60 minutes
-*   **Task 5.8: Implement Tracer Class**
-    *   **Details:** Implement `Tracer` class in `src/observability/tracing/tracer.ts` (start/end spans, context propagation) and write corresponding tests.
-    *   **Estimated Time:** 45 minutes
-*   **Task 5.9: Implement Sampling Strategies**
-    *   **Details:** Implement `Sampler` interface and `ProbabilitySampler`/`AdaptiveSampler` in `src/observability/tracing/sampler.ts` and write corresponding tests.
-    *   **Estimated Time:** 30 minutes
-*   **Task 5.10: Implement HealthCheckRegistry**
-    *   **Details:** Implement `HealthCheckRegistry` in `src/observability/health/healthRegistry.ts` (register, checkAll, getOverallStatus) and write corresponding tests.
-    *   **Estimated Time:** 30 minutes
-*   **Task 5.11: Create Default Health Checks**
-    *   **Details:** Create `src/observability/health/defaultChecks.ts` (MemoryHealthCheck, UptimeHealthCheck).
-    *   **Estimated Time:** 20 minutes
-*   **Task 5.12: Create Observability Module Exports**
-    *   **Details:** Create `src/observability/index.ts` to export all observability components.
-    *   **Estimated Time:** 5 minutes
-*   **Task 5.13: Add Metrics Endpoint to HttpServer**
-    *   **Details:** Modify `src/core/httpServer.ts` to expose a `/metrics` endpoint using `MetricsCollector`.
-    *   **Estimated Time:** 30 minutes
-*   **Task 5.14: Add Health Endpoint to HttpServer**
-    *   **Details:** Modify `src/core/httpServer.ts` to expose a `/health` endpoint using `HealthCheckRegistry`.
-    *   **Estimated Time:** 30 minutes
-*   **Task 5.15: Integrate Metrics with ActorSystem**
-    *   **Details:** Modify `src/core/actorSystem.ts` to track actor messages, errors, and restarts using `MetricsCollector`.
-    *   **Estimated Time:** 60 minutes
+## Phase 2: Implement Core Testing Infrastructure (`TimeProvider`)
 
-### Phase 6: New Feature Implementation - Resilience (Medium Priority)
+**Goal:** Decouple the system from `Date.now()` to enable fast, deterministic, and reliable time-based testing.
 
-**Goal:** Implement production-grade resilience patterns to prevent cascading failures.
+*   **Task 2.1: Define `TimeProvider` Interface**
+    *   **Action:** Create a new file `src/utils/time.ts`.
+    *   **Content:** `export interface TimeProvider { now(): number; }`
 
-*   **Task 6.1: Create Resilience Types & Errors**
-    *   **Details:** Create `src/resilience/types.ts` (CircuitState, configs) and `src/resilience/errors.ts` (custom errors).
-    *   **Estimated Time:** 30 minutes
-*   **Task 6.2: Implement Circuit Breaker**
-    *   **Details:** Implement `CircuitBreaker` in `src/resilience/circuitBreaker.ts` (state machine, rolling window) and write corresponding tests.
-    *   **Estimated Time:** 60 minutes
-*   **Task 6.3: Implement Retry Executor**
-    *   **Details:** Implement `RetryExecutor` in `src/resilience/retryExecutor.ts` (exponential backoff, jitter, error matchers) and write corresponding tests.
-    *   **Estimated Time:** 45 minutes
-*   **Task 6.4: Implement Bulkhead**
-    *   **Details:** Implement `Bulkhead` in `src/resilience/bulkhead.ts` (semaphore, queue management) and write corresponding tests.
-    *   **Estimated Time:** 45 minutes
-*   **Task 6.5: Implement Timeout Executor**
-    *   **Details:** Implement `TimeoutExecutor` in `src/resilience/timeout.ts` (Promise.race, fallback) and write corresponding tests.
-    *   **Estimated Time:** 20 minutes
-*   **Task 6.6: Implement Policy Composition**
-    *   **Details:** Implement `CompositePolicy` in `src/resilience/policies/compositePolicy.ts` (combining policies) and write corresponding tests.
-    *   **Estimated Time:** 30 minutes
-*   **Task 6.7: Create Resilience Module Exports**
-    *   **Details:** Create `src/resilience/index.ts` to export all resilience components.
-    *   **Estimated Time:** 5 minutes
-*   **Task 6.8: Write Comprehensive Resilience Tests**
-    *   **Details:** Write remaining tests for `circuitBreaker.test.ts`, `retryExecutor.test.ts`, `bulkhead.test.ts`, and `compositePolicy.test.ts`.
-    *   **Estimated Time:** 3 hours
+*   **Task 2.2: Implement `SystemTimeProvider`**
+    *   **Action:** In `src/utils/time.ts`, create the production implementation.
+    *   **Content:** `export class SystemTimeProvider implements TimeProvider { now() { return Date.now(); } }`
 
-### Phase 7: New Feature Implementation - Performance & Security Enhancements (Medium Priority)
+*   **Task 2.3: Create `ManualTimeProvider` for Tests**
+    *   **Action:** Create a new file `tests/mocks/time.ts`.
+    *   **Content:** Implement the `ManualTimeProvider` class with `now()`, `advance(milliseconds: number)`, and `setTime(timestamp: number)` methods.
 
-**Goal:** Enhance framework performance and security with robust middleware.
+*   **Task 2.4: Add Unit Tests for `ManualTimeProvider`**
+    *   **Action:** Create `tests/mocks/time.test.ts` to verify that `advance` and `setTime` work correctly.
 
-*   **Task 7.1: Implement Streaming Compression Middleware**
-    *   **Details:** Replace placeholder in `src/performance/compression.ts` with a real streaming Brotli/Gzip implementation using `node:zlib`. Write comprehensive tests.
-    *   **Estimated Time:** 60 minutes
-*   **Task 7.2: Implement HTTP Caching Utilities**
-    *   **Details:** Implement HTTP caching utilities in `src/performance/httpCache.ts` (ETags, Cache-Control headers) and write corresponding tests.
-    *   **Estimated Time:** 60 minutes
-*   **Task 7.3: Implement CSPBuilder**
-    *   **Details:** Implement `CSPBuilder` in `src/security/csp.ts` (builder pattern for CSP headers) and write corresponding tests.
-    *   **Estimated Time:** 60 minutes
-*   **Task 7.4: Implement Rate Limiting Middleware**
-    *   **Details:** Implement rate-limiting middleware in `src/security/rateLimiter.ts` (sliding window algorithm) and write corresponding tests.
-    *   **Estimated Time:** 60 minutes
+---
 
-### Phase 8: New Feature Implementation - Web3, WASM, Workers, API (Medium Priority)
+## Phase 3: Enhance `CircuitBreaker` and Refactor Tests
 
-**Goal:** Integrate advanced technologies and API capabilities.
+**Goal:** Align the `CircuitBreaker` with its advanced specification and make its tests instantaneous and reliable.
 
-*   **Task 8.1: Implement `SmartContractClient`**
-    *   **Details:** Implement `SmartContractClient` class in `src/web3/smartContracts.ts` for EVM-compatible chain interaction and write corresponding tests.
-    *   **Estimated Time:** 60 minutes
-*   **Task 8.2: Implement `IPFSClient`**
-    *   **Details:** Implement `IPFSClient` class in `src/web3/ipfs.ts` for content addressing and retrieval and write corresponding tests.
-    *   **Estimated Time:** 60 minutes
-*   **Task 8.3: Implement Wasm Loading Utilities**
-    *   **Details:** Implement Wasm loading and instantiation utilities in `src/wasm/utils.ts` and write corresponding tests.
-    *   **Estimated Time:** 60 minutes
-*   **Task 8.4: Integrate Wasm with `WorkerActor`**
-    *   **Details:** Modify `WorkerActor` to offload computations to Wasm modules and write corresponding tests.
-    *   **Estimated Time:** 60 minutes
-*   **Task 8.5: Implement `WorkerActor` Base Class**
-    *   **Details:** Implement the `WorkerActor` base class in `src/workers/workerActor.ts` and write corresponding tests.
-    *   **Estimated Time:** 60 minutes
-*   **Task 8.6: Implement `WorkerPool`**
-    *   **Details:** Implement the `WorkerPool` class in `src/workers/workerPool.ts` (using `node:worker_threads`) and write corresponding tests.
-    *   **Estimated Time:** 90 minutes
-*   **Task 8.7: Implement Basic GraphQL Server**
-    *   **Details:** Implement a basic GraphQL server in `src/api/graphql.ts` and write corresponding tests.
-    *   **Estimated Time:** 60 minutes
-*   **Task 8.8: Implement Basic gRPC Server and Client**
-    *   **Details:** Implement a basic gRPC server and client in `src/api/grpc.ts` and write corresponding tests.
-    *   **Estimated Time:** 60 minutes
+*   **Task 3.1: Implement `RollingWindow` Data Structure**
+    *   **Action:** Create `src/resilience/rollingWindow.ts` using the Circular Buffer pattern from the research. This class will manage a fixed number of "buckets" over a time window, with each bucket holding counts for success and failure.
+    *   **Testing:** Create `tests/resilience/rollingWindow.test.ts` and add comprehensive tests for adding values, window rolling, and calculating totals.
 
-### Phase 9: Documentation & Examples (Medium Priority)
+*   **Task 3.2: Refactor `CircuitBreaker`**
+    *   **Action:** Modify `src/resilience/circuitBreaker.ts`.
+        1.  **Inject `TimeProvider`:** Update the constructor to accept an optional `TimeProvider`, defaulting to `new SystemTimeProvider()`.
+        2.  **Replace Logic:** Remove the simple failure counter. Instantiate and use the `RollingWindow` to track call outcomes.
+        3.  **Update State Machine:** The decision to trip the circuit (`CLOSED` -> `OPEN`) must now be based on data from the `RollingWindow` (i.e., when `totalRequests > volumeThreshold` and `failureRate > errorThresholdPercentage`).
 
-**Goal:** Provide clear, comprehensive, and user-friendly documentation and examples.
+*   **Task 3.3: Refactor `circuitBreaker.test.ts`**
+    *   **Action:** Overhaul the entire test file.
+        1.  **Inject Mock:** In every test, instantiate and inject the `ManualTimeProvider`.
+        2.  **Eliminate `setTimeout`:** Replace all `await new Promise(...)` calls with `timeProvider.advance(...)`.
+        3.  **Remove State Manipulation:** Delete any tests that use `(circuitBreaker as any).state = ...`. Test state changes only via the public API.
 
-*   **Task 9.1: Update Main `src/index.ts` Exports**
-    *   **Details:** Add exports for all new modules (observability, resilience, etc.) in `src/index.ts`.
-    *   **Estimated Time:** 10 minutes
-*   **Task 9.2: Update `package.json` (if needed)**
-    *   **Details:** Add any new scripts or verify dependencies.
-    *   **Estimated Time:** 5 minutes
-*   **Task 9.3: Create Example Files**
-    *   **Details:** Create `examples/observability-example.ts`, `examples/resilience-example.ts`, and `examples/compression-example.ts` demonstrating usage.
-    *   **Estimated Time:** 60 minutes
-*   **Task 9.4: Update `README.md`**
-    *   **Details:** Update `README.md` to reflect all new features, architecture, and getting started guide.
-    *   **Estimated Time:** 30 minutes
-*   **Task 9.5: Create Module-Specific Documentation**
-    *   **Details:** Create detailed markdown files for each major feature area (Web3, Wasm, Workers, Security, Performance, API).
-    *   **Estimated Time:** 4 hours
-*   **Task 9.6: Create Tutorials and Usage Examples**
-    *   **Details:** Create additional example projects or code snippets demonstrating how to use various features.
-    *   **Estimated Time:** 2 hours
+*   **Task 3.4: Add New `CircuitBreaker` Tests**
+    *   **Action:** In `circuitBreaker.test.ts`, add the following new test suites:
+        1.  A test to confirm that a failure in the `HALF_OPEN` state immediately transitions the circuit back to `OPEN`.
+        2.  A test to confirm the circuit does *not* open if the number of requests is below `volumeThreshold`, even if the failure rate is 100%.
+        3.  A test to confirm the circuit *does* open only when both `volumeThreshold` and `errorThresholdPercentage` are exceeded.
 
-### Phase 10: Showcase Application (Lower Priority)
+---
 
-**Goal:** Build "Cortex Hub" - a comprehensive demo application showcasing all Cortex features.
+## Phase 4: Refactor Actor System for Complete Type Safety
 
-*   **Task 10.1: API Gateway Service Implementation**
-    *   **Details:** Create project structure, implement HTTP/REST, GraphQL, gRPC, add rate limiting, CSP, compression, and write integration tests.
-    *   **Estimated Time:** 2-3 weeks
-*   **Task 10.2: Order Service (Actor-Based) Implementation**
-    *   **Details:** Implement OrderActor state machine, event sourcing, integrate circuit breaker & retry, add distributed tracing, and write actor tests.
-    *   **Estimated Time:** 2-3 weeks
-*   **Task 10.3: Notification Service (WebSocket) Implementation**
-    *   **Details:** Implement WebSocket server, add EventBus subscriptions, broadcast logic, connection rate limiting, and write WebSocket tests.
-    *   **Estimated Time:** 1-2 weeks
-*   **Task 10.4: Analytics Service Implementation**
-    *   **Details:** Implement metrics aggregation, Prometheus exporter, Grafana dashboard JSON, write metrics tests, and document schema.
-    *   **Estimated Time:** 1-2 weeks
-*   **Task 10.5: Storage Service (Web3/IPFS) Implementation**
-    *   **Details:** Implement IPFS upload/download, smart contract integration, wallet connection UI, write Web3 integration tests, and add error handling.
-    *   **Estimated Time:** 2-3 weeks
-*   **Task 10.6: Compute Service (WASM) Implementation**
-    *   **Details:** Create WASM image processing module, TypeScript wrapper, worker pool integration, benchmarking suite, and write performance tests.
-    *   **Estimated Time:** 2-3 weeks
-*   **Task 10.7: Infrastructure & Deployment (Docker/Kubernetes)**
-    *   **Details:** Create Dockerfiles, docker-compose.yml, Kubernetes manifests, service definitions, ingress, ConfigMaps, Secrets, and autoscaling.
-    *   **Estimated Time:** 3-4 weeks
-*   **Task 10.8: Monitoring & Observability Setup**
-    *   **Details:** Set up Prometheus, Grafana dashboards, Jaeger, and log aggregation.
-    *   **Estimated Time:** 1-2 weeks
-*   **Task 10.9: Showcase Documentation**
-    *   **Details:** Write showcase README, architecture diagrams, API documentation, deployment guide, video walkthrough, and troubleshooting guide.
-    *   **Estimated Time:** 1-2 weeks
+**Goal:** Eradicate the `any` type from the actor messaging system, enforcing compile-time correctness for all actor interactions.
 
-### Phase 11: Advanced & Enterprise Features (Lower Priority)
+*   **Task 4.1: Define Core Actor Types**
+    *   **Action:** Create a new file `src/core/actorTypes.ts`.
+    *   **Content:** Define the core generic interfaces as researched: `ActorMessage`, `Actor<TState, TMessage>`, and `ActorRef<TMessage>`.
 
-**Goal:** Enhance framework with enterprise-grade features for large-scale deployments.
+*   **Task 4.2: Refactor `Actor` and `ActorSystem`**
+    *   **Action:** In `src/core/actorSystem.ts`:
+        1.  Make the `Actor` base class generic: `export abstract class Actor<TState, TMessage extends ActorMessage>`.
+        2.  The `receive` method signature will become `abstract receive(message: TMessage): void;`.
+        3.  The `ActorSystem.createActor` method will now return a strongly-typed `ActorRef<TMessage>`.
+        4.  The `ActorSystem.dispatch` method will remain internally untyped for the central lookup, but it will be protected by the typed `ActorRef`.
 
-*   **Task 11.1: WebSocket Support (Built-in)**
-    *   **Details:** Implement WebSocket server class, room-based messaging, authentication middleware, and write comprehensive tests.
-    *   **Estimated Time:** 2-3 weeks
-*   **Task 11.2: Distributed Actor System (Clustering)**
-    *   **Details:** Design cluster protocol, implement node discovery, actor routing, health checks, fault recovery, and write cluster tests.
-    *   **Estimated Time:** 3-4 weeks
-*   **Task 11.3: Advanced Rate Limiting (Distributed)**
-    *   **Details:** Implement Redis-backed distributed rate limiting, token bucket algorithm, rate limit headers, multi-key tracking, and write performance tests.
-    *   **Estimated Time:** 2-3 weeks
-*   **Task 11.4: Enhanced WASM Integration**
-    *   **Details:** Add streaming compilation, hot-reloading, debugging utilities, memory profiler, and write WASM benchmarks.
-    *   **Estimated Time:** 2-3 weeks
-*   **Task 11.5: GraphQL Enhancements**
-    *   **Details:** Implement full GraphQL server with schema stitching, subscriptions, DataLoader integration, GraphQL playground, and write GraphQL tests.
-    *   **Estimated Time:** 2-3 weeks
-*   **Task 11.6: Service Mesh Integration**
-    *   **Details:** Add Istio/Linkerd compatibility, service discovery, mTLS, traffic management, and write service mesh tests.
-    *   **Estimated Time:** 3-4 weeks
-*   **Task 11.7: Advanced Observability (Exporters)**
-    *   **Details:** Implement Jaeger/Zipkin exporters, custom span processors, log correlation, and write observability tests.
-    *   **Estimated Time:** 2-3 weeks
-*   **Task 11.8: Multi-Tenancy Support**
-    *   **Details:** Design tenant isolation model, implement tenant manager, resource quotas, tenant-aware metrics, and write multi-tenancy tests.
-    *   **Estimated Time:** 3-4 weeks
-*   **Task 11.9: Advanced Security (OAuth2/JWT/API Keys)**
-    *   **Details:** Implement OAuth2 provider, JWT authentication middleware, API key management, mTLS support, and write security tests.
-    *   **Estimated Time:** 3-4 weeks
-*   **Task 11.10: Kubernetes Operators**
-    *   **Details:** Define CRDs, implement operator logic, automated scaling, self-healing, and write operator tests.
-    *   **Estimated Time:** 3-4 weeks
-*   **Task 11.11: Helm Charts**
-    *   **Details:** Create Helm chart structure, add values.yaml, implement chart dependencies, migration hooks, and test chart installation.
-    *   **Estimated Time:** 2-3 weeks
-*   **Task 11.12: Production Guides**
-    *   **Details:** Write deployment guide (AWS/GCP/Azure), security checklist, scaling guide, monitoring setup, and troubleshooting runbook.
-    *   **Estimated Time:** 2-3 weeks
-*   **Task 11.13: Load Testing Framework**
-    *   **Details:** Set up k6/Artillery, create load test scenarios, define performance baselines, add CI/CD integration, and write performance reports.
-    *   **Estimated Time:** 2-3 weeks
-*   **Task 11.14: Chaos Engineering**
-    *   **Details:** Integrate Chaos Mesh/Litmus, create chaos experiments, implement automated recovery tests, document scenarios, and add chaos dashboard.
-    *   **Estimated Time:** 2-3 weeks
+*   **Task 4.3: Update Example Neurons**
+    *   **Action:** Refactor `src/neurons/pingNeuron.ts` and `pongNeuron.ts`.
+    *   **Details:** Define specific message types (e.g., `PingMessage`, `PongMessage`) and update the `PingNeuron` and `PongNeuron` classes to extend the new generic `Actor` class with their specific state and message types.
 
-## 3. Approval and Next Steps
+*   **Task 4.4: Update Actor System Tests**
+    *   **Action:** In `tests/core/actorSystem.test.ts`, refactor all tests to use the new `ActorRef` and its typed `dispatch` method.
+    *   **Action:** Create a new file `tests/core/actorSystem.types.test.ts`. In this file, add commented-out code demonstrating that dispatching a message of the wrong type to an `ActorRef` causes a `tsc` compilation error. This file serves as a static assertion of type safety.
 
-This plan is based on the comprehensive research conducted and aims to provide a clear roadmap for the Cortex Framework's development. Please review the plan and provide your approval.
+---
 
-Once approved, I recommend you begin the implementation phase by using the command `/blueprint:define`.
+## Phase 5: Final Validation and Documentation
+
+**Goal:** Ensure all changes are cleanly integrated and reflected in the project's documentation.
+
+*   **Task 5.1: Full Test Suite Execution**
+    *   **Action:** Run `npm test` and ensure 100% of tests pass.
+
+*   **Task 5.2: Documentation Overhaul**
+    *   **Action:** Update all JSDoc comments in the refactored files (`actorSystem.ts`, `circuitBreaker.ts`, etc.) to reflect the new APIs and behaviors.
+    *   **Action:** Update the `README.md` with new, type-safe examples for creating and interacting with actors.
+    *   **Action:** Update `IMPLEMENTATION_SPEC.md` and `ARCHITECTURE_DIAGRAM.md` to accurately describe the new `CircuitBreaker` logic and the type-safe actor model.

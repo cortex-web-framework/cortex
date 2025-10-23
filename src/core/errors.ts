@@ -16,7 +16,7 @@ export class EventBusError extends Error {
   constructor(message: string, originalError?: Error) {
     super(message);
     this.name = 'EventBusError';
-    if (originalError) {
+    if (originalError && originalError.stack) {
       this.stack = originalError.stack; // Preserve original stack trace
     }
   }

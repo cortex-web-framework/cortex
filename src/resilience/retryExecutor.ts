@@ -1,4 +1,4 @@
-import { RetryConfig, ErrorMatcher, ResiliencePolicy } from './types.js';
+import type { RetryConfig, ErrorMatcher, ResiliencePolicy } from './types.js';
 
 /**
  * Default retry configuration
@@ -90,14 +90,14 @@ export class ErrorMatchers {
  */
 export class RetryExecutor implements ResiliencePolicy {
   public readonly name = 'RetryExecutor';
-  private errorMatcher: ErrorMatcher;
+  private errorMatcher?: ErrorMatcher;
 
   constructor(
     private config: RetryConfig = DEFAULT_RETRY_CONFIG,
     errorMatcher?: ErrorMatcher
   ) {
     this.validateConfig();
-    this["error"]Matcher = errorMatcher || ErrorMatchers.byName(config.retryableErrors);
+    this.errorMatcher = errorMatcher || ErrorMatchers.byName(config.retryableErrors);
   }
 
   /**
@@ -132,7 +132,7 @@ export class RetryExecutor implements ResiliencePolicy {
    * Set a custom error matcher
    */
   public setErrorMatcher(matcher: ErrorMatcher): void {
-    this["error"]Matcher = matcher;
+    this.errorMatcher = matcher;
   }
 
   /**
@@ -142,7 +142,7 @@ export class RetryExecutor implements ResiliencePolicy {
     if (attempt >= this.config.maxAttempts) {
       return false;
     }
-    const matcherResult = this["error"]Matcher(error);
+    const matcherResult = this.errorMatcher?.(error) ?? false;
     return matcherResult;
   }
 

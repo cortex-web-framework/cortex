@@ -12,7 +12,7 @@ class MockRequest extends IncomingMessage {
 }
 
 class MockResponse extends ServerResponse {
-  public statusCode: number = 200;
+  public override statusCode: number = 200;
   public _endCalled: boolean = false;
   public _data: any[] = [];
   private _resolveCallback: (() => void) | null = null;

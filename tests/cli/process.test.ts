@@ -38,7 +38,7 @@ describe('ProcessOps', () => {
     it('should return environment variables', () => {
       const env = processOps.env;
       assert.strictEqual(typeof env, 'object');
-      assert.ok(env.NODE_ENV !== undefined || env.PATH !== undefined);
+      assert.ok(env['NODE_ENV'] !== undefined || env['PATH'] !== undefined);
     });
   });
 
@@ -76,7 +76,7 @@ describe('ProcessOps', () => {
 
   describe('memoryUsage', () => {
     it('should return memory usage', () => {
-      const memory = processOps["memory"]Usage();
+      const memory = processOps.memoryUsage();
       assert.strictEqual(typeof memory, 'object');
       assert.strictEqual(typeof memory.heapUsed, 'number');
       assert.strictEqual(typeof memory.heapTotal, 'number');

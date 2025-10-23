@@ -1,23 +1,6 @@
 import { Actor, ActorSystem } from '../core/actorSystem.js';
 
-// Worker type declarations for Node.js
-declare global {
-  class Worker {
-    constructor(path: string, options: { type: string });
-    postMessage(data: unknown): void;
-    onmessage: ((event: MessageEvent) => void) | null;
-    onerror: ((event: ErrorEvent) => void) | null;
-    terminate(): void;
-  }
-  
-  interface ErrorEvent {
-    message: string;
-    filename: string;
-    lineno: number;
-    colno: number;
-    error: Error;
-  }
-}
+// Worker types are available globally in Node.js
 
 // This will be the content of the worker file
 const workerCode = `

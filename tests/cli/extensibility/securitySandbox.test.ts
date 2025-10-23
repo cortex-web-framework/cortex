@@ -4,7 +4,7 @@
  */
 
 import assert from 'node:assert/strict';
-import { describe, it, beforeEach, afterEach } from 'node:test';
+import { describe, it, beforeEach } from 'node:test';
 
 // Mock types for now - these will be replaced with actual imports
 interface MockSecuritySandbox {
@@ -21,10 +21,10 @@ interface MockSecuritySandbox {
 interface MockSandboxContext {
   readonly pluginName: string;
   readonly permissions: Set<string>;
-  readonly isActive: boolean;
+  isActive: boolean;
   readonly createdAt: Date;
-  readonly lastAccessed: Date;
-  readonly operationCount: number;
+  lastAccessed: Date;
+  operationCount: number;
   readonly blockedOperations: string[];
 }
 
@@ -237,7 +237,7 @@ class MockCortexSecuritySandbox implements MockSecuritySandbox {
     // Check security policy
     if (plugin.securityPolicy) {
       const policyValidation = this.validateSecurityPolicy(plugin.securityPolicy);
-      errors.push(...policyValidation["error"]s);
+      errors.push(...policyValidation.errors);
       warnings.push(...policyValidation.warnings);
     }
 
@@ -400,6 +400,10 @@ class MockCortexSecuritySandbox implements MockSecuritySandbox {
     // Mock CPU usage calculation
     return Math.min(sandbox.operationCount * 0.1, 100); // 0.1% per operation, max 100%
   }
+
+  getSecurityPolicies(): Map<string, MockSecurityPolicy> {
+    return this.securityPolicies;
+  }
 }
 
 describe('CortexSecuritySandbox', () => {
@@ -462,7 +466,7 @@ describe('CortexSecuritySandbox', () => {
       const validation = sandbox.validatePlugin(testPlugin);
       
       assert.strictEqual(validation.valid, true);
-      assert.strictEqual(validation["error"]s.length, 0);
+      assert.strictEqual(validation.errors.length, 0);
       assert.strictEqual(validation.riskLevel, 'LOW');
       assert.ok(validation.recommendations.includes('Plugin appears to be secure'));
     });
@@ -475,14 +479,14 @@ describe('CortexSecuritySandbox', () => {
             name: 'delete-all-files',
             description: 'Dangerous command',
             action: async () => {}
-          }
+          } as MockCLICommand
         ]
       };
       
       const validation = sandbox.validatePlugin(dangerousPlugin);
       
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation["error"]s.some(e => e.type === 'DANGEROUS_COMMAND'));
+      assert.ok(validation.errors.some(e => e.type === 'DANGEROUS_COMMAND'));
       assert.strictEqual(validation.riskLevel, 'HIGH');
     });
 
@@ -508,7 +512,7 @@ describe('CortexSecuritySandbox', () => {
       const validation = sandbox.validatePlugin(dangerousPermissionPlugin);
       
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation["error"]s.some(e => e.type === 'DANGEROUS_PERMISSION'));
+      assert.ok(validation.errors.some(e => e.type === 'DANGEROUS_PERMISSION'));
       assert.strictEqual(validation.riskLevel, 'CRITICAL');
     });
 
@@ -638,7 +642,7 @@ describe('CortexSecuritySandbox', () => {
       assert.strictEqual(info.isActive, true);
       assert.strictEqual(info.operationCount, 2);
       assert.strictEqual(info.blockedOperations.length, 0);
-      assert.strictEqual(typeof info["memory"]Usage, 'number');
+      assert.strictEqual(typeof info.memoryUsage, 'number');
       assert.strictEqual(typeof info.cpuUsage, 'number');
     });
 
@@ -653,7 +657,7 @@ describe('CortexSecuritySandbox', () => {
       const info = sandbox.getSandboxInfo(sandboxContext);
       
       assert.strictEqual(info.operationCount, 10);
-      assert.ok(info["memory"]Usage > 0);
+      assert.ok(info.memoryUsage > 0);
       assert.ok(info.cpuUsage > 0);
     });
   });
@@ -681,7 +685,7 @@ describe('CortexSecuritySandbox', () => {
 
   describe('security edge cases', () => {
     it('should handle plugins with no security policy', () => {
-      const noPolicyPlugin = {
+      const noPolicyPlugin: MockCortexPlugin = {
         name: 'no-policy-plugin',
         version: '1.0.0',
         description: 'Plugin without security policy',

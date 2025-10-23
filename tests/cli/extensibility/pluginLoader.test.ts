@@ -4,8 +4,8 @@
  */
 
 import assert from 'node:assert/strict';
-import { describe, it, beforeEach, afterEach, mock } from 'node:test';
-import { readFile, readdir, stat } from 'node:fs/promises';
+import { describe, it, beforeEach, afterEach } from 'node:test';
+import { readdir, stat } from 'node:fs/promises';
 import { join, extname } from 'node:path';
 
 // Mock types for now - these will be replaced with actual imports
@@ -176,7 +176,7 @@ class MockCortexPluginLoader implements MockPluginLoader {
       // Validate the plugin
       const validation = this.validatePlugin(plugin);
       if (!validation.valid) {
-        throw new Error(`Plugin validation failed: ${validation["error"]s.map(e => e.message).join(', ')}`);
+        throw new Error(`Plugin validation failed: ${validation.errors.map(e => e.message).join(', ')}`);
       }
 
       // Cache the loaded plugin
@@ -255,7 +255,7 @@ class MockCortexPluginLoader implements MockPluginLoader {
     // Validate commands if provided
     if (plugin.commands) {
       for (let i = 0; i < plugin.commands.length; i++) {
-        const command = plugin.commands[i];
+        const command = plugin.commands[i]!;
         if (!command.name || typeof command.name !== 'string') {
           errors.push({
             field: `commands[${i}].name`,
@@ -277,7 +277,7 @@ class MockCortexPluginLoader implements MockPluginLoader {
     // Validate templates if provided
     if (plugin.templates) {
       for (let i = 0; i < plugin.templates.length; i++) {
-        const template = plugin.templates[i];
+        const template = plugin.templates[i]!;
         if (!template.name || typeof template.name !== 'string') {
           errors.push({
             field: `templates[${i}].name`,
@@ -299,7 +299,7 @@ class MockCortexPluginLoader implements MockPluginLoader {
     // Validate hooks if provided
     if (plugin.hooks) {
       for (let i = 0; i < plugin.hooks.length; i++) {
-        const hook = plugin.hooks[i];
+        const hook = plugin.hooks[i]!;
         if (!hook.name || typeof hook.name !== 'string') {
           errors.push({
             field: `hooks[${i}].name`,
@@ -383,7 +383,7 @@ describe('CortexPluginLoader', () => {
   describe('loadPlugin', () => {
     it('should load a valid plugin successfully', async () => {
       // Mock the import function
-      const mockImport = mock.fn(() => Promise.resolve({ default: testPlugin }));
+      // const mockImport = mock.fn(() => Promise.resolve({ default: testPlugin }));
       
       // This would require mocking the import function, which is complex in Node.js
       // For now, we'll test the validation logic
@@ -407,7 +407,7 @@ describe('CortexPluginLoader', () => {
       const invalidPlugin = { invalid: 'data' } as unknown as MockCortexPlugin;
       const validation = loader.validatePlugin(invalidPlugin);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation["error"]s.length > 0);
+      assert.ok(validation.errors.length > 0, 'Should have validation errors');
     });
   });
 
@@ -445,35 +445,35 @@ describe('CortexPluginLoader', () => {
     it('should validate a correct plugin', () => {
       const validation = loader.validatePlugin(testPlugin);
       assert.strictEqual(validation.valid, true);
-      assert.strictEqual(validation["error"]s.length, 0);
+      assert.strictEqual(validation.errors.length, 0);
     });
 
     it('should reject plugin without name', () => {
       const invalidPlugin = { ...testPlugin, name: '' };
       const validation = loader.validatePlugin(invalidPlugin);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation["error"]s.some(e => e.field === 'name'));
+      assert.ok(validation.errors.some(e => e.field === 'name'));
     });
 
     it('should reject plugin without version', () => {
       const invalidPlugin = { ...testPlugin, version: '' };
       const validation = loader.validatePlugin(invalidPlugin);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation["error"]s.some(e => e.field === 'version'));
+      assert.ok(validation.errors.some(e => e.field === 'version'));
     });
 
     it('should reject plugin without description', () => {
       const invalidPlugin = { ...testPlugin, description: '' };
       const validation = loader.validatePlugin(invalidPlugin);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation["error"]s.some(e => e.field === 'description'));
+      assert.ok(validation.errors.some(e => e.field === 'description'));
     });
 
     it('should reject plugin without author', () => {
       const invalidPlugin = { ...testPlugin, author: '' };
       const validation = loader.validatePlugin(invalidPlugin);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation["error"]s.some(e => e.field === 'author'));
+      assert.ok(validation.errors.some(e => e.field === 'author'));
     });
 
     it('should validate plugin with commands', () => {
@@ -484,7 +484,7 @@ describe('CortexPluginLoader', () => {
             name: 'test-command',
             description: 'A test command',
             action: async () => {}
-          }
+          } as MockCLICommand
         ]
       };
       
@@ -506,7 +506,7 @@ describe('CortexPluginLoader', () => {
       
       const validation = loader.validatePlugin(pluginWithInvalidCommands);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation["error"]s.some(e => e.field === 'commands[0].name'));
+      assert.ok(validation.errors.some(e => e.field === 'commands[0].name'));
     });
 
     it('should validate plugin with templates', () => {
@@ -563,7 +563,7 @@ describe('CortexPluginLoader', () => {
       
       const validation = loader.validatePlugin(pluginWithInvalidTemplates);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation["error"]s.some(e => e.field === 'templates[0].name'));
+      assert.ok(validation.errors.some(e => e.field === 'templates[0].name'));
     });
 
     it('should validate plugin with hooks', () => {
@@ -598,7 +598,7 @@ describe('CortexPluginLoader', () => {
       
       const validation = loader.validatePlugin(pluginWithInvalidHooks);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation["error"]s.some(e => e.field === 'hooks[0].name'));
+      assert.ok(validation.errors.some(e => e.field === 'hooks[0].name'));
     });
 
     it('should reject plugin with invalid hook priority', () => {
@@ -616,7 +616,7 @@ describe('CortexPluginLoader', () => {
       
       const validation = loader.validatePlugin(pluginWithInvalidHookPriority);
       assert.strictEqual(validation.valid, false);
-      assert.ok(validation["error"]s.some(e => e.field === 'hooks[0].priority'));
+      assert.ok(validation.errors.some(e => e.field === 'hooks[0].priority'));
     });
   });
 

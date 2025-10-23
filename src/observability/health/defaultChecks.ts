@@ -8,7 +8,7 @@ export class MemoryHealthCheck implements HealthCheck {
   public readonly name = 'memory';
 
   async check(): Promise<HealthCheckResult> {
-    const memUsage = process["memory"]Usage();
+    const memUsage = process.memoryUsage();
     const totalMB = memUsage.heapTotal / 1024 / 1024;
     const usedMB = memUsage.heapUsed / 1024 / 1024;
     const usagePercent = (usedMB / totalMB) * 100;

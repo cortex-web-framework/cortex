@@ -49,8 +49,10 @@ test('Span should add events correctly', () => {
   span.addEvent('database.query');
 
   assert.strictEqual(span.events.length, 2);
+  assert.ok(span.events[0], 'First event should exist');
   assert.strictEqual(span.events[0].name, 'user.login');
   assert.strictEqual(span.events[0].attributes?.['user.id'], '123');
+  assert.ok(span.events[1], 'Second event should exist');
   assert.strictEqual(span.events[1].name, 'database.query');
 });
 
@@ -83,6 +85,7 @@ test('Span should record exceptions correctly', () => {
   span.recordException(error);
 
   assert.strictEqual(span.events.length, 1);
+  assert.ok(span.events[0], 'First event should exist');
   assert.strictEqual(span.events[0].name, 'exception');
   assert.strictEqual(span.events[0].attributes?.['exception.type'], 'Error');
   assert.strictEqual(span.events[0].attributes?.['exception.message'], 'Test error');

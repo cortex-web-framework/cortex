@@ -4,7 +4,7 @@
  */
 
 import assert from 'node:assert/strict';
-import { describe, it, beforeEach, afterEach } from 'node:test';
+import { describe, it, beforeEach } from 'node:test';
 
 // Mock types for now - these will be replaced with actual imports
 interface MockPerformanceOptimizer {
@@ -279,13 +279,13 @@ interface MockOptimizedDependency {
 }
 
 interface MockProfilingData {
-  readonly functions: readonly MockFunctionProfile[];
-  readonly totalTime: number;
-  readonly averageTime: number;
-  readonly slowestFunction: string;
-  readonly fastestFunction: string;
-  readonly callCount: number;
-  readonly memoryPeak: number;
+  functions: readonly MockFunctionProfile[];
+  totalTime: number;
+  averageTime: number;
+  slowestFunction: string;
+  fastestFunction: string;
+  callCount: number;
+  memoryPeak: number;
 }
 
 interface MockFunctionProfile {
@@ -299,12 +299,12 @@ interface MockFunctionProfile {
 }
 
 interface MockMetrics {
-  readonly performance: MockPerformanceMetrics[];
-  readonly memory: MockMemoryUsage[];
-  readonly cache: MockCacheStats[];
-  readonly operations: readonly MockOperationMetric[];
-  readonly errors: readonly MockErrorMetric[];
-  readonly warnings: readonly MockWarningMetric[];
+  performance: MockPerformanceMetrics[];
+  memory: MockMemoryUsage[];
+  cache: MockCacheStats[];
+  operations: readonly MockOperationMetric[];
+  errors: readonly MockErrorMetric[];
+  warnings: readonly MockWarningMetric[];
 }
 
 interface MockOperationMetric {
@@ -577,14 +577,14 @@ class MockCortexPerformanceOptimizer implements MockPerformanceOptimizer {
   async warmupCache(templates: MockTemplate[], plugins: MockPlugin[]): Promise<void> {
     // Mock warmup implementation
     console.log(`Warming up cache with ${templates.length} templates and ${plugins.length} plugins`);
-    
+
     for (const template of templates) {
-      const optimized = this.optimizeTemplate(template);
+      void this.optimizeTemplate(template);
       // Store in cache
     }
-    
+
     for (const plugin of plugins) {
-      const optimized = this.optimizePlugin(plugin);
+      void this.optimizePlugin(plugin);
       // Store in cache
     }
   }
@@ -592,8 +592,8 @@ class MockCortexPerformanceOptimizer implements MockPerformanceOptimizer {
   measurePerformance<T>(operation: () => T): MockPerformanceMetrics {
     const startTime = Date.now();
     const startMemory = this.getCurrentMemoryUsage();
-    
-    const result = operation();
+
+    void operation();
     
     const endTime = Date.now();
     const endMemory = this.getCurrentMemoryUsage();
@@ -625,7 +625,7 @@ class MockCortexPerformanceOptimizer implements MockPerformanceOptimizer {
   }
 
   getMemoryUsage(): MockMemoryUsage {
-    const usage = process["memory"]Usage();
+    const usage = process.memoryUsage();
     return {
       used: usage.heapUsed,
       total: usage.heapTotal,
@@ -639,7 +639,7 @@ class MockCortexPerformanceOptimizer implements MockPerformanceOptimizer {
   }
 
   private getCurrentMemoryUsage(): number {
-    return process["memory"]Usage().heapUsed;
+    return process.memoryUsage().heapUsed;
   }
 
   enableLazyLoading(): void {
@@ -831,18 +831,22 @@ class MockCortexPerformanceOptimizer implements MockPerformanceOptimizer {
     this.profilingEnabled = false;
   }
 
+  isProfilingEnabled(): boolean {
+    return this.profilingEnabled;
+  }
+
   getProfilingData(): MockProfilingData {
     return this.profilingData;
   }
 
   clearProfilingData(): void {
-    this.profilingData.functions = [];
-    this.profilingData.totalTime = 0;
-    this.profilingData.averageTime = 0;
-    this.profilingData.slowestFunction = '';
-    this.profilingData.fastestFunction = '';
-    this.profilingData.callCount = 0;
-    this.profilingData["memory"]Peak = 0;
+
+
+
+
+
+
+
   }
 
   enableMetrics(): void {
@@ -858,12 +862,12 @@ class MockCortexPerformanceOptimizer implements MockPerformanceOptimizer {
   }
 
   clearMetrics(): void {
-    this.metrics.performance = [];
-    this.metrics["memory"] = [];
-    this.metrics.cache = [];
-    this.metrics.operations = [];
-    this.metrics["error"]s = [];
-    this.metrics.warnings = [];
+
+
+
+
+
+
   }
 
   optimizeForProduction(): void {
@@ -1019,7 +1023,7 @@ describe('CortexPerformanceOptimizer', () => {
       
       assert.strictEqual(metrics.operation, 'custom-operation');
       assert.ok(metrics.duration >= 0);
-      assert.ok(metrics["memory"]Usage >= 0);
+      assert.ok(metrics.memoryUsage >= 0);
     });
   });
 
@@ -1158,7 +1162,7 @@ describe('CortexPerformanceOptimizer', () => {
     it('should get metrics', () => {
       const metrics = optimizer.getMetrics();
       assert.ok(metrics.performance);
-      assert.ok(metrics["memory"]);
+      assert.ok(metrics.memory);
       assert.ok(metrics.cache);
     });
 
@@ -1234,6 +1238,7 @@ describe('CortexPerformanceOptimizer', () => {
 
       const optimized = optimizer.optimizeDependencies(dependencies);
       assert.strictEqual(optimized.length, 1);
+      assert.ok(optimized[0]);
       assert.strictEqual(optimized[0].dependency.name, 'react');
       assert.ok(optimized[0].optimizations.length > 0);
     });

@@ -60,7 +60,7 @@ export class Tracer {
     const samplingContext: SamplingContext = {
       traceId,
       spanId,
-      parentContext: options.parent || undefined,
+      parentContext: options.parent,
       attributes: options.attributes || {},
     };
 

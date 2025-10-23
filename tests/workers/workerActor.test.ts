@@ -9,7 +9,7 @@ class MockActorSystem extends ActorSystem {
     // @ts-ignore
     super(null); // Pass null for EventBus as it's not used in this test
   }
-  public handleFailure(actor: any, error: any): void {
+  public override handleFailure(actor: any, error: any): void {
     console["error"]('MockActorSystem: Actor failed', actor.id, error);
   }
 }
