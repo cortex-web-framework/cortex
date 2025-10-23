@@ -1,6 +1,8 @@
 import type { CircuitBreakerConfig, ResiliencePolicy } from './types.js';
 import { CircuitState } from './types.js';
 import { CircuitBreakerOpenError } from './errors.js';
+import type { TimeProvider } from '../utils/time.js';
+import { SystemTimeProvider } from '../utils/time.js';
 
 /**
  * Default circuit breaker configuration
@@ -36,8 +38,13 @@ export class CircuitBreaker implements ResiliencePolicy {
   private failureCount = 0;
   private successCount = 0;
   private nextAttemptTime = 0;
+  private timeProvider: TimeProvider;
 
-  constructor(private config: CircuitBreakerConfig = DEFAULT_CIRCUIT_BREAKER_CONFIG) {
+  constructor(
+    private config: CircuitBreakerConfig = DEFAULT_CIRCUIT_BREAKER_CONFIG,
+    timeProvider?: TimeProvider
+  ) {
+    this.timeProvider = timeProvider ?? new SystemTimeProvider();
     this.validateConfig();
   }
 
@@ -46,7 +53,7 @@ export class CircuitBreaker implements ResiliencePolicy {
    */
   public async execute<T>(operation: () => Promise<T>): Promise<T> {
     if (this.state === CircuitState.OPEN) {
-      if (Date.now() < this.nextAttemptTime) {
+      if (this.timeProvider.now() < this.nextAttemptTime) {
         throw new CircuitBreakerOpenError('Circuit breaker is OPEN', this.nextAttemptTime);
       }
       this.state = CircuitState.HALF_OPEN;
@@ -101,11 +108,11 @@ export class CircuitBreaker implements ResiliencePolicy {
     if (this.state === CircuitState.CLOSED) {
       return true;
     }
-    
+
     if (this.state === CircuitState.OPEN) {
-      return Date.now() >= this.nextAttemptTime;
+      return this.timeProvider.now() >= this.nextAttemptTime;
     }
-    
+
     return true; // HALF_OPEN
   }
 
@@ -132,10 +139,10 @@ export class CircuitBreaker implements ResiliencePolicy {
 
     if (this.state === CircuitState.HALF_OPEN) {
       this.state = CircuitState.OPEN;
-      this.nextAttemptTime = Date.now() + this.config.timeout;
+      this.nextAttemptTime = this.timeProvider.now() + this.config.timeout;
     } else if (this.failureCount >= this.config.failureThreshold) {
       this.state = CircuitState.OPEN;
-      this.nextAttemptTime = Date.now() + this.config.timeout;
+      this.nextAttemptTime = this.timeProvider.now() + this.config.timeout;
     }
   }
 
