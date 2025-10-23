@@ -10,3 +10,5 @@ export { RetryExecutor, ErrorMatchers } from './retryExecutor.js';
 export { Bulkhead } from './bulkhead.js';
 export { TimeoutExecutor } from './timeout.js';
 export { CompositePolicy } from './compositePolicy.js';
+export { RollingWindow, TimeWindowTracker } from './rollingWindow.js';
+export type { TimeWindowConfig } from './rollingWindow.js';
