@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert';
 import { rateLimiter, __testing__ } from '../../src/security/rateLimiter.js';
 import { IncomingMessage, ServerResponse } from 'node:http';
+import { ManualTimeProvider } from '../../tests/mocks/time.js';
 
 // Mock Request and Response objects for middleware testing
 class MockRequest extends IncomingMessage {
@@ -86,7 +87,8 @@ test('rateLimiter should allow requests within the limit', async () => {
 });
 
 test('rateLimiter should block requests exceeding the limit', async () => {
-  const limiter = rateLimiter({ max: 1, windowMs: 100 });
+  const timeProvider = new ManualTimeProvider(1000); // Start at 1000ms
+  const limiter = rateLimiter({ max: 1, windowMs: 100 }, timeProvider);
   const req = new MockRequest();
   const res = new MockResponse();
 
@@ -95,7 +97,7 @@ test('rateLimiter should block requests exceeding the limit', async () => {
   assert.strictEqual(nextCalled1, true, 'Next should be called for allowed request');
   assert.strictEqual(res.statusCode, 200, 'Status code should be 200');
 
-  // Second request (blocked)
+  // Second request immediately (blocked) - no time has passed
   const res2 = new MockResponse();
   const nextCalled2 = await callLimiter(limiter, req, res2);
   assert.strictEqual(nextCalled2, false, 'Next should not be called for blocked request');

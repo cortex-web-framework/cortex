@@ -166,8 +166,19 @@ export function compression(config: CompressionConfig = {}): (req: Request, res:
 
     // Override writeHead to check content type and length
     res.writeHead = function writeHeadImpl(statusCode: number, ...args: any[]): Response {
-      const contentType = res.getHeader('Content-Type') as string || '';
-      const contentLengthHeader = res.getHeader('Content-Length') as string;
+      // Extract headers from writeHead arguments
+      // Signature: writeHead(statusCode, [statusMessage], [headers])
+      let headersArg: Record<string, any> = {};
+      if (args.length > 0) {
+        const lastArg = args[args.length - 1];
+        if (typeof lastArg === 'object' && lastArg !== null && !Array.isArray(lastArg)) {
+          headersArg = lastArg;
+        }
+      }
+
+      // Merge headers from arguments with previously set headers
+      const contentType = (headersArg['Content-Type'] ?? res.getHeader('Content-Type') ?? '') as string;
+      const contentLengthHeader = (headersArg['Content-Length'] ?? res.getHeader('Content-Length') ?? '') as string;
 
       if (contentLengthHeader) {
         contentLength = parseInt(contentLengthHeader, 10);

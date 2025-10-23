@@ -1,4 +1,6 @@
 import * as http from 'node:http';
+import type { TimeProvider } from '../utils/time.js';
+import { SystemTimeProvider } from '../utils/time.js';
 
 interface RequestExt extends http.IncomingMessage {
   ip?: string;
@@ -33,21 +35,23 @@ export const __testing__ = {
   clearClients: () => clients.clear(),
 };
 
-export function rateLimiter(options?: Partial<RateLimiterOptions>) {
+export function rateLimiter(options?: Partial<RateLimiterOptions>, timeProvider?: TimeProvider) {
   const opts = { ...defaultOptions, ...options };
+  const time = timeProvider ?? new SystemTimeProvider();
 
   return (req: Request, res: Response, next: NextFunction): void => {
     const ip = req.ip ?? 'unknown'; // Use 'unknown' if ip is undefined
+    const now = time.now();
 
     if (!clients.has(ip)) {
-      clients.set(ip, { count: 0, lastReset: Date.now() });
+      clients.set(ip, { count: 0, lastReset: now });
     }
 
     const client = clients.get(ip)!;
 
-    if (Date.now() - client.lastReset > opts.windowMs) {
+    if (now - client.lastReset > opts.windowMs) {
       client.count = 0;
-      client.lastReset = Date.now();
+      client.lastReset = now;
     }
 
     if (client.count >= opts.max) {
