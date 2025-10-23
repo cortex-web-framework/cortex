@@ -272,16 +272,21 @@ export function createMessageEnvelope<T>(
   serialization: SerializationConfig,
   transfers?: Transferable[]
 ): MessageEnvelope<T> {
-  return {
+  const result: MessageEnvelope<T> = {
     version: PROTOCOL_VERSION,
     messageId: generateMessageId(),
     type,
     timestamp: Date.now(),
     payload,
     metadata,
-    serialization,
-    transfers
+    serialization
   };
+
+  if (transfers !== undefined) {
+    result.transfers = transfers;
+  }
+
+  return result;
 }
 
 /**

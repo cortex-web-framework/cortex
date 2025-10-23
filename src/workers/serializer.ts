@@ -209,14 +209,13 @@ export class MessageSerializer {
     for (const handler of this.handlers.values()) {
       if (handler.canHandle(value)) {
         const serialized = handler.serialize(value);
-        const typeInfo = this.options.includeTypeInfo
-          ? this.getTypeInfo(value)
-          : undefined;
+        const result: SerializedValue = { value: serialized };
 
-        return {
-          value: serialized,
-          typeInfo
-        };
+        if (this.options.includeTypeInfo) {
+          result.typeInfo = this.getTypeInfo(value);
+        }
+
+        return result;
       }
     }
 
@@ -232,18 +231,22 @@ export class MessageSerializer {
     typeHint: DataTypeHint,
     depth: number
   ): SerializedValue {
-    const typeInfo = this.options.includeTypeInfo
-      ? this.getTypeInfo(value)
-      : undefined;
+    const createResult = (val: unknown): SerializedValue => {
+      const result: SerializedValue = { value: val };
+      if (this.options.includeTypeInfo) {
+        result.typeInfo = this.getTypeInfo(value);
+      }
+      return result;
+    };
 
     switch (typeHint) {
       case DataTypeHint.Primitive:
-        return { value, typeInfo };
+        return createResult(value);
 
       case DataTypeHint.Array: {
         const arr = value as unknown[];
         const serialized = arr.map((item) => this.serialize(item, depth + 1).value);
-        return { value: serialized, typeInfo };
+        return createResult(serialized);
       }
 
       case DataTypeHint.PlainObject: {
@@ -259,7 +262,7 @@ export class MessageSerializer {
             serialized[key] = this.serialize(itemValue, depth + 1).value;
           }
         }
-        return { value: serialized, typeInfo };
+        return createResult(serialized);
       }
 
       case DataTypeHint.Date:
@@ -267,20 +270,20 @@ export class MessageSerializer {
       case DataTypeHint.Set:
       case DataTypeHint.Regex:
         // Already handled by handlers above
-        return { value, typeInfo };
+        return createResult(value);
 
       case DataTypeHint.ArrayBuffer: {
         const buffer = value as ArrayBuffer;
-        return { value: buffer, typeInfo };
+        return createResult(buffer);
       }
 
       case DataTypeHint.TypedArray: {
         const typed = value as any;
-        return { value: typed, typeInfo };
+        return createResult(typed);
       }
 
       default:
-        return { value, typeInfo };
+        return createResult(value);
     }
   }
 
@@ -319,12 +322,17 @@ export class MessageSerializer {
     if (type === "object") {
       const constructor = Object.getPrototypeOf(value).constructor;
       const constructorName = constructor?.name || "Object";
-
-      return {
+      const result: TypeInformation = {
         constructorName,
-        version: 1,
-        schema: this.getSchema(value as object)
+        version: 1
       };
+
+      const schema = this.getSchema(value as object);
+      if (schema !== undefined) {
+        result.schema = schema;
+      }
+
+      return result;
     }
 
     return {
@@ -468,23 +476,23 @@ export class ErrorSerializer {
    * Deserialize an error from transmitted format
    */
   static deserialize(data: Record<string, unknown>): Error {
-    const message = (data.message as string) || "Unknown error";
+    const message = (data["message"] as string) || "Unknown error";
     const error = new Error(message);
 
-    if (data.errorType) {
-      error.name = data.errorType as string;
+    if (data["errorType"]) {
+      error.name = data["errorType"] as string;
     }
 
-    if (data.stack) {
+    if (data["stack"]) {
       Object.defineProperty(error, "stack", {
-        value: data.stack,
+        value: data["stack"],
         writable: true,
         configurable: true
       });
     }
 
-    if (data.cause) {
-      (error as any).cause = data.cause;
+    if (data["cause"]) {
+      (error as any).cause = data["cause"];
     }
 
     return error;
