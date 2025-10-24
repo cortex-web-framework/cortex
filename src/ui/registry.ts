@@ -40,6 +40,7 @@ import { uiPopoverMetadata } from './components/popover/ui-popover.metadata.js';
 import { uiToastMetadata } from './components/toast/ui-toast.metadata.js';
 import { uiCodeMetadata } from './components/code/ui-code.metadata.js';
 import { uiTagMetadata } from './components/tag/ui-tag.metadata.js';
+import { uiEmptyStateMetadata } from './components/empty-state/ui-empty-state.metadata.js';
 
 /**
  * Register all component metadata.
@@ -81,6 +82,7 @@ export function registerAllComponents(): void {
   globalRegistry.register(uiToastMetadata);
   globalRegistry.register(uiCodeMetadata);
   globalRegistry.register(uiTagMetadata);
+  globalRegistry.register(uiEmptyStateMetadata);
 }
 
 /**
