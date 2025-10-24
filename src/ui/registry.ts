@@ -45,6 +45,10 @@ import { uiRatingMetadata } from './components/rating/ui-rating.metadata.js';
 import { uiStatMetadata } from './components/stat/ui-stat.metadata.js';
 import { uiProgressCircleMetadata } from './components/progress-circle/ui-progress-circle.metadata.js';
 import { uiTimelineMetadata } from './components/timeline/ui-timeline.metadata.js';
+import { uiCarouselMetadata } from './components/carousel/ui-carousel.metadata.js';
+import { uiSwitchMetadata } from './components/switch/ui-switch.metadata.js';
+import { uiCopyMetadata } from './components/copy/ui-copy.metadata.js';
+import { uiResultMetadata } from './components/result/ui-result.metadata.js';
 
 /**
  * Register all component metadata.
@@ -91,6 +95,10 @@ export function registerAllComponents(): void {
   globalRegistry.register(uiStatMetadata);
   globalRegistry.register(uiProgressCircleMetadata);
   globalRegistry.register(uiTimelineMetadata);
+  globalRegistry.register(uiCarouselMetadata);
+  globalRegistry.register(uiSwitchMetadata);
+  globalRegistry.register(uiCopyMetadata);
+  globalRegistry.register(uiResultMetadata);
 }
 
 /**
