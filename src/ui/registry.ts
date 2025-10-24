@@ -20,6 +20,7 @@ import { uiAutocompleteMetadata } from './components/autocomplete/ui-autocomplet
 import { uiColorPickerMetadata } from './components/color-picker/ui-color-picker.metadata.js';
 import { uiFileUploadMetadata } from './components/file-upload/ui-file-upload.metadata.js';
 import { uiModalMetadata } from './components/modal/ui-modal.metadata.js';
+import { uiAlertMetadata } from './components/alert/ui-alert.metadata.js';
 
 /**
  * Register all component metadata.
@@ -41,6 +42,7 @@ export function registerAllComponents(): void {
   globalRegistry.register(uiColorPickerMetadata);
   globalRegistry.register(uiFileUploadMetadata);
   globalRegistry.register(uiModalMetadata);
+  globalRegistry.register(uiAlertMetadata);
 }
 
 /**
