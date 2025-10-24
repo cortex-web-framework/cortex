@@ -14,10 +14,8 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
-    "lib": ["dom", "es2020"],
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "lib": ["dom", "es2020"]
   },
-  "include": ["src/**/*", "src/ui/**/*"],
-  "exclude": ["node_modules", "tests", "dist", "dist/ui"]
+  "include": ["scripts/**/*"],
+  "exclude": ["node_modules", "tests", "dist"]
 }

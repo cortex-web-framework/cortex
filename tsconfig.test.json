@@ -2,18 +2,16 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist/ui-test-compiled",
-    "rootDir": "./src",
     "target": "es2020",
     "module": "es2022",
-    "baseUrl": ".",
-    "paths": {
-      "../../../dist/ui/components/button/ui-button.js": ["dist/ui/components/button/ui-button.d.ts"]
-    }
+    "rootDirs": ["./src", "./tests"]
   },
   "include": [
     "src/ui-test/**/*.ts",
     "src/ui/**/*.ts",
-    "src/ui/**/*.test.ts"
+    "src/ui/**/*.test.ts",
+    "tests/ui/components/**/*.ts",
+    "tests/ui/components/**/*.test.ts"
   ],
   "exclude": [
     "node_modules",
