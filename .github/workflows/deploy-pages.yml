@@ -6,17 +6,16 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: List files in the workspace
-        run: ls -R
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -31,11 +30,22 @@ jobs:
 
       - name: Prepare for deployment
         run: |
-          mkdir -p examples/ui-component-test-app/dist/ui
-          cp dist/ui/ui-bundle.js examples/ui-component-test-app/dist/ui/ui-bundle.js
+          mkdir -p _site/dist/ui
+          cp -r examples/ui-component-test-app/* _site/
+          cp dist/ui/ui-bundle.js _site/dist/ui/ui-bundle.js
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./examples/ui-component-test-app
+          path: './_site'
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
