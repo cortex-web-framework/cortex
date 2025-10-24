@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search Component - Cortex UI</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    .demo-section {
+      background: white;
+      border-radius: 8px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .demo-section h3 {
+      color: #667eea;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+
+    .demo-section p {
+      color: #666;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .demo-section code {
+      background: #f5f5f5;
+      padding: 0.2rem 0.4rem;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+    }
+
+    .results {
+      background: #f5f5f5;
+      border-radius: 4px;
+      padding: 1rem;
+      margin-top: 1rem;
+      min-height: 50px;
+      color: #666;
+    }
+
+    .results.empty {
+      color: #999;
+      font-style: italic;
+    }
+
+    @media (max-width: 640px) {
+      .header h1 {
+        font-size: 1.5rem;
+      }
+
+      .demo-section {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Search Component</h1>
+      <p>Debounced search with suggestions - Zero Dependencies</p>
+    </div>
+
+    <div class="demo-section">
+      <h3>🔍 Basic Search</h3>
+      <p>Type to search through a list of programming languages. Results appear automatically with debouncing.</p>
+      <ui-search
+        id="search1"
+        data-items="JavaScript,TypeScript,Python,Java,C#,C++,Ruby,Go,Rust,Kotlin"
+        placeholder="Search languages..."
+      ></ui-search>
+      <div id="results1" class="results empty">Results will appear here...</div>
+    </div>
+
+    <div class="demo-section">
+      <h3>🎨 Search with Show All</h3>
+      <p>Click in the search box to see all available items even without typing.</p>
+      <ui-search
+        id="search2"
+        data-items="React,Vue,Angular,Svelte,Alpine,Preact,Next.js,Nuxt,SvelteKit,Astro"
+        placeholder="Search frameworks..."
+        show-all-on-focus
+      ></ui-search>
+      <div id="results2" class="results empty">Click to see all items...</div>
+    </div>
+
+    <div class="demo-section">
+      <h3>⚡ Custom Debounce Delay</h3>
+      <p>This search has a 500ms debounce delay instead of the default 300ms.</p>
+      <ui-search
+        id="search3"
+        data-items="HTML,CSS,JavaScript,WebAssembly,GraphQL,REST,WebSocket"
+        placeholder="Search web technologies..."
+        debounce-delay="500"
+      ></ui-search>
+      <div id="results3" class="results empty">Waiting for input...</div>
+    </div>
+
+    <div class="demo-section">
+      <h3>✨ Features</h3>
+      <ul style="color: #666; line-height: 2; margin-left: 1.5rem;">
+        <li>✓ Debounced search (configurable delay)</li>
+        <li>✓ Smart filtering across items</li>
+        <li>✓ Keyboard navigation (arrow keys, enter, escape)</li>
+        <li>✓ Match highlighting</li>
+        <li>✓ Clear button appears on input</li>
+        <li>✓ "Show all on focus" option</li>
+        <li>✓ Case-insensitive search</li>
+        <li>✓ Custom events (search, select)</li>
+        <li>✓ Responsive dropdown</li>
+        <li>✓ No external dependencies</li>
+      </ul>
+    </div>
+  </div>
+
+  <script type="module">
+    import './ui-search.js';
+
+    // Demo 1
+    const search1 = document.getElementById('search1');
+    const results1 = document.getElementById('results1');
+
+    search1.addEventListener('search', (event) => {
+      const query = event.detail.query;
+      const filtered = search1.getFilteredItems();
+      if (filtered.length > 0) {
+        results1.innerHTML = `<strong>Found:</strong> ${filtered.join(', ')}`;
+        results1.classList.remove('empty');
+      } else if (query) {
+        results1.innerHTML = 'No results found';
+        results1.classList.add('empty');
+      } else {
+        results1.innerHTML = 'Results will appear here...';
+        results1.classList.add('empty');
+      }
+    });
+
+    search1.addEventListener('select', (event) => {
+      results1.innerHTML = `<strong>Selected:</strong> ${event.detail.value}`;
+      results1.classList.remove('empty');
+    });
+
+    // Demo 2
+    const search2 = document.getElementById('search2');
+    const results2 = document.getElementById('results2');
+
+    search2.addEventListener('search', (event) => {
+      const filtered = search2.getFilteredItems();
+      if (filtered.length > 0) {
+        results2.innerHTML = `<strong>Filtered:</strong> ${filtered.join(', ')}`;
+        results2.classList.remove('empty');
+      }
+    });
+
+    search2.addEventListener('select', (event) => {
+      results2.innerHTML = `<strong>Selected:</strong> ${event.detail.value}`;
+      results2.classList.remove('empty');
+    });
+
+    // Demo 3
+    const search3 = document.getElementById('search3');
+    const results3 = document.getElementById('results3');
+
+    search3.addEventListener('search', (event) => {
+      results3.innerHTML = `Searching for: <strong>${event.detail.query}</strong>`;
+      results3.classList.remove('empty');
+    });
+
+    search3.addEventListener('select', (event) => {
+      results3.innerHTML = `<strong>Selected:</strong> ${event.detail.value}`;
+      results3.classList.remove('empty');
+    });
+  </script>
+</body>
+</html>
