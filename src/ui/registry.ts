@@ -33,6 +33,7 @@ import { uiCardMetadata } from './components/card/ui-card.metadata.js';
 import { uiDividerMetadata } from './components/divider/ui-divider.metadata.js';
 import { uiAvatarMetadata } from './components/avatar/ui-avatar.metadata.js';
 import { uiChipMetadata } from './components/chip/ui-chip.metadata.js';
+import { uiSkeletonMetadata } from './components/skeleton/ui-skeleton.metadata.js';
 
 /**
  * Register all component metadata.
@@ -67,6 +68,7 @@ export function registerAllComponents(): void {
   globalRegistry.register(uiDividerMetadata);
   globalRegistry.register(uiAvatarMetadata);
   globalRegistry.register(uiChipMetadata);
+  globalRegistry.register(uiSkeletonMetadata);
 }
 
 /**
