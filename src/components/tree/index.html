@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tree Component - Cortex UI</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .demo-section {
+      background: white;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .demo-section h3 {
+      color: #667eea;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+
+    .demo-section p {
+      color: #666;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .tree-wrapper {
+      background: #f9f9f9;
+      border: 1px solid #eee;
+      border-radius: 4px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .results {
+      background: #f5f5f5;
+      border-radius: 4px;
+      padding: 1rem;
+      margin-top: 1rem;
+      min-height: 40px;
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .results.empty {
+      color: #999;
+      font-style: italic;
+    }
+
+    .results strong {
+      color: #667eea;
+    }
+
+    .controls {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .controls button {
+      padding: 0.5rem 1rem;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+
+    .controls button:hover {
+      background: #5568d3;
+    }
+
+    .features-section {
+      background: white;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .features-section h3 {
+      color: #667eea;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature-item {
+      padding: 1rem;
+      background: #f9f9f9;
+      border-radius: 4px;
+      border-left: 4px solid #667eea;
+    }
+
+    .feature-item h4 {
+      color: #333;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .feature-item p {
+      color: #666;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 640px) {
+      .header h1 {
+        font-size: 1.5rem;
+      }
+
+      .demo-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .demo-section {
+        padding: 1.5rem;
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+
+      .controls button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Tree Component</h1>
+      <p>Hierarchical data visualization with expand/collapse - Zero Dependencies</p>
+    </div>
+
+    <div class="demo-grid">
+      <!-- Demo 1: Basic Tree -->
+      <div class="demo-section">
+        <h3>🌳 Basic File Tree</h3>
+        <p>A simple file structure tree with expand/collapse functionality.</p>
+        <div class="tree-wrapper">
+          <ui-tree id="tree1"></ui-tree>
+        </div>
+        <div id="results1" class="results empty">Select a node to see details...</div>
+      </div>
+
+      <!-- Demo 2: Tree with Mixed Items -->
+      <div class="demo-section">
+        <h3>🎯 Mixed Tree</h3>
+        <p>Tree with files, folders, and disabled items.</p>
+        <div class="tree-wrapper">
+          <ui-tree id="tree2"></ui-tree>
+        </div>
+        <div id="results2" class="results empty">Expand folders to explore...</div>
+      </div>
+
+      <!-- Demo 3: Deep Nesting -->
+      <div class="demo-section">
+        <h3>📚 Deep Hierarchy</h3>
+        <p>Nested structure with multiple levels of depth.</p>
+        <div class="tree-wrapper" style="max-height: 400px;">
+          <ui-tree id="tree3"></ui-tree>
+        </div>
+        <div id="results3" class="results empty">Navigate the hierarchy...</div>
+      </div>
+
+      <!-- Demo 4: Programmatic Control -->
+      <div class="demo-section">
+        <h3>⚙️ Programmatic Control</h3>
+        <p>Use buttons to expand, collapse, and select nodes programmatically.</p>
+        <div class="tree-wrapper">
+          <ui-tree id="tree4"></ui-tree>
+        </div>
+        <div class="controls">
+          <button id="expandAllBtn">Expand All</button>
+          <button id="collapseAllBtn">Collapse All</button>
+          <button id="clearSelBtn">Clear Selection</button>
+        </div>
+        <div id="results4" class="results empty">Use controls above...</div>
+      </div>
+
+      <!-- Demo 5: Large Tree -->
+      <div class="demo-section">
+        <h3>📊 Large Data Set</h3>
+        <p>Performance test with many nodes and nested levels.</p>
+        <div class="tree-wrapper">
+          <ui-tree id="tree5"></ui-tree>
+        </div>
+        <div id="results5" class="results empty">Expand folders to view...</div>
+      </div>
+
+      <!-- Demo 6: Navigation -->
+      <div class="demo-section">
+        <h3>⌨️ Keyboard Navigation</h3>
+        <p>Use arrow keys to navigate, Enter to select.</p>
+        <div class="tree-wrapper">
+          <ui-tree id="tree6"></ui-tree>
+        </div>
+        <div id="results6" class="results empty">Focus a node and use arrow keys...</div>
+      </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="features-section">
+      <h3>✨ Key Features</h3>
+      <div class="features-grid">
+        <div class="feature-item">
+          <h4>🌳 Hierarchical Display</h4>
+          <p>Display complex nested data structures with proper indentation and visual hierarchy.</p>
+        </div>
+        <div class="feature-item">
+          <h4>🔄 Expand/Collapse</h4>
+          <p>Toggle visibility of child nodes with smooth animations and state tracking.</p>
+        </div>
+        <div class="feature-item">
+          <h4>⌨️ Full Keyboard Nav</h4>
+          <p>Arrow keys for navigation, arrow right to expand, arrow left to collapse, Enter to select.</p>
+        </div>
+        <div class="feature-item">
+          <h4>🚫 Disabled Items</h4>
+          <p>Mark nodes as non-selectable while keeping them visible in the tree structure.</p>
+        </div>
+        <div class="feature-item">
+          <h4>🎯 Selection</h4>
+          <p>Single or multi-select mode with visual feedback and state tracking.</p>
+        </div>
+        <div class="feature-item">
+          <h4>🎨 Custom Icons</h4>
+          <p>Display custom icons next to each node for visual identification.</p>
+        </div>
+        <div class="feature-item">
+          <h4>🔌 Public API</h4>
+          <p>Comprehensive API for programmatic control: expand, collapse, select, navigate.</p>
+        </div>
+        <div class="feature-item">
+          <h4>📱 Responsive</h4>
+          <p>Mobile-optimized with touch-friendly interactions and scrollable content.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import './ui-tree.js';
+
+    // Demo 1: Basic file tree
+    const fileTreeData = [
+      {
+        id: 'src',
+        label: 'src',
+        icon: '📁',
+        children: [
+          {
+            id: 'components',
+            label: 'components',
+            icon: '📁',
+            children: [
+              { id: 'button.ts', label: 'button.ts', icon: '📄' },
+              { id: 'input.ts', label: 'input.ts', icon: '📄' },
+              { id: 'modal.ts', label: 'modal.ts', icon: '📄' },
+            ],
+          },
+          {
+            id: 'utils',
+            label: 'utils',
+            icon: '📁',
+            children: [
+              { id: 'helpers.ts', label: 'helpers.ts', icon: '📄' },
+              { id: 'format.ts', label: 'format.ts', icon: '📄' },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'tests',
+        label: 'tests',
+        icon: '📁',
+        children: [{ id: 'setup.ts', label: 'setup.ts', icon: '📄' }],
+      },
+      { id: 'package.json', label: 'package.json', icon: '📋' },
+      { id: 'README.md', label: 'README.md', icon: '📄' },
+    ];
+
+    const tree1 = document.getElementById('tree1');
+    tree1.setNodes(fileTreeData);
+
+    tree1.addEventListener('select', (e) => {
+      const results1 = document.getElementById('results1');
+      results1.innerHTML = `<strong>Selected:</strong> ${e.detail.node?.label || 'N/A'} (${e.detail.nodeId})`;
+      results1.classList.remove('empty');
+    });
+
+    tree1.addEventListener('toggle', (e) => {
+      const results1 = document.getElementById('results1');
+      const action = e.detail.isExpanded ? 'Expanded' : 'Collapsed';
+      results1.innerHTML = `<em>${action}:</em> <strong>${e.detail.nodeId}</strong>`;
+      results1.classList.remove('empty');
+    });
+
+    // Demo 2: Mixed tree
+    const mixedTreeData = [
+      {
+        id: 'docs',
+        label: 'Documentation',
+        icon: '📚',
+        children: [
+          { id: 'guide.md', label: 'Getting Started Guide', icon: '📘' },
+          { id: 'api.md', label: 'API Reference', icon: '📗' },
+          { id: 'locked', label: 'Private Docs', icon: '🔒', disabled: true },
+        ],
+      },
+      {
+        id: 'media',
+        label: 'Media Files',
+        icon: '🎨',
+        children: [
+          { id: 'images', label: 'Images', icon: '📁', children: [{ id: 'logo.png', label: 'logo.png', icon: '🖼️' }] },
+          { id: 'videos', label: 'Videos', icon: '📁', disabled: true },
+        ],
+      },
+    ];
+
+    const tree2 = document.getElementById('tree2');
+    tree2.setNodes(mixedTreeData);
+
+    tree2.addEventListener('select', (e) => {
+      const results2 = document.getElementById('results2');
+      results2.innerHTML = `<strong>Selected:</strong> ${e.detail.node?.label}`;
+      results2.classList.remove('empty');
+    });
+
+    // Demo 3: Deep nesting
+    const deepTreeData = [
+      {
+        id: 'root',
+        label: 'Root Project',
+        icon: '🏠',
+        children: [
+          {
+            id: 'level1',
+            label: 'Level 1',
+            icon: '📁',
+            children: [
+              {
+                id: 'level2',
+                label: 'Level 2',
+                icon: '📁',
+                children: [
+                  {
+                    id: 'level3',
+                    label: 'Level 3',
+                    icon: '📁',
+                    children: [
+                      { id: 'deep-file', label: 'Deep File', icon: '📄' },
+                      { id: 'deep-file2', label: 'Another Deep File', icon: '📄' },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ];
+
+    const tree3 = document.getElementById('tree3');
+    tree3.setNodes(deepTreeData);
+
+    tree3.addEventListener('select', (e) => {
+      const results3 = document.getElementById('results3');
+      const path = tree3.getNodePath(e.detail.nodeId);
+      results3.innerHTML = `<strong>Path:</strong> ${path.join(' > ')}`;
+      results3.classList.remove('empty');
+    });
+
+    // Demo 4: Programmatic control
+    const controlTreeData = [
+      {
+        id: 'app',
+        label: 'Application',
+        icon: '📱',
+        children: [
+          {
+            id: 'features',
+            label: 'Features',
+            icon: '⭐',
+            children: [
+              { id: 'feature1', label: 'Feature 1', icon: '✨' },
+              { id: 'feature2', label: 'Feature 2', icon: '✨' },
+            ],
+          },
+          {
+            id: 'settings',
+            label: 'Settings',
+            icon: '⚙️',
+            children: [
+              { id: 'general', label: 'General', icon: '🔧' },
+              { id: 'advanced', label: 'Advanced', icon: '🔧' },
+            ],
+          },
+        ],
+      },
+    ];
+
+    const tree4 = document.getElementById('tree4');
+    tree4.setNodes(controlTreeData);
+
+    document.getElementById('expandAllBtn').addEventListener('click', () => {
+      tree4.expandAll();
+      const results4 = document.getElementById('results4');
+      results4.innerHTML = '<em>All nodes expanded!</em>';
+      results4.classList.remove('empty');
+    });
+
+    document.getElementById('collapseAllBtn').addEventListener('click', () => {
+      tree4.collapseAll();
+      const results4 = document.getElementById('results4');
+      results4.innerHTML = '<em>All nodes collapsed!</em>';
+      results4.classList.remove('empty');
+    });
+
+    document.getElementById('clearSelBtn').addEventListener('click', () => {
+      tree4.clearSelection();
+      const results4 = document.getElementById('results4');
+      results4.innerHTML = '<em>Selection cleared!</em>';
+      results4.classList.remove('empty');
+    });
+
+    tree4.addEventListener('select', (e) => {
+      const results4 = document.getElementById('results4');
+      results4.innerHTML = `<strong>Selected:</strong> ${e.detail.node?.label}`;
+      results4.classList.remove('empty');
+    });
+
+    // Demo 5: Large tree
+    function generateLargeTree(parentId, depth, count) {
+      if (depth === 0) return [];
+      const children = [];
+      for (let i = 0; i < count; i++) {
+        const id = `${parentId}-${i}`;
+        children.push({
+          id,
+          label: `Node ${parentId}-${i}`,
+          icon: depth > 1 ? '📁' : '📄',
+          children: depth > 1 ? generateLargeTree(id, depth - 1, 3) : undefined,
+        });
+      }
+      return children;
+    }
+
+    const largeTreeData = [
+      {
+        id: 'root',
+        label: 'Large Dataset',
+        icon: '📊',
+        children: generateLargeTree('root', 3, 4),
+      },
+    ];
+
+    const tree5 = document.getElementById('tree5');
+    tree5.setNodes(largeTreeData);
+
+    tree5.addEventListener('select', (e) => {
+      const results5 = document.getElementById('results5');
+      results5.innerHTML = `<strong>Selected:</strong> ${e.detail.node?.label}`;
+      results5.classList.remove('empty');
+    });
+
+    // Demo 6: Navigation
+    const navTreeData = [
+      {
+        id: 'nav1',
+        label: 'Home',
+        icon: '🏠',
+        children: [
+          { id: 'nav1-1', label: 'Dashboard', icon: '📊' },
+          { id: 'nav1-2', label: 'Profile', icon: '👤' },
+        ],
+      },
+      {
+        id: 'nav2',
+        label: 'Settings',
+        icon: '⚙️',
+        children: [
+          { id: 'nav2-1', label: 'Preferences', icon: '🎯' },
+          { id: 'nav2-2', label: 'Security', icon: '🔒' },
+        ],
+      },
+    ];
+
+    const tree6 = document.getElementById('tree6');
+    tree6.setNodes(navTreeData);
+
+    tree6.addEventListener('select', (e) => {
+      const results6 = document.getElementById('results6');
+      results6.innerHTML = `<strong>Selected:</strong> ${e.detail.node?.label}`;
+      results6.classList.remove('empty');
+    });
+  </script>
+</body>
+</html>
