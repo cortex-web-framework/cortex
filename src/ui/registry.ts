@@ -6,6 +6,7 @@
 
 import { globalRegistry } from './metadata.js';
 import { uiButtonMetadata } from './components/button/ui-button.metadata.js';
+import { uiTextInputMetadata } from './components/text-input/ui-text-input.metadata.js';
 
 /**
  * Register all component metadata.
@@ -13,6 +14,7 @@ import { uiButtonMetadata } from './components/button/ui-button.metadata.js';
  */
 export function registerAllComponents(): void {
   globalRegistry.register(uiButtonMetadata);
+  globalRegistry.register(uiTextInputMetadata);
 }
 
 /**
