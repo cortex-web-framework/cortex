@@ -35,6 +35,7 @@ import { uiAvatarMetadata } from './components/avatar/ui-avatar.metadata.js';
 import { uiChipMetadata } from './components/chip/ui-chip.metadata.js';
 import { uiSkeletonMetadata } from './components/skeleton/ui-skeleton.metadata.js';
 import { uiLinkMetadata } from './components/link/ui-link.metadata.js';
+import { uiTooltipMetadata } from './components/tooltip/ui-tooltip.metadata.js';
 
 /**
  * Register all component metadata.
@@ -71,6 +72,7 @@ export function registerAllComponents(): void {
   globalRegistry.register(uiChipMetadata);
   globalRegistry.register(uiSkeletonMetadata);
   globalRegistry.register(uiLinkMetadata);
+  globalRegistry.register(uiTooltipMetadata);
 }
 
 /**
