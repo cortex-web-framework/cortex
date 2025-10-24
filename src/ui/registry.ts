@@ -26,6 +26,7 @@ import { uiSpinnerMetadata } from './components/spinner/ui-spinner.metadata.js';
 import { uiPaginationMetadata } from './components/pagination/ui-pagination.metadata.js';
 import { uiAccordionMetadata } from './components/accordion/ui-accordion.metadata.js';
 import { uiProgressBarMetadata } from './components/progress-bar/ui-progress-bar.metadata.js';
+import { uiBreadcrumbMetadata } from './components/breadcrumb/ui-breadcrumb.metadata.js';
 
 /**
  * Register all component metadata.
@@ -53,6 +54,7 @@ export function registerAllComponents(): void {
   globalRegistry.register(uiPaginationMetadata);
   globalRegistry.register(uiAccordionMetadata);
   globalRegistry.register(uiProgressBarMetadata);
+  globalRegistry.register(uiBreadcrumbMetadata);
 }
 
 /**
