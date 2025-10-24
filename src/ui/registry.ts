@@ -31,6 +31,7 @@ import { uiStepperMetadata } from './components/stepper/ui-stepper.metadata.js';
 import { uiBadgeMetadata } from './components/badge/ui-badge.metadata.js';
 import { uiCardMetadata } from './components/card/ui-card.metadata.js';
 import { uiDividerMetadata } from './components/divider/ui-divider.metadata.js';
+import { uiAvatarMetadata } from './components/avatar/ui-avatar.metadata.js';
 
 /**
  * Register all component metadata.
@@ -63,6 +64,7 @@ export function registerAllComponents(): void {
   globalRegistry.register(uiBadgeMetadata);
   globalRegistry.register(uiCardMetadata);
   globalRegistry.register(uiDividerMetadata);
+  globalRegistry.register(uiAvatarMetadata);
 }
 
 /**
