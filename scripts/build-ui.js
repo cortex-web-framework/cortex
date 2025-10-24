@@ -51,6 +51,7 @@ function getAllJsFiles(dirPath, arrayOfFiles) {
       arrayOfFiles = getAllJsFiles(path.join(dirPath, file), arrayOfFiles);
     } else {
       if (file.endsWith('.js') && !file.endsWith('.test.js') && !file.endsWith('.metadata.js')) {
+        console.log('Bundling file:', path.join(dirPath, file));
         arrayOfFiles.push(path.join(dirPath, file));
       }
     }
