@@ -17,6 +17,9 @@ import { uiToggleMetadata } from './components/toggle/ui-toggle.metadata.js';
 import { uiNumberInputMetadata } from './components/number-input/ui-number-input.metadata.js';
 import { uiDatePickerMetadata } from './components/date-picker/ui-date-picker.metadata.js';
 import { uiAutocompleteMetadata } from './components/autocomplete/ui-autocomplete.metadata.js';
+import { uiColorPickerMetadata } from './components/color-picker/ui-color-picker.metadata.js';
+import { uiFileUploadMetadata } from './components/file-upload/ui-file-upload.metadata.js';
+import { uiModalMetadata } from './components/modal/ui-modal.metadata.js';
 
 /**
  * Register all component metadata.
@@ -35,6 +38,9 @@ export function registerAllComponents(): void {
   globalRegistry.register(uiNumberInputMetadata);
   globalRegistry.register(uiDatePickerMetadata);
   globalRegistry.register(uiAutocompleteMetadata);
+  globalRegistry.register(uiColorPickerMetadata);
+  globalRegistry.register(uiFileUploadMetadata);
+  globalRegistry.register(uiModalMetadata);
 }
 
 /**
