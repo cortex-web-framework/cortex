@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-step Registration Form - Cortex UI</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .demo-info {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      color: #333;
+    }
+
+    .demo-info h3 {
+      margin-bottom: 0.5rem;
+      color: #667eea;
+    }
+
+    .demo-info p {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 0.5rem;
+    }
+
+    .demo-info code {
+      background: #f5f5f5;
+      padding: 0.2rem 0.4rem;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+    }
+
+    .result {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+      color: #333;
+      display: none;
+    }
+
+    .result.show {
+      display: block;
+    }
+
+    .result h3 {
+      color: #4CAF50;
+      margin-bottom: 1rem;
+    }
+
+    .result pre {
+      background: #f5f5f5;
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .instructions {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      padding: 1.5rem;
+      color: white;
+      margin-bottom: 2rem;
+    }
+
+    .instructions h3 {
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+
+    .instructions ol {
+      margin-left: 1.5rem;
+      line-height: 1.8;
+    }
+
+    .instructions li {
+      margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 640px) {
+      .header h1 {
+        font-size: 1.8rem;
+      }
+
+      body {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Registration Form</h1>
+      <p>Multi-step form with validation - Zero dependencies</p>
+    </div>
+
+    <div class="instructions">
+      <h3>📋 How to Use:</h3>
+      <ol>
+        <li>Fill in your email address on step 1</li>
+        <li>Click "Next" to proceed to password setup</li>
+        <li>Enter a strong password (8+ chars, uppercase, number, special char)</li>
+        <li>Complete your profile on step 3</li>
+        <li>Click "Register" to submit the form</li>
+      </ol>
+    </div>
+
+    <div class="demo-info">
+      <h3>✨ Features:</h3>
+      <p>✓ Multi-step form navigation with progress indicator</p>
+      <p>✓ Real-time email validation</p>
+      <p>✓ Password strength validation with requirements</p>
+      <p>✓ Password confirmation matching</p>
+      <p>✓ Form data persistence across steps</p>
+      <p>✓ Error messages and visual feedback</p>
+      <p>✓ Built with Web Components (zero dependencies)</p>
+    </div>
+
+    <ui-registration-form id="registrationForm"></ui-registration-form>
+
+    <div class="result" id="result">
+      <h3>✅ Registration Successful!</h3>
+      <p>Form data submitted:</p>
+      <pre id="resultData"></pre>
+    </div>
+  </div>
+
+  <script type="module">
+    import './ui-registration-form.js';
+
+    const form = document.getElementById('registrationForm');
+    const resultDiv = document.getElementById('result');
+    const resultData = document.getElementById('resultData');
+
+    form.addEventListener('formSubmit', (event) => {
+      const data = event.detail;
+
+      // Display the submitted data
+      resultData.textContent = JSON.stringify(
+        {
+          email: data.email,
+          password: '••••••••••',
+          firstName: data.firstName || '(not provided)',
+          lastName: data.lastName || '(not provided)',
+          registeredAt: new Date().toISOString(),
+        },
+        null,
+        2
+      );
+
+      resultDiv.classList.add('show');
+
+      // Scroll to results
+      setTimeout(() => {
+        resultDiv.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+
+      // Log full data to console for inspection
+      console.log('Registration data:', data);
+
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        form.reset();
+        resultDiv.classList.remove('show');
+      }, 3000);
+    });
+  </script>
+</body>
+</html>
