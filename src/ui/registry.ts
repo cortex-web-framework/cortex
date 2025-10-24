@@ -39,6 +39,7 @@ import { uiTooltipMetadata } from './components/tooltip/ui-tooltip.metadata.js';
 import { uiPopoverMetadata } from './components/popover/ui-popover.metadata.js';
 import { uiToastMetadata } from './components/toast/ui-toast.metadata.js';
 import { uiCodeMetadata } from './components/code/ui-code.metadata.js';
+import { uiTagMetadata } from './components/tag/ui-tag.metadata.js';
 
 /**
  * Register all component metadata.
@@ -79,6 +80,7 @@ export function registerAllComponents(): void {
   globalRegistry.register(uiPopoverMetadata);
   globalRegistry.register(uiToastMetadata);
   globalRegistry.register(uiCodeMetadata);
+  globalRegistry.register(uiTagMetadata);
 }
 
 /**
