@@ -292,8 +292,8 @@ export function createMemoryStorage(prefix: string = '') {
     },
 
     onChange(
-      key: string | null,
-      callback: (value: any, oldValue: any, key: string) => void
+      _key: string | null,
+      _callback: (value: any, oldValue: any, key: string) => void
     ): () => void {
       // Memory storage doesn't support external events, but return a no-op unsubscribe
       return () => {};

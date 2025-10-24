@@ -112,13 +112,13 @@ export function once<T extends (...args: any[]) => any>(fn: T): (...args: Parame
  */
 export function memoize<T extends (...args: any[]) => any>(
   fn: T,
-  keyGenerator?: (...args: Parameters<T>) => string
+  keyGenerator?: (args: any[]) => string
 ): (...args: Parameters<T>) => ReturnType<T> {
   const cache = new Map<string, ReturnType<T>>();
   const makeKey = keyGenerator || ((first: any) => String(first));
 
   return function (...args: Parameters<T>) {
-    const key = makeKey(...args);
+    const key = makeKey(args);
 
     if (cache.has(key)) {
       return cache.get(key)!;
@@ -203,10 +203,11 @@ export function once_event<K extends keyof HTMLElementEventMap>(
   handler: (this: any, ev: HTMLElementEventMap[K]) => any,
   options?: boolean | AddEventListenerOptions
 ): () => void {
-  target.addEventListener(event as string, handler as EventListener, {
-    ...options,
-    once: true,
-  });
+  const eventOptions = typeof options === 'boolean'
+    ? { capture: options, once: true }
+    : { ...options, once: true };
+
+  target.addEventListener(event as string, handler as EventListener, eventOptions);
 
   return () => {
     target.removeEventListener(event as string, handler as EventListener, options);
