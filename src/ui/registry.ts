@@ -15,6 +15,7 @@ import { uiTextareaMetadata } from './components/textarea/ui-textarea.metadata.j
 import { uiRadioMetadata } from './components/radio/ui-radio.metadata.js';
 import { uiToggleMetadata } from './components/toggle/ui-toggle.metadata.js';
 import { uiNumberInputMetadata } from './components/number-input/ui-number-input.metadata.js';
+import { uiDatePickerMetadata } from './components/date-picker/ui-date-picker.metadata.js';
 
 /**
  * Register all component metadata.
@@ -31,6 +32,7 @@ export function registerAllComponents(): void {
   globalRegistry.register(uiRadioMetadata);
   globalRegistry.register(uiToggleMetadata);
   globalRegistry.register(uiNumberInputMetadata);
+  globalRegistry.register(uiDatePickerMetadata);
 }
 
 /**
