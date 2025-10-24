@@ -21,6 +21,8 @@ import { uiColorPickerMetadata } from './components/color-picker/ui-color-picker
 import { uiFileUploadMetadata } from './components/file-upload/ui-file-upload.metadata.js';
 import { uiModalMetadata } from './components/modal/ui-modal.metadata.js';
 import { uiAlertMetadata } from './components/alert/ui-alert.metadata.js';
+import { uiTabsMetadata } from './components/tabs/ui-tabs.metadata.js';
+import { uiSpinnerMetadata } from './components/spinner/ui-spinner.metadata.js';
 
 /**
  * Register all component metadata.
@@ -43,6 +45,8 @@ export function registerAllComponents(): void {
   globalRegistry.register(uiFileUploadMetadata);
   globalRegistry.register(uiModalMetadata);
   globalRegistry.register(uiAlertMetadata);
+  globalRegistry.register(uiTabsMetadata);
+  globalRegistry.register(uiSpinnerMetadata);
 }
 
 /**
