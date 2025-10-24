@@ -181,6 +181,7 @@ async function runTests() {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Runner: ${testName}</title>
     <script type="module" src="${path.relative(testRunnerHtmlDir, path.join(uiDistDir, 'ui-bundle.js'))}"></script>
+    <script type="module" src="${path.relative(testRunnerHtmlDir, path.join(uiDistDir, 'test-runner-framework.js'))}"></script>
     <script type="module" src="${path.relative(testRunnerHtmlDir, testScriptPath)}"></script>
 </head>
 <body>

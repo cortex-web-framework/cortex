@@ -24,7 +24,7 @@ try {
   console.log('UI TypeScript compilation successful.');
 
   // 2. Concatenate and minify CSS files (Placeholder for now)
-  console.log('Processing UI CSS files (placeholder - no-op for now).');
+  console.log('Processing UI CSS files (Lit components embed CSS directly).');
 
   // 3. Bundle Web Component definitions into a single JavaScript file
   console.log('Bundling UI components...');
@@ -33,10 +33,21 @@ try {
   for (const file of compiledJsFiles) {
     bundleContent += fs.readFileSync(path.join(uiDistDir, file), 'utf8') + '\n';
   }
-  fs.writeFileSync(path.join(uiDistDir, 'ui-bundle.js'), bundleContent, 'utf8');
-  console.log('UI components bundled into ui-bundle.js.');
+  fs.writeFileSync(path.join(uiDistDir, 'ui-bundle.js'), minifyJs(bundleContent), 'utf8');
+  console.log('UI components bundled and minified into ui-bundle.js.');
 
 } catch (error) {
   console.error('UI build failed:', error.message);
   process.exit(1);
 }
+
+function minifyJs(code) {
+  // Very basic minification: remove comments and extra whitespace
+  // This is a simplified approach and not a full-fledged minifier.
+  let minifiedCode = code.replace(/\/\/.*|\/\*[\s\S]*?\*\//g, ''); // Remove comments
+  minifiedCode = minifiedCode.replace(/\s+/g, ' '); // Replace multiple spaces with single space
+  minifiedCode = minifiedCode.replace(/\s*([{}();,=:])\s*/g, '$1'); // Remove spaces around braces, parens, semicolons, commas, equals, colons
+  minifiedCode = minifiedCode.trim(); // Trim leading/trailing whitespace
+  return minifiedCode;
+}
+

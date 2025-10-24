@@ -1,0 +1,2 @@
+import { ComponentMetadata } from '../../metadata.js';
+export const uiCopyMetadata: ComponentMetadata = { tag: 'ui-copy', name: 'Copy', category: 'Utility', description: 'Copy to clipboard button.', since: '1.0.0', props: [{ name: 'text', type: 'string | undefined', description: 'Text to copy', isAttribute: true }], events: [], slots: [], cssProps: [], examples: [], issueUrl: 'https://github.com/cortexproject/cortex/issues?q=label%3Aui-copy' };

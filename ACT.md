@@ -99,3 +99,43 @@
 
 **Action:** User clarified that `develop` is the working branch and `main` is the "all work done" branch. This contradicts the current state where `main` is ahead of `develop`.
 **Status:** Re-evaluated branch relationship. `git log --oneline develop..main` shows `main` is significantly ahead of `develop`. `git log --oneline main..develop` is empty, meaning `develop` is fully contained within `main`'s history.
+
+### 2025-10-24 - Phase 3 (Git Cleanup): Execution of Cleanup
+
+**Action:** Committed `ACT.md`. Executed `git checkout develop`, `git merge main`, `git push origin develop`, `git checkout main`, `git push origin main`.
+**Status:** All changes from `main` have been merged into `develop`, and both `develop` and `main` branches have been pushed to their respective remotes. The repository is now aligned with the user's branching model where `develop` contains the latest work.
+
+### 2025-10-24 - Phase 4 (Git Cleanup): Final Verification
+
+**Action:** Executed `git status`, `git branch --list`, `git branch -r` to verify the repository state.
+**Status:** Repository is clean. Local `main` is up to date with `origin/main`. Local `develop` is up to date with `origin/develop`. No branches were deleted as per user instruction.
+
+### 2025-10-24 - Phase 1.1 (UI Component Development): Define Core Design Principles & Guidelines
+
+**Action:** Created `DESIGN_SYSTEM_GUIDELINES.md` and populated it with core UI/UX and DX principles.
+**Status:** `DESIGN_SYSTEM_GUIDELINES.md` created successfully.
+
+### 2025-10-24 - Phase 1.2 (UI Component Development): Choose Component Technology Stack
+
+**Action:** Researched component frameworks and styling approaches for large UI libraries. Decided on Lit (LitElement) for the component framework and CSS Custom Properties with internal CSS for styling.
+**Status:** Documented decision in `ARCHITECTURE_DECISIONS.md`.
+
+### 2025-10-24 - Phase 1.3 (UI Component Development): Set Up Component Scaffolding & Build Process - Component Generator
+
+**Action:** Created `scripts/generate-component.js` to scaffold new Lit components, including component, test, and Storybook files.
+**Status:** `scripts/generate-component.js` created successfully.
+
+### 2025-10-24 - Phase 1.3 (UI Component Development): Set Up Component Scaffolding & Build Process - Build Tooling (Rollup Revert)
+
+**Action:** User directed to avoid external dependencies. Uninstalled Rollup and its plugins. Deleted `rollup.config.js`. Reverted `scripts/build-ui.js` to its original state.
+**Status:** Rollup integration reverted.
+
+### 2025-10-24 - Phase 1.3 (UI Component Development): Set Up Component Scaffolding & Build Process - Custom Build Process
+
+**Action:** Implemented a basic minification function in `scripts/build-ui.js` and applied it to `ui-bundle.js`. Updated CSS processing placeholder.
+**Status:** Custom build process implemented for bundling and basic minification.
+
+### 2025-10-24 - Phase 1.4 (UI Component Development): Establish Testing Infrastructure
+
+**Action:** Created `dist/ui/test-runner-framework.js` (a custom, minimal testing framework) and modified `scripts/test-ui.js` to load it in the generated HTML test runner.
+**Status:** Custom testing infrastructure established for unit and integration tests.

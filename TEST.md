@@ -1,39 +1,38 @@
-## TEST.md Log
+## Test Plan
 
-### 2025-10-24 - Test Plan
+**Phase 1: Core Infrastructure Validation**
+1.  **Generate a Test Component:** I will use the `scripts/generate-component.js` script to create a new UI component named `test-component`. This will validate that the component scaffolding process is working as expected.
+2.  **Build the Component:** I will execute the `scripts/build-ui.js` script to build the newly created `test-component`. This will verify the custom build process.
+3.  **Unit Test the Component:** I will run the `scripts/test-ui.js` script to execute the unit tests for the `test-component`. This will ensure the testing infrastructure is functioning correctly.
 
-**Objective:** Verify that the D-Bus error messages no longer appear during UI test execution and that all UI tests pass successfully.
+**Phase 2: Example Application**
+1.  **Create an Example App:** I will create a new directory `examples/ui-component-test-app` containing an `index.html` and a `main.js`.
+2.  **Integrate the Component:** The `main.js` will import and use the `test-component`, and the `index.html` will host the application. This will test the component's integration and usage.
 
-**Test Steps:**
-1.  Execute the UI test command: `node /home/matthias/projects/cortex/scripts/test-ui.js`.
-2.  Carefully review the output for any D-Bus related error messages.
-3.  Confirm that all UI tests pass.
+**Phase 3: Verification**
+1.  **Serve the App:** I will start a simple HTTP server to serve the example application.
+2.  **Manual Verification:** I will then provide you with the URL to the running application so you can manually verify that the `test-component` renders and functions correctly.
 
-### 2025-10-24 - Test Execution Results
+## Phase 1: Core Infrastructure Validation
 
-**Command Executed:** `node /home/matthias/projects/cortex/scripts/test-ui.js`
+- **Generate a Test Component:** `test-component` generated successfully.
+- **Build the Component:** Build successful after fixing dependencies and type errors.
+- **Unit Test the Component:** All tests passed, including the new `test-component` test.
 
-**Output:**
-```
-Running UI tests...
-Ensuring D-Bus and Xvfb are available...
-  ✅ WSLg detected. Relying on WSLg for D-Bus and Xvfb.
-Ensuring UI components are built...
-Building UI components...
-UI TypeScript compilation successful.
-Processing UI CSS files (placeholder - no-op for now).
-Bundling UI components...
-UI components bundled into ui-bundle.js.
-UI components build successful.
-Compiling UI test files...
-UI test compilation successful.
-Preparing test runner for: components/button/ui-button.test.js
-Launching headless browser for ui-button.test...
-  ✅ ui-button.test PASSED
-Preparing test runner for: ui-test/components/button/ui-button.test.js
-Launching headless browser for ui-button.test...
-  ✅ ui-button.test PASSED
-All UI tests passed!
-```
+## Phase 1: Core Infrastructure Validation (Second Attempt)
 
-**Result:** All UI tests passed successfully, and no D-Bus related error messages were observed in the output.
+- **Uninstall Dependencies:** Uninstalled `lit` and `@storybook/web-components`.
+- **Update Component Templates:** Updated component and test templates to use vanilla Web Components.
+- **Generate a Test Component:** `test-component` regenerated successfully.
+- **Build the Component:** Build successful after fixing type errors.
+- **Unit Test the Component:** All tests passed, including the new `test-component` test.
+
+## Phase 2: Example Application
+
+1.  **Create an Example App:** Created a new directory `examples/ui-component-test-app` with `index.html` and `main.js`.
+2.  **Integrate the Component:** The `main.js` imports the `ui-bundle.js` which contains the `test-component`.
+
+## Phase 3: Verification
+
+1.  **Serve the App:** Started a simple HTTP server on port 8888.
+2.  **Manual Verification:** Please open the following URL in your browser to verify that the `test-component` renders and functions correctly: [http://172.25.150.64:8888/examples/ui-component-test-app/](http://172.25.150.64:8888/examples/ui-component-test-app/)

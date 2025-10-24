@@ -1,78 +1,103 @@
-# Plan for Git Repository Cleanup
+# Plan for Cortex UI Component Development
 
-**Project Goal:** Perform a comprehensive Git repository cleanup, including merging, pushing, and removing unused branches, to maintain a clean and efficient codebase.
+**Project Goal:** Develop a comprehensive UI component library for the Cortex framework, aiming for 150+ components, while adhering to UI/UX best practices and optimizing Developer Experience (DX).
 
-## Phase 1: Repository Analysis (Agent Action)
+This plan is structured into phases, emphasizing foundational setup, iterative development, and continuous improvement, integrating insights from the UI/UX and DX research.
 
-### Step 1.1: Get Current Branch Status
-*   **Objective:** Determine the current active branch and its status (e.g., clean, uncommitted changes).
-*   **Action (Agent):** Run `git status` to get an overview of the current working directory.
+## Phase 1: Foundation & Design System Establishment
 
-### Step 1.2: List All Local Branches
-*   **Objective:** Get a comprehensive list of all local branches.
-*   **Action (Agent):** Run `git branch --list` to list all local branches.
+### Step 1.1: Define Core Design Principles & Guidelines
+*   **Objective:** Establish a foundational set of UI/UX principles (User-Centered Design, Usability, Consistency, Accessibility, etc.) that will guide all component development.
+*   **Action:** Document core design principles, visual language (colors, typography, spacing, iconography), and interaction patterns.
+*   **Output:** `DESIGN_SYSTEM_GUIDELINES.md` (or similar documentation).
 
-### Step 1.3: List All Remote Branches
-*   **Objective:** Get a comprehensive list of all remote branches.
-*   **Action (Agent):** Run `git branch -r` to list all remote branches.
+### Step 1.2: Choose Component Technology Stack
+*   **Objective:** Select the framework/library (e.g., Lit, React, Vue) and styling approach (e.g., CSS-in-JS, Web Components, utility-first CSS) for component implementation.
+*   **Action:** Research and decide on the most suitable technologies that align with Cortex's architecture and DX goals.
+*   **Output:** Decision documented in `ARCHITECTURE_DECISIONS.md`.
 
-### Step 1.4: Identify Merged Local Branches
-*   **Objective:** Find local branches that have already been merged into the current branch (or `main`/`master`).
-*   **Action (Agent):** Run `git branch --merged` to list branches merged into the current HEAD. For branches merged into `main`/`master`, run `git branch --merged main` (or `master`).
+### Step 1.3: Set Up Component Scaffolding & Build Process
+*   **Objective:** Create a standardized way to generate new component files and a robust build process for the UI library.
+*   **Action:** Implement a component generator (e.g., using Plop.js, custom script) and configure build tools (e.g., Rollup, Webpack, Vite) for efficient bundling, minification, and TypeScript compilation.
+*   **Output:** Component generator script, updated `package.json` scripts, build configuration files.
 
-### Step 1.5: Identify Stale Remote Tracking Branches
-*   **Objective:** Find remote tracking branches that no longer exist on the remote.
-*   **Action (Agent):** Run `git remote prune origin --dry-run` to see what would be pruned.
+### Step 1.4: Establish Testing Infrastructure
+*   **Objective:** Set up a comprehensive testing environment for UI components.
+*   **Action:** Configure unit testing (e.g., Jest, Vitest), integration testing (e.g., React Testing Library, Playwright), and visual regression testing (e.g., Storybook with Chromatic, Playwright with image snapshots).
+*   **Output:** Test configuration files, example tests.
 
-## Phase 2: Proposed Cleanup Actions (Agent to User)
+### Step 1.5: Set Up Documentation & Storybook
+*   **Objective:** Create a living style guide and component documentation platform.
+*   **Action:** Integrate Storybook (or similar) for component showcasing, interactive examples, and auto-generated documentation.
+*   **Output:** Storybook setup, initial component stories.
 
-### Step 2.1: Present Current Status and Proposed Merges
-*   **Objective:** Inform the user about the current branch, any uncommitted changes, and propose merging the current branch (if it's a feature branch) into the main development branch.
-*   **Action (Agent):** Summarize `git status` output. Ask the user if the current branch should be merged into `main`/`master` or if there's a specific target branch.
+## Phase 2: Component Prioritization & API Design
 
-### Step 2.2: Propose Local Branches for Deletion
-*   **Objective:** Suggest local branches that can be safely deleted based on merge status.
-*   **Action (Agent):** Present the list of merged local branches identified in Step 1.4 and ask for user confirmation before deletion. Also, ask the user if there are any other local branches they wish to delete.
+### Step 2.1: Prioritize Basic Input Controls & Buttons
+*   **Objective:** Focus on foundational components that are used across almost all applications.
+*   **Action:** Select the top 10-15 most critical basic input controls and button types from the `RESEARCH.md` list.
+*   **Output:** Prioritized component list.
 
-### Step 2.3: Propose Remote Branches for Deletion
-*   **Objective:** Suggest remote branches that can be safely deleted (e.g., stale branches, or branches corresponding to local branches the user wants to delete).
-*   **Action (Agent):** Present the list of stale remote tracking branches from Step 1.5 and ask for user confirmation. Also, ask the user if there are any other remote branches they wish to delete.
+### Step 2.2: Define Component API & Props (for prioritized components)
+*   **Objective:** Design intuitive and consistent APIs for the initial set of components, considering DX.
+*   **Action:** For each prioritized component, define its props, events, slots (if using Web Components), and methods.
+*   **Output:** API specifications (e.g., TypeScript interfaces, JSDoc comments).
 
-## Phase 3: Execution of Cleanup (Agent Action with User Confirmation)
+## Phase 3: Iterative Component Development (Cycle for each prioritized component)
 
-### Step 3.1: Handle Uncommitted Changes (if any)
-*   **Objective:** Ensure no work is lost before proceeding with merges or deletions.
-*   **Action (Agent):** If `git status` shows uncommitted changes, prompt the user to commit or stash them.
+### Step 3.1: Implement Component Core Logic & Structure
+*   **Objective:** Write the functional code for the component.
+*   **Action:** Use the chosen technology stack to implement the component, focusing on modularity, reusability, and performance.
+*   **Output:** Component source files (`.ts`, `.css`/styling).
 
-### Step 3.2: Merge Current Branch (if approved)
-*   **Objective:** Integrate the current branch's changes into the main development branch.
-*   **Action (Agent):** If the user approved merging the current branch:
-    1.  Checkout the target branch (e.g., `main`).
-    2.  Merge the current branch: `git merge <current-branch-name>`.
-    3.  Resolve any merge conflicts (will require user intervention if conflicts arise).
+### Step 3.2: Apply Styling & Theming
+*   **Objective:** Style the component according to the design system guidelines and ensure theming capabilities.
+*   **Action:** Implement CSS/styling, ensuring variables for theming (e.g., CSS custom properties).
+*   **Output:** Component styling.
 
-### Step 3.3: Push Merged Changes to Remote
-*   **Objective:** Synchronize the main development branch with the remote repository.
-*   **Action (Agent):** Run `git push origin <target-branch-name>`.
+### Step 3.3: Develop Comprehensive Tests
+*   **Objective:** Ensure component quality, reliability, and adherence to specifications.
+*   **Action:** Write unit tests (for logic), integration tests (for interaction), and visual regression tests (for appearance).
+*   **Output:** Test files (`.test.ts`).
 
-### Step 3.4: Delete Local Branches (after user confirmation)
-*   **Objective:** Remove local branches that are no longer needed.
-*   **Action (Agent):** For each approved local branch, run `git branch -d <branch-name>` (or `git branch -D <branch-name>` for unmerged branches, with explicit user confirmation).
+### Step 3.4: Create Storybook Entry & Documentation
+*   **Objective:** Document the component's usage, props, and examples.
+*   **Action:** Create a Storybook story for the component, including interactive controls and usage examples. Write API documentation.
+*   **Output:** Storybook story file, API documentation.
 
-### Step 3.5: Delete Remote Branches (after user confirmation)
-*   **Objective:** Remove remote branches that are no longer needed.
-*   **Action (Agent):** For each approved remote branch, run `git push origin --delete <branch-name>`.
+### Step 3.5: Review & Refine (Internal)
+*   **Objective:** Ensure the component meets quality standards and design principles.
+*   **Action:** Conduct internal code review and design review.
+*   **Output:** Review feedback, component refinements.
 
-### Step 3.6: Prune Stale Remote Tracking Branches
-*   **Objective:** Clean up local references to remote branches that no longer exist.
-*   **Action (Agent):** Run `git remote prune origin`.
+## Phase 4: Expansion & Advanced Components
 
-## Phase 4: Final Verification (Agent Action)
+### Step 4.1: Develop Navigation & Data Display Components
+*   **Objective:** Implement more complex components like Navbar, Tabs, Tables, and the foundational Data Grid.
+*   **Action:** Repeat the iterative development cycle (Phase 3) for components in these categories.
 
-### Step 4.1: Verify Repository State
-*   **Objective:** Confirm that the repository is clean and the desired branches have been merged/deleted.
-*   **Action (Agent):** Run `git status`, `git branch --list`, `git branch -r` to verify the cleanup.
+### Step 4.2: Develop Form & Feedback Components
+*   **Objective:** Implement form elements, validation, alerts, and toasts.
+*   **Action:** Repeat the iterative development cycle (Phase 3) for components in these categories.
 
-### Step 4.2: Report Completion
-*   **Objective:** Inform the user that the Git cleanup is complete.
-*   **Action (Agent):** Summarize the actions taken and the final state of the repository.
+### Step 4.3: Develop Advanced/Composite Components
+*   **Objective:** Implement complex components like Rich Text Editor, Charts, Maps, etc.
+*   **Action:** Repeat the iterative development cycle (Phase 3) for components in these categories, potentially breaking down very large components (like the Data Grid) into smaller, manageable sub-components.
+
+### Step 4.4: Achieve 150+ Component Target
+*   **Objective:** Systematically work through the proposed component list, ensuring a diverse and comprehensive library.
+*   **Action:** Continuously develop components, tracking progress against the 150+ target.
+
+## Phase 5: Continuous Improvement & DX Optimization
+
+### Step 5.1: Gather User Feedback (UI/UX & DX)
+*   **Objective:** Collect feedback from designers, developers, and end-users.
+*   **Action:** Conduct usability testing, developer surveys, and gather feedback through community channels.
+
+### Step 5.2: Iterate on Components & Design System
+*   **Objective:** Refine existing components and design system based on feedback and new insights.
+*   **Action:** Prioritize and implement improvements, bug fixes, and new features for components.
+
+### Step 5.3: Optimize Developer Experience (DX)
+*   **Objective:** Continuously improve the ease of use, documentation, and tooling for developers.
+*   **Action:** Enhance component APIs, improve error messages, streamline the development workflow, and expand documentation.
