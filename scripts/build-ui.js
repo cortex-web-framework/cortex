@@ -50,7 +50,7 @@ function getAllJsFiles(dirPath, arrayOfFiles) {
     if (fs.statSync(path.join(dirPath, file)).isDirectory()) {
       arrayOfFiles = getAllJsFiles(path.join(dirPath, file), arrayOfFiles);
     } else {
-      if (file.endsWith('.js')) {
+      if (file.endsWith('.js') && !file.endsWith('.test.js') && !file.endsWith('.metadata.js')) {
         arrayOfFiles.push(path.join(dirPath, file));
       }
     }
