@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>File Manager - Cortex UI Examples</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f7fa;
+    }
+  </style>
+</head>
+<body>
+  <script type="module">
+    import '../../src/components/tree/ui-tree.js';
+    import '../../src/components/search/ui-search.js';
+    import '../../src/components/dropdown/ui-dropdown.js';
+    import './ui-file-manager.js';
+  </script>
+
+  <ui-file-manager></ui-file-manager>
+</body>
+</html>
