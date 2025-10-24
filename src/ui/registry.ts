@@ -36,6 +36,7 @@ import { uiChipMetadata } from './components/chip/ui-chip.metadata.js';
 import { uiSkeletonMetadata } from './components/skeleton/ui-skeleton.metadata.js';
 import { uiLinkMetadata } from './components/link/ui-link.metadata.js';
 import { uiTooltipMetadata } from './components/tooltip/ui-tooltip.metadata.js';
+import { uiPopoverMetadata } from './components/popover/ui-popover.metadata.js';
 
 /**
  * Register all component metadata.
@@ -73,6 +74,7 @@ export function registerAllComponents(): void {
   globalRegistry.register(uiSkeletonMetadata);
   globalRegistry.register(uiLinkMetadata);
   globalRegistry.register(uiTooltipMetadata);
+  globalRegistry.register(uiPopoverMetadata);
 }
 
 /**
