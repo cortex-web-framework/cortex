@@ -3,99 +3,645 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UI Component Test App</title>
+  <title>Cortex UI Component Library - Complete Showcase</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
       padding: 20px;
-      background: #f5f5f5;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
     }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
       background: white;
-      padding: 30px;
+      padding: 40px;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    h1 {
+    .header h1 {
+      margin: 0;
       color: #333;
-      margin-bottom: 30px;
+      font-size: 2.5rem;
     }
-    .components {
+    .header p {
+      color: #666;
+      margin-top: 10px;
+      font-size: 1.1rem;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .section-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
       gap: 20px;
+      margin-bottom: 20px;
     }
-    .component-section {
-      border: 1px solid #e0e0e0;
-      padding: 20px;
-      border-radius: 4px;
+    .component-card {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
     }
-    .component-section h3 {
-      margin-top: 0;
-      color: #555;
-      font-size: 14px;
+    .component-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    .component-card h3 {
+      margin: 0 0 16px 0;
+      color: #007bff;
+      font-size: 1.1rem;
       text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .component-card .example {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .component-card .example.vertical {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .section-title {
+      grid-column: 1 / -1;
+      font-size: 1.8rem;
+      color: white;
+      margin: 30px 0 20px 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 8px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
     ui-button {
-      margin-right: 10px;
-      margin-bottom: 10px;
+      margin: 4px;
+    }
+    ui-badge {
+      margin: 4px;
+    }
+    ui-tag {
+      margin: 4px;
+    }
+    ui-chip {
+      margin: 4px;
+    }
+    .code-block {
+      background: #f4f4f4;
+      padding: 12px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: #333;
+      margin-top: 12px;
+      overflow-x: auto;
+      max-height: 100px;
     }
   </style>
   <script type="module" src="main.js"></script>
 </head>
 <body>
+  <div class="header">
+    <h1>🎨 Cortex UI Component Library</h1>
+    <p>Complete Showcase of All 54 Web Components</p>
+  </div>
+
   <div class="container">
-    <h1>UI Component Test App</h1>
+    <div class="section-grid">
 
-    <div class="components">
-      <div class="component-section">
+      <!-- BUTTONS & SELECTION -->
+      <div class="section-title">🔘 Buttons & Selection</div>
+
+      <div class="component-card">
         <h3>Buttons</h3>
-        <ui-button variant="primary">Primary Button</ui-button>
-        <ui-button variant="secondary">Secondary Button</ui-button>
-        <ui-button variant="success">Success Button</ui-button>
-        <ui-button variant="danger">Danger Button</ui-button>
-        <ui-button variant="ghost">Ghost Button</ui-button>
+        <div class="example">
+          <ui-button variant="primary">Primary</ui-button>
+          <ui-button variant="secondary">Secondary</ui-button>
+          <ui-button variant="success">Success</ui-button>
+          <ui-button variant="danger">Danger</ui-button>
+          <ui-button variant="warning">Warning</ui-button>
+          <ui-button variant="info">Info</ui-button>
+          <ui-button variant="ghost">Ghost</ui-button>
+        </div>
       </div>
 
-      <div class="component-section">
-        <h3>Buttons - Sizes</h3>
-        <ui-button size="small">Small</ui-button>
-        <ui-button size="medium">Medium</ui-button>
-        <ui-button size="large">Large</ui-button>
+      <div class="component-card">
+        <h3>Button Sizes & States</h3>
+        <div class="example vertical">
+          <div>
+            <ui-button size="small">Small</ui-button>
+            <ui-button size="medium">Medium</ui-button>
+            <ui-button size="large">Large</ui-button>
+          </div>
+          <div style="margin-top: 10px;">
+            <ui-button disabled>Disabled</ui-button>
+            <ui-button loading>Loading...</ui-button>
+          </div>
+        </div>
       </div>
 
-      <div class="component-section">
-        <h3>Buttons - States</h3>
-        <ui-button>Normal</ui-button>
-        <ui-button disabled>Disabled</ui-button>
-        <ui-button loading>Loading</ui-button>
+      <div class="component-card">
+        <h3>Checkbox</h3>
+        <div class="example vertical">
+          <ui-checkbox label="Unchecked"></ui-checkbox>
+          <ui-checkbox label="Checked" checked></ui-checkbox>
+          <ui-checkbox label="Disabled" disabled></ui-checkbox>
+          <ui-checkbox label="Indeterminate" indeterminate></ui-checkbox>
+        </div>
       </div>
 
-      <div class="component-section">
-        <h3>Badges</h3>
-        <ui-badge content="Default"></ui-badge>
-        <ui-badge content="Primary" variant="primary"></ui-badge>
-        <ui-badge content="Success" variant="success"></ui-badge>
-        <ui-badge content="Warning" variant="warning"></ui-badge>
-        <ui-badge content="Error" variant="error"></ui-badge>
+      <div class="component-card">
+        <h3>Radio Button</h3>
+        <div class="example vertical">
+          <ui-radio name="demo" value="1" label="Option 1"></ui-radio>
+          <ui-radio name="demo" value="2" label="Option 2"></ui-radio>
+          <ui-radio name="demo" value="3" label="Option 3" disabled></ui-radio>
+        </div>
       </div>
 
-      <div class="component-section">
-        <h3>Avatars</h3>
-        <ui-avatar initials="AB" size="small"></ui-avatar>
-        <ui-avatar initials="CD" size="medium"></ui-avatar>
-        <ui-avatar initials="EF" size="large"></ui-avatar>
+      <div class="component-card">
+        <h3>Switch</h3>
+        <div class="example vertical">
+          <ui-switch label="Off"></ui-switch>
+          <ui-switch label="On" checked></ui-switch>
+          <ui-switch label="Disabled" disabled></ui-switch>
+        </div>
       </div>
 
-      <div class="component-section">
-        <h3>Alerts</h3>
-        <ui-alert type="success" message="Success!" dismissible></ui-alert>
-        <ui-alert type="info" message="Info message" dismissible></ui-alert>
-        <ui-alert type="warning" message="Warning!" dismissible></ui-alert>
-        <ui-alert type="error" message="Error occurred" dismissible></ui-alert>
+      <div class="component-card">
+        <h3>Toggle</h3>
+        <div class="example vertical">
+          <ui-toggle>Toggle Off</ui-toggle>
+          <ui-toggle checked>Toggle On</ui-toggle>
+        </div>
       </div>
+
+      <!-- TEXT INPUTS -->
+      <div class="section-title">📝 Text Inputs & Forms</div>
+
+      <div class="component-card">
+        <h3>Text Input</h3>
+        <div class="example vertical">
+          <ui-text-input placeholder="Enter text..."></ui-text-input>
+          <ui-text-input placeholder="Disabled" disabled></ui-text-input>
+          <ui-text-input placeholder="With value" value="Sample text"></ui-text-input>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Textarea</h3>
+        <div class="example vertical">
+          <ui-textarea placeholder="Enter multiple lines..."></ui-textarea>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Number Input</h3>
+        <div class="example vertical">
+          <ui-number-input value="5" min="0" max="100"></ui-number-input>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Select</h3>
+        <div class="example vertical">
+          <ui-select placeholder="Choose an option...">
+            <option value="1">Option 1</option>
+            <option value="2">Option 2</option>
+            <option value="3">Option 3</option>
+          </ui-select>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Autocomplete</h3>
+        <div class="example vertical">
+          <ui-autocomplete placeholder="Search..." label="Search items"></ui-autocomplete>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Date Picker</h3>
+        <div class="example vertical">
+          <ui-date-picker></ui-date-picker>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Color Picker</h3>
+        <div class="example vertical">
+          <ui-color-picker value="#007bff"></ui-color-picker>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Slider</h3>
+        <div class="example vertical">
+          <ui-slider min="0" max="100" value="50"></ui-slider>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>File Upload</h3>
+        <div class="example vertical">
+          <ui-file-upload></ui-file-upload>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Form Field</h3>
+        <div class="example vertical">
+          <ui-form-field label="Email" required>
+            <ui-text-input placeholder="user@example.com"></ui-text-input>
+          </ui-form-field>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Input Group</h3>
+        <div class="example vertical">
+          <ui-input-group>
+            <span slot="before-text">$</span>
+            <ui-text-input placeholder="0.00"></ui-text-input>
+            <span slot="after-text">.00</span>
+          </ui-input-group>
+        </div>
+      </div>
+
+      <!-- DISPLAY & FEEDBACK -->
+      <div class="section-title">📊 Display & Feedback</div>
+
+      <div class="component-card">
+        <h3>Badge</h3>
+        <div class="example">
+          <ui-badge content="Default"></ui-badge>
+          <ui-badge content="Primary" variant="primary"></ui-badge>
+          <ui-badge content="Success" variant="success"></ui-badge>
+          <ui-badge content="Warning" variant="warning"></ui-badge>
+          <ui-badge content="Error" variant="error"></ui-badge>
+          <ui-badge content="99" variant="primary" pill></ui-badge>
+          <ui-badge content="●" variant="primary" dot></ui-badge>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Tag</h3>
+        <div class="example">
+          <ui-tag>JavaScript</ui-tag>
+          <ui-tag>React</ui-tag>
+          <ui-tag removable>Web Components</ui-tag>
+          <ui-tag variant="primary">Featured</ui-tag>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Chip</h3>
+        <div class="example">
+          <ui-chip>Default Chip</ui-chip>
+          <ui-chip variant="primary">Primary Chip</ui-chip>
+          <ui-chip removable>Closable Chip</ui-chip>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Avatar</h3>
+        <div class="example">
+          <ui-avatar initials="AB" size="small"></ui-avatar>
+          <ui-avatar initials="CD" size="medium"></ui-avatar>
+          <ui-avatar initials="EF" size="large"></ui-avatar>
+          <ui-avatar initials="GH" size="xlarge"></ui-avatar>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Alert</h3>
+        <div class="example vertical">
+          <ui-alert type="success" message="Success message!" dismissible></ui-alert>
+          <ui-alert type="info" message="Info message" dismissible></ui-alert>
+          <ui-alert type="warning" message="Warning message" dismissible></ui-alert>
+          <ui-alert type="error" message="Error message" dismissible></ui-alert>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Progress Bar</h3>
+        <div class="example vertical">
+          <ui-progress-bar value="30"></ui-progress-bar>
+          <ui-progress-bar value="60"></ui-progress-bar>
+          <ui-progress-bar value="100"></ui-progress-bar>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Progress Circle</h3>
+        <div class="example">
+          <ui-progress-circle value="25"></ui-progress-circle>
+          <ui-progress-circle value="50"></ui-progress-circle>
+          <ui-progress-circle value="75"></ui-progress-circle>
+          <ui-progress-circle value="100"></ui-progress-circle>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Spinner</h3>
+        <div class="example">
+          <ui-spinner></ui-spinner>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Skeleton</h3>
+        <div class="example vertical">
+          <ui-skeleton width="100%" height="20px"></ui-skeleton>
+          <ui-skeleton width="80%" height="20px"></ui-skeleton>
+          <ui-skeleton width="100%" height="20px"></ui-skeleton>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Rating</h3>
+        <div class="example vertical">
+          <ui-rating value="3"></ui-rating>
+          <ui-rating value="4.5"></ui-rating>
+        </div>
+      </div>
+
+      <!-- NAVIGATION -->
+      <div class="section-title">🧭 Navigation</div>
+
+      <div class="component-card">
+        <h3>Breadcrumb</h3>
+        <div class="example vertical">
+          <ui-breadcrumb></ui-breadcrumb>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Tabs</h3>
+        <div class="example vertical">
+          <ui-tabs>
+            <div data-tab-id="tab1" slot="tab-button">Tab 1</div>
+            <div data-tab-id="tab2" slot="tab-button">Tab 2</div>
+            <div data-tab-id="tab3" slot="tab-button">Tab 3</div>
+            <div id="tab1">Content 1</div>
+            <div id="tab2">Content 2</div>
+            <div id="tab3">Content 3</div>
+          </ui-tabs>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Pagination</h3>
+        <div class="example vertical">
+          <ui-pagination current-page="3" total-pages="10"></ui-pagination>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Menu</h3>
+        <div class="example vertical">
+          <ui-menu>
+            <button slot="trigger">Open Menu</button>
+            <ui-link href="#item1">Menu Item 1</ui-link>
+            <ui-link href="#item2">Menu Item 2</ui-link>
+            <ui-link href="#item3">Menu Item 3</ui-link>
+          </ui-menu>
+        </div>
+      </div>
+
+      <!-- LAYOUT & STRUCTURE -->
+      <div class="section-title">🏗️ Layout & Structure</div>
+
+      <div class="component-card">
+        <h3>Card</h3>
+        <div class="example vertical">
+          <ui-card>
+            <div slot="card-title">Card Title</div>
+            <div slot="card-subtitle">Card Subtitle</div>
+            <div>This is card content</div>
+          </ui-card>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Divider</h3>
+        <div class="example vertical">
+          <div>Above divider</div>
+          <ui-divider></ui-divider>
+          <div>Below divider</div>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Label</h3>
+        <div class="example vertical">
+          <ui-label for="demo-input">Input Label</ui-label>
+          <ui-text-input id="demo-input" placeholder="Associated input"></ui-text-input>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Hint</h3>
+        <div class="example vertical">
+          <ui-hint>This is a helpful hint message</ui-hint>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Code</h3>
+        <div class="example vertical">
+          <ui-code language="javascript">const hello = "world";</ui-code>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Description List</h3>
+        <div class="example vertical">
+          <ui-description-list>
+            <dt>Term 1</dt>
+            <dd>Definition 1</dd>
+            <dt>Term 2</dt>
+            <dd>Definition 2</dd>
+          </ui-description-list>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Timeline</h3>
+        <div class="example vertical">
+          <ui-timeline>
+            <div>Event 1</div>
+            <div>Event 2</div>
+            <div>Event 3</div>
+          </ui-timeline>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Stepper</h3>
+        <div class="example vertical">
+          <ui-stepper current-step="2" steps="3"></ui-stepper>
+        </div>
+      </div>
+
+      <!-- DATA DISPLAY -->
+      <div class="section-title">📋 Data Display</div>
+
+      <div class="component-card">
+        <h3>Table</h3>
+        <div class="example vertical">
+          <ui-table striped bordered>
+            <thead>
+              <tr>
+                <th>Header 1</th>
+                <th>Header 2</th>
+                <th>Header 3</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Row 1, Col 1</td>
+                <td>Row 1, Col 2</td>
+                <td>Row 1, Col 3</td>
+              </tr>
+              <tr>
+                <td>Row 2, Col 1</td>
+                <td>Row 2, Col 2</td>
+                <td>Row 2, Col 3</td>
+              </tr>
+            </tbody>
+          </ui-table>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Stat</h3>
+        <div class="example">
+          <ui-stat heading-text="Revenue" result-title="$12,345" trend="up" trend-value="12%"></ui-stat>
+          <ui-stat heading-text="Users" result-title="5,678" trend="down" trend-value="5%"></ui-stat>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Empty State</h3>
+        <div class="example vertical">
+          <ui-empty-state heading-text="No Data" result-title="Nothing to display"></ui-empty-state>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Result</h3>
+        <div class="example vertical">
+          <ui-result heading-text="Success!" result-title="Operation completed"></ui-result>
+        </div>
+      </div>
+
+      <!-- OVERLAYS & INTERACTIONS -->
+      <div class="section-title">🎭 Overlays & Interactions</div>
+
+      <div class="component-card">
+        <h3>Modal</h3>
+        <div class="example vertical">
+          <ui-button onclick="document.querySelector('ui-modal')?.setAttribute('visible', 'true')">Open Modal</ui-button>
+          <ui-modal modal-title="Modal Title" visible="false">
+            <p>Modal content goes here</p>
+          </ui-modal>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Popover</h3>
+        <div class="example vertical">
+          <ui-popover>
+            <button slot="trigger">Hover me</button>
+            <div>Popover content</div>
+          </ui-popover>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Tooltip</h3>
+        <div class="example vertical">
+          <ui-tooltip content="Tooltip text">
+            <ui-button>Hover for tooltip</ui-button>
+          </ui-tooltip>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Toast</h3>
+        <div class="example vertical">
+          <ui-button onclick="document.querySelector('ui-toast')?.show()">Show Toast</ui-button>
+          <ui-toast toast-type="success">This is a toast message!</ui-toast>
+        </div>
+      </div>
+
+      <!-- UTILITIES -->
+      <div class="section-title">🛠️ Utilities & Special</div>
+
+      <div class="component-card">
+        <h3>Copy</h3>
+        <div class="example vertical">
+          <ui-copy copyable="Text to copy">Copy this text</ui-copy>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Link</h3>
+        <div class="example">
+          <ui-link href="#home">Home Link</ui-link>
+          <ui-link href="#about" target="_blank">External Link</ui-link>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Carousel</h3>
+        <div class="example vertical">
+          <ui-carousel show-controls="true">
+            <div>Slide 1</div>
+            <div>Slide 2</div>
+            <div>Slide 3</div>
+          </ui-carousel>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Tile</h3>
+        <div class="example">
+          <ui-tile>Tile 1</ui-tile>
+          <ui-tile>Tile 2</ui-tile>
+          <ui-tile>Tile 3</ui-tile>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Watermark</h3>
+        <div class="example vertical">
+          <ui-watermark content="WATERMARK">Watermarked content</ui-watermark>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h3>Form Group</h3>
+        <div class="example vertical">
+          <ui-form-group>
+            <ui-form-field label="First Name">
+              <ui-text-input placeholder="John"></ui-text-input>
+            </ui-form-field>
+            <ui-form-field label="Last Name">
+              <ui-text-input placeholder="Doe"></ui-text-input>
+            </ui-form-field>
+          </ui-form-group>
+        </div>
+      </div>
+
     </div>
   </div>
 </body>
