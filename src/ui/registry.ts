@@ -49,6 +49,11 @@ import { uiCarouselMetadata } from './components/carousel/ui-carousel.metadata.j
 import { uiSwitchMetadata } from './components/switch/ui-switch.metadata.js';
 import { uiCopyMetadata } from './components/copy/ui-copy.metadata.js';
 import { uiResultMetadata } from './components/result/ui-result.metadata.js';
+import { uiMenuMetadata } from './components/menu/ui-menu.metadata.js';
+import { uiTableMetadata } from './components/table/ui-table.metadata.js';
+import { uiSliderMetadata } from './components/slider/ui-slider.metadata.js';
+import { uiHintMetadata } from './components/hint/ui-hint.metadata.js';
+import { uiDescriptionListMetadata } from './components/description-list/ui-description-list.metadata.js';
 
 /**
  * Register all component metadata.
@@ -99,6 +104,11 @@ export function registerAllComponents(): void {
   globalRegistry.register(uiSwitchMetadata);
   globalRegistry.register(uiCopyMetadata);
   globalRegistry.register(uiResultMetadata);
+  globalRegistry.register(uiMenuMetadata);
+  globalRegistry.register(uiTableMetadata);
+  globalRegistry.register(uiSliderMetadata);
+  globalRegistry.register(uiHintMetadata);
+  globalRegistry.register(uiDescriptionListMetadata);
 }
 
 /**
