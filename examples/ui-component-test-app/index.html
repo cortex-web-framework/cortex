@@ -4,10 +4,99 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UI Component Test App</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 30px;
+    }
+    .components {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .component-section {
+      border: 1px solid #e0e0e0;
+      padding: 20px;
+      border-radius: 4px;
+    }
+    .component-section h3 {
+      margin-top: 0;
+      color: #555;
+      font-size: 14px;
+      text-transform: uppercase;
+    }
+    ui-button {
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+  </style>
   <script type="module" src="main.js"></script>
 </head>
 <body>
-  <h1>UI Component Test App</h1>
-  <test-component></test-component>
+  <div class="container">
+    <h1>UI Component Test App</h1>
+
+    <div class="components">
+      <div class="component-section">
+        <h3>Buttons</h3>
+        <ui-button variant="primary">Primary Button</ui-button>
+        <ui-button variant="secondary">Secondary Button</ui-button>
+        <ui-button variant="success">Success Button</ui-button>
+        <ui-button variant="danger">Danger Button</ui-button>
+        <ui-button variant="ghost">Ghost Button</ui-button>
+      </div>
+
+      <div class="component-section">
+        <h3>Buttons - Sizes</h3>
+        <ui-button size="small">Small</ui-button>
+        <ui-button size="medium">Medium</ui-button>
+        <ui-button size="large">Large</ui-button>
+      </div>
+
+      <div class="component-section">
+        <h3>Buttons - States</h3>
+        <ui-button>Normal</ui-button>
+        <ui-button disabled>Disabled</ui-button>
+        <ui-button loading>Loading</ui-button>
+      </div>
+
+      <div class="component-section">
+        <h3>Badges</h3>
+        <ui-badge content="Default"></ui-badge>
+        <ui-badge content="Primary" variant="primary"></ui-badge>
+        <ui-badge content="Success" variant="success"></ui-badge>
+        <ui-badge content="Warning" variant="warning"></ui-badge>
+        <ui-badge content="Error" variant="error"></ui-badge>
+      </div>
+
+      <div class="component-section">
+        <h3>Avatars</h3>
+        <ui-avatar initials="AB" size="small"></ui-avatar>
+        <ui-avatar initials="CD" size="medium"></ui-avatar>
+        <ui-avatar initials="EF" size="large"></ui-avatar>
+      </div>
+
+      <div class="component-section">
+        <h3>Alerts</h3>
+        <ui-alert type="success" message="Success!" dismissible></ui-alert>
+        <ui-alert type="info" message="Info message" dismissible></ui-alert>
+        <ui-alert type="warning" message="Warning!" dismissible></ui-alert>
+        <ui-alert type="error" message="Error occurred" dismissible></ui-alert>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
