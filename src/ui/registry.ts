@@ -28,6 +28,7 @@ import { uiAccordionMetadata } from './components/accordion/ui-accordion.metadat
 import { uiProgressBarMetadata } from './components/progress-bar/ui-progress-bar.metadata.js';
 import { uiBreadcrumbMetadata } from './components/breadcrumb/ui-breadcrumb.metadata.js';
 import { uiStepperMetadata } from './components/stepper/ui-stepper.metadata.js';
+import { uiBadgeMetadata } from './components/badge/ui-badge.metadata.js';
 
 /**
  * Register all component metadata.
@@ -57,6 +58,7 @@ export function registerAllComponents(): void {
   globalRegistry.register(uiProgressBarMetadata);
   globalRegistry.register(uiBreadcrumbMetadata);
   globalRegistry.register(uiStepperMetadata);
+  globalRegistry.register(uiBadgeMetadata);
 }
 
 /**
