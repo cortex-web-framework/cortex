@@ -38,6 +38,21 @@ describe('ui-watermark', () => {
   it('should have angle property', () => {
     const e = el as any;
     e.angle = -30;
-    assert.equal(e.angle, -30);
+    // -30 % 360 = 330 (normalized to 0-359 range)
+    assert.equal(e.angle, 330);
+  });
+
+  it('should normalize large angle values', () => {
+    const e = el as any;
+    e.angle = 720;
+    // 720 % 360 = 0
+    assert.equal(e.angle, 0);
+  });
+
+  it('should normalize large negative angle values', () => {
+    const e = el as any;
+    e.angle = -450;
+    // (-450 % 360 + 360) % 360 = 270
+    assert.equal(e.angle, 270);
   });
 });

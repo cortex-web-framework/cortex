@@ -21,7 +21,10 @@ class UiWatermark extends HTMLElement implements IWatermarkElement {
     if (name === 'text') this.state.text = val || undefined;
     if (name === 'opacity') this.state.opacity = Math.max(0, Math.min(1, parseFloat(val || '0.1')));
     if (name === 'font-size') this.state.fontSize = Math.max(1, parseInt(val || '20', 10));
-    if (name === 'angle') this.state.angle = parseInt(val || '-45', 10) % 360;
+    if (name === 'angle') {
+      const angleVal = parseInt(val || '-45', 10);
+      this.state.angle = ((angleVal % 360) + 360) % 360;
+    }
     this.render();
   }
 
@@ -61,7 +64,7 @@ class UiWatermark extends HTMLElement implements IWatermarkElement {
   }
 
   set angle(val: number) {
-    this.state.angle = val % 360;
+    this.state.angle = ((val % 360) + 360) % 360;
     this.setAttribute('angle', this.state.angle.toString());
     this.render();
   }
