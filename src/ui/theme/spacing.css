@@ -1,0 +1,13 @@
+/*
+ * Defines spacing tokens for the UI component library.
+ * These are CSS custom properties that can be consumed by Web Components.
+ */
+:root {
+  --ui-spacing-xxs: 4px;
+  --ui-spacing-xs: 8px;
+  --ui-spacing-sm: 12px;
+  --ui-spacing-md: 16px;
+  --ui-spacing-lg: 24px;
+  --ui-spacing-xl: 32px;
+  --ui-spacing-xxl: 48px;
+}

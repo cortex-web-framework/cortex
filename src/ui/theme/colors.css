@@ -1,0 +1,32 @@
+/*
+ * Defines semantic color variables for the UI component library.
+ * These are CSS custom properties that can be consumed by Web Components.
+ */
+:root {
+  /* Primary colors */
+  --ui-color-primary: #007bff; /* Blue - Trust, Reliability */
+  --ui-color-primary-hover: #0056b3;
+  --ui-color-primary-active: #004085;
+
+  /* Secondary colors */
+  --ui-color-secondary: #6c757d; /* Grey - Neutrality, Balance */
+  --ui-color-secondary-hover: #545b62;
+  --ui-color-secondary-active: #343a40;
+
+  /* Semantic status colors */
+  --ui-color-success: #28a745; /* Green - Success, Growth */
+  --ui-color-success-hover: #1e7e34;
+  --ui-color-danger: #dc3545; /* Red - Warning, Urgency */
+  --ui-color-danger-hover: #bd2130;
+  --ui-color-warning: #ffc107; /* Yellow - Caution, Optimism */
+  --ui-color-warning-hover: #e0a800;
+  --ui-color-info: #17a2b8; /* Cyan - Information, Clarity */
+  --ui-color-info-hover: #117a8b;
+
+  /* Background and text colors */
+  --ui-color-background-default: #ffffff; /* White - Purity, Simplicity */
+  --ui-color-background-light: #f8f9fa;
+  --ui-color-text-default: #212529; /* Dark Grey - Readability */
+  --ui-color-text-light: #6c757d;
+  --ui-color-border-default: #ced4da;
+}

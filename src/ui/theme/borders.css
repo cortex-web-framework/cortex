@@ -1,0 +1,11 @@
+/*
+ * Defines border-radius tokens for the UI component library.
+ * These are CSS custom properties that can be consumed by Web Components.
+ */
+:root {
+  --ui-border-radius-none: 0px;
+  --ui-border-radius-sm: 2px;
+  --ui-border-radius-md: 4px;
+  --ui-border-radius-lg: 8px;
+  --ui-border-radius-full: 9999px; /* For perfect circles/pills */
+}

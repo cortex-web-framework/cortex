@@ -1,0 +1,22 @@
+/*
+ * Defines effect tokens (z-index, shadows, transitions) for the UI component library.
+ * These are CSS custom properties that can be consumed by Web Components.
+ */
+:root {
+  /* Z-index */
+  --ui-z-index-dropdown: 1000;
+  --ui-z-index-sticky: 1020;
+  --ui-z-index-fixed: 1030;
+  --ui-z-index-modal: 1040;
+  --ui-z-index-tooltip: 1050;
+
+  /* Shadows */
+  --ui-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --ui-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --ui-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  /* Transitions */
+  --ui-transition-fast: all 0.15s ease-out;
+  --ui-transition-normal: all 0.3s ease-in-out;
+  --ui-transition-slow: all 0.5s ease-in-out;
+}
