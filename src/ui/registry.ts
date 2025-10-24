@@ -23,6 +23,7 @@ import { uiModalMetadata } from './components/modal/ui-modal.metadata.js';
 import { uiAlertMetadata } from './components/alert/ui-alert.metadata.js';
 import { uiTabsMetadata } from './components/tabs/ui-tabs.metadata.js';
 import { uiSpinnerMetadata } from './components/spinner/ui-spinner.metadata.js';
+import { uiPaginationMetadata } from './components/pagination/ui-pagination.metadata.js';
 
 /**
  * Register all component metadata.
@@ -47,6 +48,7 @@ export function registerAllComponents(): void {
   globalRegistry.register(uiAlertMetadata);
   globalRegistry.register(uiTabsMetadata);
   globalRegistry.register(uiSpinnerMetadata);
+  globalRegistry.register(uiPaginationMetadata);
 }
 
 /**
