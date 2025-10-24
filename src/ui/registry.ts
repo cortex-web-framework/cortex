@@ -11,6 +11,7 @@ import { uiCheckboxMetadata } from './components/checkbox/ui-checkbox.metadata.j
 import { uiSelectMetadata } from './components/select/ui-select.metadata.js';
 import { uiLabelMetadata } from './components/label/ui-label.metadata.js';
 import { uiFormFieldMetadata } from './components/form-field/ui-form-field.metadata.js';
+import { uiTextareaMetadata } from './components/textarea/ui-textarea.metadata.js';
 
 /**
  * Register all component metadata.
@@ -23,6 +24,7 @@ export function registerAllComponents(): void {
   globalRegistry.register(uiSelectMetadata);
   globalRegistry.register(uiLabelMetadata);
   globalRegistry.register(uiFormFieldMetadata);
+  globalRegistry.register(uiTextareaMetadata);
 }
 
 /**
