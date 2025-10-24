@@ -94,4 +94,3 @@ export function createHandlerBuilder() {
 export function isMessageType(message, type) {
     return message.type === type;
 }
-//# sourceMappingURL=actorTypes.js.map

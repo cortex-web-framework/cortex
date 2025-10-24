@@ -13,4 +13,3 @@ export class SystemTimeProvider {
         return Date.now();
     }
 }
-//# sourceMappingURL=time.js.map

@@ -64,9 +64,10 @@ export function selectEncoding(supportedEncodings) {
  * Check if content should be compressed
  */
 export function isCompressible(contentType, config) {
+    var _a;
     const type = contentType.split(';')[0].toLowerCase();
     // Check excluded types first (blacklist takes priority)
-    if (config.excludeContentTypes?.some(excluded => type.includes(excluded.toLowerCase()))) {
+    if ((_a = config.excludeContentTypes) === null || _a === void 0 ? void 0 : _a.some(excluded => type.includes(excluded.toLowerCase()))) {
         return false;
     }
     // If contentTypes whitelist is specified, check it
@@ -84,22 +85,23 @@ export function isCompressible(contentType, config) {
  * Create compression transform stream
  */
 function createCompressionStream(encoding, config) {
+    var _a, _b, _c, _d, _e;
     switch (encoding) {
         case 'br':
             return createBrotliCompress({
                 params: {
-                    [11]: config.level ?? 6, // BROTLI_PARAM_QUALITY
+                    [11]: (_a = config.level) !== null && _a !== void 0 ? _a : 6, // BROTLI_PARAM_QUALITY
                 }
             });
         case 'gzip':
             return createGzip({
-                level: config.level ?? 6,
-                memLevel: config.memLevel ?? 8
+                level: (_b = config.level) !== null && _b !== void 0 ? _b : 6,
+                memLevel: (_c = config.memLevel) !== null && _c !== void 0 ? _c : 8
             });
         case 'deflate':
             return createDeflate({
-                level: config.level ?? 6,
-                memLevel: config.memLevel ?? 8,
+                level: (_d = config.level) !== null && _d !== void 0 ? _d : 6,
+                memLevel: (_e = config.memLevel) !== null && _e !== void 0 ? _e : 8,
                 windowBits: config.windowBits,
                 strategy: config.strategy
             });
@@ -111,10 +113,11 @@ function createCompressionStream(encoding, config) {
  * Main compression middleware
  */
 export function compression(config = {}) {
-    const finalConfig = { ...DEFAULT_COMPRESSION_CONFIG, ...config };
+    const finalConfig = Object.assign(Object.assign({}, DEFAULT_COMPRESSION_CONFIG), config);
     return (req, res, next) => {
+        var _a, _b, _c;
         // Support both standard Node.js req.headers and Express-style req.get()
-        const acceptEncoding = (req.get?.('Accept-Encoding') || req.headers?.['accept-encoding'] || '');
+        const acceptEncoding = (((_b = (_a = req).get) === null || _b === void 0 ? void 0 : _b.call(_a, 'Accept-Encoding')) || ((_c = req.headers) === null || _c === void 0 ? void 0 : _c['accept-encoding']) || '');
         const supportedEncodings = parseAcceptEncoding(acceptEncoding);
         const selectedEncoding = selectEncoding(supportedEncodings);
         if (!selectedEncoding) {
@@ -131,8 +134,21 @@ export function compression(config = {}) {
         let chunks = [];
         // Override writeHead to check content type and length
         res.writeHead = function writeHeadImpl(statusCode, ...args) {
-            const contentType = res.getHeader('Content-Type') || '';
-            const contentLengthHeader = res.getHeader('Content-Length');
+            var _a, _b, _c, _d;
+            // Extract headers from writeHead arguments
+            // Signature: writeHead(statusCode, [statusMessage], [headers])
+            let headersArg = {};
+            let headersArgIndex = -1;
+            if (args.length > 0) {
+                const lastArg = args[args.length - 1];
+                if (typeof lastArg === 'object' && lastArg !== null && !Array.isArray(lastArg)) {
+                    headersArg = lastArg;
+                    headersArgIndex = args.length - 1;
+                }
+            }
+            // Merge headers from arguments with previously set headers
+            const contentType = ((_b = (_a = headersArg['Content-Type']) !== null && _a !== void 0 ? _a : res.getHeader('Content-Type')) !== null && _b !== void 0 ? _b : '');
+            const contentLengthHeader = ((_d = (_c = headersArg['Content-Length']) !== null && _c !== void 0 ? _c : res.getHeader('Content-Length')) !== null && _d !== void 0 ? _d : '');
             if (contentLengthHeader) {
                 contentLength = parseInt(contentLengthHeader, 10);
             }
@@ -142,6 +158,12 @@ export function compression(config = {}) {
                 shouldCompress = true;
                 res.setHeader('Content-Encoding', selectedEncoding);
                 res.removeHeader('Content-Length'); // Remove original content length
+                // Remove Content-Length from args if it was passed in writeHead call
+                if (headersArgIndex >= 0 && headersArg['Content-Length']) {
+                    const newHeaders = Object.assign({}, headersArg);
+                    delete newHeaders['Content-Length'];
+                    args[headersArgIndex] = newHeaders;
+                }
             }
             return originalWriteHead(statusCode, ...args);
         };

@@ -7,4 +7,3 @@ export var CircuitState;
     CircuitState["OPEN"] = "open";
     CircuitState["HALF_OPEN"] = "half-open";
 })(CircuitState || (CircuitState = {}));
-//# sourceMappingURL=types.js.map

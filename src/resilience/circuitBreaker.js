@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import { CircuitState } from './types.js';
 import { CircuitBreakerOpenError } from './errors.js';
 import { SystemTimeProvider } from '../utils/time.js';
@@ -36,29 +45,31 @@ export class CircuitBreaker {
         this.failureCount = 0;
         this.successCount = 0;
         this.nextAttemptTime = 0;
-        this.timeProvider = timeProvider ?? new SystemTimeProvider();
+        this.timeProvider = timeProvider !== null && timeProvider !== void 0 ? timeProvider : new SystemTimeProvider();
         this.validateConfig();
     }
     /**
      * Execute an operation with circuit breaker protection
      */
-    async execute(operation) {
-        if (this.state === CircuitState.OPEN) {
-            if (this.timeProvider.now() < this.nextAttemptTime) {
-                throw new CircuitBreakerOpenError('Circuit breaker is OPEN', this.nextAttemptTime);
+    execute(operation) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.state === CircuitState.OPEN) {
+                if (this.timeProvider.now() < this.nextAttemptTime) {
+                    throw new CircuitBreakerOpenError('Circuit breaker is OPEN', this.nextAttemptTime);
+                }
+                this.state = CircuitState.HALF_OPEN;
+                this.successCount = 0;
             }
-            this.state = CircuitState.HALF_OPEN;
-            this.successCount = 0;
-        }
-        try {
-            const result = await operation();
-            this.onSuccess();
-            return result;
-        }
-        catch (error) {
-            this.onFailure();
-            throw error;
-        }
+            try {
+                const result = yield operation();
+                this.onSuccess();
+                return result;
+            }
+            catch (error) {
+                this.onFailure();
+                throw error;
+            }
+        });
     }
     /**
      * Get current circuit breaker state
@@ -144,4 +155,3 @@ export class CircuitBreaker {
         }
     }
 }
-//# sourceMappingURL=circuitBreaker.js.map

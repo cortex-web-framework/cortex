@@ -13,8 +13,9 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "lib": ["dom", "es2020"]
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "tests", "dist"]
+  "include": ["src/**/*", "src/ui/**/*"],
+  "exclude": ["node_modules", "tests", "dist", "dist/ui"]
 }

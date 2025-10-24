@@ -195,4 +195,3 @@ TypeSafeActorSystem.MAX_RESTARTS = 3;
 export function createTypeSafeActorSystem() {
     return new TypeSafeActorSystem();
 }
-//# sourceMappingURL=typeSafeActorSystem.js.map

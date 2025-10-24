@@ -1,58 +1,23 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    // Test-specific overrides
-    "outDir": "./dist-tests",
-    "noEmit": false,
-    "sourceMap": true,
-    "declaration": false,
-    "declarationMap": false,
-    "removeComments": false,
-    "noEmitOnError": true,
-    "skipLibCheck": false,
-    
-    // Maximum strictness (inherits from base config)
-    "strict": true,
-    "exactOptionalPropertyTypes": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedIndexedAccess": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": false,
-    "allowUnusedLabels": true,
-    "allowUnreachableCode": false,
-    
-    // Module system - match base config for consistency
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "verbatimModuleSyntax": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    
-    // Environment - Node.js for tests (must include Node types)
-    "target": "ES2016",
-    "lib": ["ES2016", "DOM"],
-    "useDefineForClassFields": true,
-    "forceConsistentCasingInFileNames": true,
-    
-    // Include Node.js types for testing (minimal dependency)
-    "types": ["node"],
-    
-    // TDD optimizations
-    "incremental": true,
-    "tsBuildInfoFile": "./dist-tests/.tsbuildinfo"
+    "outDir": "./dist/ui-test-compiled",
+    "rootDir": "./src",
+    "target": "es2020",
+    "module": "es2022",
+    "baseUrl": ".",
+    "paths": {
+      "../../../dist/ui/components/button/ui-button.js": ["dist/ui/components/button/ui-button.d.ts"]
+    }
   },
   "include": [
-    "src/**/*",
-    "tests/**/*"
+    "src/ui-test/**/*.ts",
+    "src/ui/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "dist-tests"
+    "dist-test",
+    "dist/ui-test-compiled"
   ]
 }

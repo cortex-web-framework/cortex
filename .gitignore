@@ -100,6 +100,9 @@ dist-tests/.tsbuildinfo
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 
+# Compiled JavaScript files
+src/**/*.js
+
 # IDE files
 .idea
 .vscode/

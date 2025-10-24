@@ -33,4 +33,3 @@ export class TimeoutError extends Error {
         Object.setPrototypeOf(this, TimeoutError.prototype);
     }
 }
-//# sourceMappingURL=errors.js.map

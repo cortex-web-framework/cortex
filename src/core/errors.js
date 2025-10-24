@@ -19,4 +19,3 @@ export class EventBusError extends Error {
         }
     }
 }
-//# sourceMappingURL=errors.js.map

@@ -218,4 +218,3 @@ export class TimeWindowTracker {
         }
     }
 }
-//# sourceMappingURL=rollingWindow.js.map

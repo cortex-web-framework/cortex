@@ -12,14 +12,16 @@ class EventBus {
         return EventBus.instance;
     }
     subscribe(topic, callback) {
+        var _a;
         if (!this.subscriptions.has(topic)) {
             this.subscriptions.set(topic, []);
         }
-        this.subscriptions.get(topic)?.push(callback);
+        (_a = this.subscriptions.get(topic)) === null || _a === void 0 ? void 0 : _a.push(callback);
     }
     publish(topic, message) {
+        var _a;
         if (this.subscriptions.has(topic)) {
-            this.subscriptions.get(topic)?.forEach(callback => {
+            (_a = this.subscriptions.get(topic)) === null || _a === void 0 ? void 0 : _a.forEach(callback => {
                 try {
                     callback(message);
                 }
@@ -32,4 +34,3 @@ class EventBus {
     }
 }
 export { EventBus };
-//# sourceMappingURL=eventBus.js.map
