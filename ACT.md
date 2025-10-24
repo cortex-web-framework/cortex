@@ -15,7 +15,7 @@
 **Action:** User clarified that the environment is Debian WSL and questioned the current UI testing approach due to persistent D-Bus errors, asking for a more "fail-safe" approach or to get rid of the tests. This changes the scope of the task from merely fixing D-Bus errors to re-evaluating the UI testing strategy in a WSL environment.
 **Status:** Researched alternative UI testing strategies for WSL/headless environments that are less prone to D-Bus issues. Updated `PLAN.md` and `TODO.md` with a revised plan.
 
-### 2025-10-24 - User Choice: Option A (Leverage WSL2 with WSLg)
+### 2025-10-24 - User Choice: Option A: Leverage WSL2 with WSLg
 
 **Action:** User chose Option A: Leverage WSL2 with WSLg. User also asked how to check WSL version.
 **Status:** Provided instructions to check WSL version. Proceeding with Phase 2, Step 2.A.1 based on user's choice.
@@ -69,3 +69,33 @@
 
 **Action:** Reviewed `.gitignore` and added patterns to ignore `src/**/*.js` files. Removed `scripts/**/*.js` from `.gitignore` so that test-ui.js is tracked.
 **Status:** `.gitignore` updated. The `git add` command failed due to `scripts/test-ui.js` being ignored. Corrected `.gitignore` by removing `scripts/**/*.js` from ignore rules.
+
+### 2025-10-24 - Phase 1.1 (Git Cleanup): Commit Changes
+
+**Action:** Staged and committed all modified files, including working files, `.gitignore`, `scripts/test-ui.js`, and compiled JS files affected by the build process.
+**Status:** Commit successful. `[main 7992aad] feat: Implement fail-safe UI testing for WSLg and update gitignore`
+
+### 2025-10-24 - Phase 1.1 (Git Cleanup): Re-evaluate Untracked Files
+
+**Action:** Re-ran `git status` after the commit. Identified remaining untracked files: `scripts/build-ui-docs.js`, `scripts/build-ui.js`, `src/ui-test/`, `src/ui/`, `tsconfig.build-ui.json`.
+**Status:** These files need to be explicitly added to Git tracking as they appear to be source or configuration files that should be part of the repository.
+
+### 2025-10-24 - Phase 1.1 (Git Cleanup): Commit Remaining Untracked Files
+
+**Action:** Added remaining untracked files (`scripts/build-ui-docs.js`, `scripts/build-ui.js`, `src/ui-test/`, `src/ui/`, `tsconfig.build-ui.json`) to Git tracking and committed them.
+**Status:** Commit successful. `[main c2ac5a3] feat: Add missing build scripts, UI test and UI source directories, and build config`
+
+### 2025-10-24 - Phase 1 (Git Cleanup): Repository Analysis Complete
+
+**Action:** Completed all steps in Phase 1 of the Git cleanup plan.
+**Status:**
+*   Current branch: `main`
+*   Local `main` is ahead of `origin/main` by 12 commits.
+*   Working directory is clean except for `ACT.md`.
+*   Local branch `develop` is merged into `main`.
+*   No stale remote tracking branches.
+
+### 2025-10-24 - Phase 2 (Git Cleanup): User Clarification on Branching Model
+
+**Action:** User clarified that `develop` is the working branch and `main` is the "all work done" branch. This contradicts the current state where `main` is ahead of `develop`.
+**Status:** Re-evaluated branch relationship. `git log --oneline develop..main` shows `main` is significantly ahead of `develop`. `git log --oneline main..develop` is empty, meaning `develop` is fully contained within `main`'s history.
