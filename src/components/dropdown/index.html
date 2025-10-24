@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dropdown Component - Cortex UI</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .demo-section {
+      background: white;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .demo-section h3 {
+      color: #667eea;
+      margin-bottom: 1.5rem;
+      font-size: 1.25rem;
+    }
+
+    .demo-section p {
+      color: #666;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .results {
+      background: #f5f5f5;
+      border-radius: 4px;
+      padding: 1rem;
+      margin-top: 1.5rem;
+      min-height: 50px;
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .results.empty {
+      color: #999;
+      font-style: italic;
+    }
+
+    .results strong {
+      color: #667eea;
+    }
+
+    .features-section {
+      background: white;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .features-section h3 {
+      color: #667eea;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature-item {
+      padding: 1rem;
+      background: #f9f9f9;
+      border-radius: 4px;
+      border-left: 4px solid #667eea;
+    }
+
+    .feature-item h4 {
+      color: #333;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .feature-item p {
+      color: #666;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 640px) {
+      .header h1 {
+        font-size: 1.5rem;
+      }
+
+      .demo-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .demo-section {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Dropdown Component</h1>
+      <p>Flexible dropdown menu with keyboard navigation - Zero Dependencies</p>
+    </div>
+
+    <div class="demo-grid">
+      <!-- Demo 1: Basic Dropdown -->
+      <div class="demo-section">
+        <h3>🎯 Basic Dropdown</h3>
+        <p>A simple dropdown with fruit options. Select an item to see the change event.</p>
+        <ui-dropdown id="dropdown1" data-selected-text="Select a fruit...">
+          <div data-option data-value="apple">Apple</div>
+          <div data-option data-value="banana">Banana</div>
+          <div data-option data-value="cherry">Cherry</div>
+          <div data-option data-value="date">Date</div>
+          <div data-option data-value="elderberry">Elderberry</div>
+        </ui-dropdown>
+        <div id="results1" class="results empty">Select an option to see the result...</div>
+      </div>
+
+      <!-- Demo 2: Dropdown with Disabled Items -->
+      <div class="demo-section">
+        <h3>🚫 Disabled Items</h3>
+        <p>Some items are disabled and cannot be selected. Try clicking them.</p>
+        <ui-dropdown id="dropdown2" data-selected-text="Choose a browser...">
+          <div data-option data-value="chrome">Chrome</div>
+          <div data-option data-value="firefox">Firefox</div>
+          <div data-option data-value="safari" disabled>Safari (unavailable)</div>
+          <div data-option data-value="edge" disabled>Edge (unavailable)</div>
+          <div data-option data-value="opera">Opera</div>
+        </ui-dropdown>
+        <div id="results2" class="results empty">Try selecting from enabled options...</div>
+      </div>
+
+      <!-- Demo 3: Top Positioned Dropdown -->
+      <div class="demo-section">
+        <h3>⬆️ Top Positioned</h3>
+        <p>This dropdown opens upward instead of downward. Useful for footers.</p>
+        <div style="margin-top: 8rem;">
+          <ui-dropdown id="dropdown3" position="top" data-selected-text="Pick a color...">
+            <div data-option data-value="red">Red</div>
+            <div data-option data-value="green">Green</div>
+            <div data-option data-value="blue">Blue</div>
+            <div data-option data-value="yellow">Yellow</div>
+            <div data-option data-value="purple">Purple</div>
+          </ui-dropdown>
+          <div id="results3" class="results empty" style="margin-top: 3rem;">Selection will appear here...</div>
+        </div>
+      </div>
+
+      <!-- Demo 4: Right Positioned Dropdown -->
+      <div class="demo-section">
+        <h3>➡️ Right Positioned</h3>
+        <p>This dropdown opens to the right. Good for sidebars.</p>
+        <ui-dropdown id="dropdown4" position="right" data-selected-text="Select a language...">
+          <div data-option data-value="javascript">JavaScript</div>
+          <div data-option data-value="python">Python</div>
+          <div data-option data-value="rust">Rust</div>
+          <div data-option data-value="go">Go</div>
+          <div data-option data-value="typescript">TypeScript</div>
+        </ui-dropdown>
+        <div id="results4" class="results empty">Language selection will appear here...</div>
+      </div>
+
+      <!-- Demo 5: Dynamic Options -->
+      <div class="demo-section">
+        <h3>⚡ Dynamic Options</h3>
+        <p>Add, remove, or clear options programmatically using the public API.</p>
+        <ui-dropdown id="dropdown5" data-selected-text="Dynamic options...">
+          <div data-option data-value="opt1">Option 1</div>
+          <div data-option data-value="opt2">Option 2</div>
+          <div data-option data-value="opt3">Option 3</div>
+        </ui-dropdown>
+        <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button id="addBtn" style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">Add Option</button>
+          <button id="removeBtn" style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">Remove Option 1</button>
+          <button id="clearBtn" style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">Clear All</button>
+        </div>
+        <div id="results5" class="results empty">Dynamic results...</div>
+      </div>
+
+      <!-- Demo 6: Programmatic Control -->
+      <div class="demo-section">
+        <h3>🎮 Programmatic Control</h3>
+        <p>Use the public API to control the dropdown with JavaScript.</p>
+        <ui-dropdown id="dropdown6" data-selected-text="Control me...">
+          <div data-option data-value="fast">Fast</div>
+          <div data-option data-value="medium">Medium</div>
+          <div data-option data-value="slow">Slow</div>
+          <div data-option data-value="paused">Paused</div>
+        </ui-dropdown>
+        <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button id="openBtn" style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">Open</button>
+          <button id="closeBtn" style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">Close</button>
+          <button id="setBtn" style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">Set to Medium</button>
+        </div>
+        <div id="results6" class="results empty">Control state will appear here...</div>
+      </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="features-section">
+      <h3>✨ Key Features</h3>
+      <div class="features-grid">
+        <div class="feature-item">
+          <h4>🎯 Flexible Positioning</h4>
+          <p>Open dropdown in any direction: bottom (default), top, left, or right. Perfect for any layout.</p>
+        </div>
+        <div class="feature-item">
+          <h4>⌨️ Keyboard Accessible</h4>
+          <p>Full keyboard navigation with arrow keys, enter, space, and escape support for power users.</p>
+        </div>
+        <div class="feature-item">
+          <h4>🚫 Disabled Items</h4>
+          <p>Mark items as disabled to prevent selection while keeping them visible in the menu.</p>
+        </div>
+        <div class="feature-item">
+          <h4>🔌 Public API</h4>
+          <p>Complete API for programmatic control: getValue, setValue, open, close, toggle, addOption, etc.</p>
+        </div>
+        <div class="feature-item">
+          <h4>📱 Responsive Design</h4>
+          <p>Optimized for all screen sizes with touch-friendly interactions and mobile layouts.</p>
+        </div>
+        <div class="feature-item">
+          <h4>🎨 Styled & Themeable</h4>
+          <p>Beautiful default styles with Shadow DOM encapsulation. Easy to customize via CSS properties.</p>
+        </div>
+        <div class="feature-item">
+          <h4>🔔 Custom Events</h4>
+          <p>Listen to change, open, and close events for parent integration and reactive updates.</p>
+        </div>
+        <div class="feature-item">
+          <h4>📦 Zero Dependencies</h4>
+          <p>Pure TypeScript implementation with no external libraries. Just ~6KB minified.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import './ui-dropdown.js';
+
+    // Demo 1: Basic dropdown
+    const dropdown1 = document.getElementById('dropdown1');
+    const results1 = document.getElementById('results1');
+
+    dropdown1.addEventListener('change', (event) => {
+      results1.innerHTML = `<strong>Selected:</strong> ${event.detail.label} (${event.detail.value})`;
+      results1.classList.remove('empty');
+    });
+
+    dropdown1.addEventListener('open', () => {
+      results1.innerHTML = '<em>Menu opened...</em>';
+    });
+
+    // Demo 2: Disabled items
+    const dropdown2 = document.getElementById('dropdown2');
+    const results2 = document.getElementById('results2');
+
+    dropdown2.addEventListener('change', (event) => {
+      results2.innerHTML = `<strong>Selected:</strong> ${event.detail.label}`;
+      results2.classList.remove('empty');
+    });
+
+    // Demo 3: Top positioned
+    const dropdown3 = document.getElementById('dropdown3');
+    const results3 = document.getElementById('results3');
+
+    dropdown3.addEventListener('change', (event) => {
+      results3.innerHTML = `<strong>Your color:</strong> ${event.detail.label}`;
+      results3.classList.remove('empty');
+    });
+
+    // Demo 4: Right positioned
+    const dropdown4 = document.getElementById('dropdown4');
+    const results4 = document.getElementById('results4');
+
+    dropdown4.addEventListener('change', (event) => {
+      results4.innerHTML = `<strong>Language:</strong> ${event.detail.label}`;
+      results4.classList.remove('empty');
+    });
+
+    // Demo 5: Dynamic options
+    const dropdown5 = document.getElementById('dropdown5');
+    const results5 = document.getElementById('results5');
+    let optionCount = 3;
+
+    document.getElementById('addBtn').addEventListener('click', () => {
+      optionCount++;
+      dropdown5.addOption(`opt${optionCount}`, `Option ${optionCount}`);
+      results5.innerHTML = `<em>Option ${optionCount} added!</em>`;
+      results5.classList.remove('empty');
+    });
+
+    document.getElementById('removeBtn').addEventListener('click', () => {
+      dropdown5.removeOption('opt1');
+      results5.innerHTML = '<em>Option 1 removed!</em>';
+      results5.classList.remove('empty');
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      dropdown5.clearOptions();
+      results5.innerHTML = '<em>All options cleared!</em>';
+      results5.classList.remove('empty');
+    });
+
+    // Demo 6: Programmatic control
+    const dropdown6 = document.getElementById('dropdown6');
+    const results6 = document.getElementById('results6');
+
+    document.getElementById('openBtn').addEventListener('click', () => {
+      dropdown6.open();
+      results6.innerHTML = '<em>Menu opened programmatically...</em>';
+    });
+
+    document.getElementById('closeBtn').addEventListener('click', () => {
+      dropdown6.close();
+      results6.innerHTML = '<em>Menu closed programmatically...</em>';
+      results6.classList.remove('empty');
+    });
+
+    document.getElementById('setBtn').addEventListener('click', () => {
+      dropdown6.setValue('medium');
+      results6.innerHTML = '<strong>Set to:</strong> Medium';
+      results6.classList.remove('empty');
+    });
+
+    dropdown6.addEventListener('change', (event) => {
+      results6.innerHTML = `<strong>Selected:</strong> ${event.detail.label}`;
+      results6.classList.remove('empty');
+    });
+  </script>
+</body>
+</html>
