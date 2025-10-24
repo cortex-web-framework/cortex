@@ -41,4 +41,5 @@ class TestComponent extends HTMLElement {
   }
 }
 
+console.log('test-component.ts executed');
 customElements.define('test-component', TestComponent);
