@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cortex UI Components</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        .component-viewer {
+            border: 1px solid #eee;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        .component-viewer h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .component-example {
+            border: 1px dashed #ccc;
+            padding: 15px;
+            margin-top: 15px;
+            background-color: #f9f9f9;
+            display: block;
+        }
+        .component-code {
+            background-color: #e8e8e8;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cortex UI Component Library</h1>
+    <p>This page showcases the available UI components for the Cortex framework.</p>
+
+    <div id="components-list">
+        <!-- Components will be dynamically loaded here -->
+    </div>
+
+    <script type="module" src="../../dist/ui/ui-bundle.js"></script>
+    <script type="module">
+        // This script will dynamically load and display components
+        // For now, we'll manually add the ui-button as an example
+
+        const componentsListDiv = document.getElementById('components-list');
+
+        // Example for ui-button
+        const buttonViewer = document.createElement('div');
+        buttonViewer.className = 'component-viewer';
+        buttonViewer.innerHTML = `
+            <h2>ui-button</h2>
+            <p>A basic button component.</p>
+            <h3>Example:</h3>
+            <div class="component-example">
+                <ui-button message="Click Me"></ui-button>
+            </div>
+            <h3>Code:</h3>
+            <pre class="component-code">&lt;ui-button message="Click Me"&gt;&lt;/ui-button&gt;</pre>
+            <h3>Properties:</h3>
+            <ul>
+                <li><code>message</code>: string - The text displayed on the button.</li>
+            </ul>
+        `;
+        componentsListDiv.appendChild(buttonViewer);
+
+        // More components will be added dynamically by a script or manually
+    </script>
+</body>
+</html>

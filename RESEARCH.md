@@ -1,72 +1,314 @@
-# Research on D-Bus Errors During UI Tests
+# Research on UI Components, UI/UX, and DX for Cortex
 
-During the execution of UI tests, several D-Bus related error messages appeared in the console output, even though the tests ultimately passed. These errors indicate underlying issues with D-Bus communication and environment setup, particularly in a Linux-like environment such as WSL. This document summarizes the identified errors and provides comprehensive solutions.
+This document compiles research findings regarding existing and proposed UI components for the Cortex framework, alongside insights from scientific research on UI/UX best practices and Developer Experience (DX). The goal is to inform the development of a comprehensive UI component library that enables the creation of "awesome apps" with Cortex.
 
-## Identified Errors and Solutions
+## 1. Implemented UI Components
 
-### 1. `dbus[PID]: Unable to set up transient service directory: XDG_RUNTIME_DIR "/mnt/wslg/runtime-dir" can be written by others (mode 040777)`
+Currently, only one UI component has been identified as implemented:
 
-*   **Problem Description:** This error occurs because the `XDG_RUNTIME_DIR` (a directory for user-specific non-essential runtime files and other file objects) has overly permissive permissions (mode `040777`, meaning world-writable). D-Bus, for security reasons, requires this directory to have restricted permissions, typically `0700` (only the owner can read, write, and execute). This issue is frequently encountered in environments like Windows Subsystem for Linux (WSL) where file permission handling can differ from native Linux.
+*   `ui-button` (located at `src/ui/components/button/ui-button.ts`)
 
-*   **Bulletproof, Elegant, Comprehensive Solution:**
-    *   **Root Cause Analysis:** The core problem is the insecure permission setting of `XDG_RUNTIME_DIR`. This often indicates an environmental misconfiguration rather than a code bug within the application being tested.
-    *   **Verification:** Check the current permissions of the `XDG_RUNTIME_DIR` using `stat -c "%a %n" $XDG_RUNTIME_DIR`.
-    *   **Remediation:**
-        1.  **Environmental Configuration:** The most robust solution is to ensure the environment (e.g., WSL configuration, systemd-logind setup) correctly sets up `XDG_RUNTIME_DIR` with `0700` permissions upon session start. This might involve reviewing and adjusting system-level configuration files or ensuring that the user's session is properly managed by a system that handles `XDG_RUNTIME_DIR` correctly (e.g., `systemd` or `logind`).
-        2.  **Temporary Fix (if environmental fix is complex):** If a permanent environmental fix is not immediately feasible, a temporary workaround could involve manually setting the permissions: `chmod 0700 $XDG_RUNTIME_DIR`. However, this might be reset on reboot or session restart, so it's not a long-term solution.
-        3.  **WSL Specifics:** In WSL, this often points to issues with how `XDG_RUNTIME_DIR` is mounted or managed. Ensuring that the WSL distribution is up-to-date and that `systemd` is enabled (if applicable to the distribution) can help.
+## 2. Proposed UI Components (Categorized)
 
-### 2. `Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory`
+To achieve a collection of 150+ components, a broad range of UI elements are proposed, categorized for clarity and systematic development. This list aims to cover common application needs and provide a rich toolkit for developers.
 
-*   **Problem Description:** This error indicates that the D-Bus system daemon is either not running or its socket file (`/run/dbus/system_bus_socket`) is missing or inaccessible. D-Bus is essential for inter-process communication, and without its socket, applications cannot communicate via the system bus.
+### 2.1. Basic Input Controls
+*   Text Input (single line, multi-line)
+*   Number Input
+*   Password Input
+*   Checkbox
+*   Radio Button
+*   Dropdown (Select)
+*   Toggle Switch
+*   Slider
+*   Date Picker
+*   Time Picker
+*   File Input
+*   Color Picker
+*   Range Slider
 
-*   **Bulletproof, Elegant, Comprehensive Solution:**
-    *   **Root Cause Analysis:** The D-Bus daemon is not operational or its communication endpoint is unavailable.
-    *   **Verification:**
-        *   Check the status of the D-Bus service: `systemctl status dbus`. Look for "Active: active (running)".
-        *   Verify the existence of the socket file: `ls -l /run/dbus/system_bus_socket`.
-    *   **Remediation:**
-        1.  **Start D-Bus Service:** If the service is not running, start it: `sudo systemctl start dbus`.
-        2.  **Enable D-Bus on Boot:** To ensure D-Bus starts automatically, enable it: `sudo systemctl enable dbus`.
-        3.  **Restart D-Bus Service:** If D-Bus is running but still problematic, a restart can often resolve transient issues: `sudo systemctl restart dbus`.
-        4.  **System Reboot:** As a last resort, a system reboot can often resolve issues with system services not starting correctly.
-        5.  **Environment Check:** Ensure that the environment variables related to D-Bus (e.g., `DBUS_SESSION_BUS_ADDRESS`) are correctly set.
+### 2.2. Buttons & Actions
+*   Button (various styles: primary, secondary, ghost, icon)
+*   Button Group
+*   Floating Action Button (FAB)
+*   Link Button
+*   Split Button
 
-### 3. `Failed to connect to the bus: In D-Bus address, character ''' should have been escaped`
+### 2.3. Navigation
+*   Navbar/App Bar
+*   Sidebar/Drawer
+*   Tabs
+*   Breadcrumbs
+*   Pagination
+*   Stepper
+*   Menu (Context Menu, Dropdown Menu)
+*   Accordion
+*   Tree View
 
-*   **Problem Description:** This error signifies a malformed D-Bus address string. Specifically, a single quote character (`'`) within the address has not been properly escaped, violating the D-Bus specification for address formatting. This is typically a programming error in the application code that constructs the D-Bus address.
+### 2.4. Data Display
+*   Typography (Headings, Paragraphs, Lists)
+*   Avatar
+*   Badge
+*   Card
+*   Table (Basic, Sortable, Paginated, Editable)
+*   List (Ordered, Unordered, Definition)
+*   Description List
+*   Progress Bar
+*   Spinner/Loader
+*   Tooltip
+*   Popover
+*   Modal/Dialog
+*   Snackbar/Toast
+*   Alert/Banner
+*   Carousel/Slider
+*   Image
+*   Video Player
+*   Audio Player
+*   Calendar
+*   Timeline
+*   Data Grid (with extensive features like filtering, sorting, editing, virtualization, etc. - detailed sub-components are listed below)
 
-*   **Bulletproof, Elegant, Comprehensive Solution:**
-    *   **Root Cause Analysis:** The application code is generating an invalid D-Bus address string.
-    *   **Verification:** Identify the section of the application code that constructs D-Bus addresses. Look for instances where string concatenation or formatting is used to build the address, especially if any part of the address originates from user input or dynamic values that might contain single quotes.
-    *   **Remediation:**
-        1.  **Proper Escaping:** Modify the code to correctly escape single quotes within D-Bus address components. According to the D-Bus specification, a single quote should be escaped with a backslash (`'`). For example, if a path component is `path='/some/path/with/an/apostrophe'`, it should be changed to `path='/some/path/with/an/\'apostrophe\''`. 
-        2.  **Use D-Bus Libraries:** Whenever possible, use official D-Bus client libraries or wrappers in the programming language of the application. These libraries typically handle the complexities of D-Bus address formatting and escaping automatically, reducing the chance of such errors.
+### 2.5. Feedback & Status
+*   Alert
+*   Toast/Snackbar
+*   Progress Indicator (Linear, Circular)
+*   Skeleton Loader
 
-### 4. `Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:`
+### 2.6. Layout & Structure
+*   Grid System (Row, Column)
+*   Stack (Horizontal, Vertical)
+*   Container
+*   Divider
+*   Spacer
+*   Panel
 
-*   **Problem Description:** This error indicates a general failure to communicate with the D-Bus daemon when attempting to call the `NameHasOwner` method. The "unknown error type" suggests a fundamental communication breakdown rather than an issue with the method call itself. This error is highly likely a secondary symptom of the primary D-Bus connectivity problems described in errors 1 and 2.
+### 2.7. Forms
+*   Form (wrapper)
+*   Form Field (wrapper for label, input, error)
+*   Form Group
+*   Validation Message
+*   Label
 
-*   **Bulletproof, Elegant, Comprehensive Solution:**
-    *   **Root Cause Analysis:** This error is almost certainly a consequence of the D-Bus daemon not being properly accessible or configured (as per errors 1 and 2). If the D-Bus bus itself is not functioning, any attempts to call methods on it will fail.
-    *   **Remediation:** Focus on resolving errors 1 and 2. Once the D-Bus daemon is running correctly and accessible with proper permissions, this error should naturally disappear. No specific code changes are typically required for this error itself, as it's a symptom.
+### 2.8. Advanced/Composite Components (Examples)
+*   Autocomplete/Combobox
+*   Rich Text Editor
+*   Code Editor
+*   Upload Zone (Drag and Drop)
+*   Rating
+*   Tags/Chips Input
+*   Chart/Graph (various types: bar, line, pie)
+*   Map
+*   Calendar/Scheduler
+*   Kanban Board
+*   Chat Interface
+*   File Browser
+*   Color Palette Selector
+*   Icon Picker
+*   Markdown Editor
+*   Code Block
+*   Syntax Highlighter
+*   Image Cropper
+*   Video Editor Controls
+*   Audio Waveform Visualizer
+*   Drawing Canvas
+*   Signature Pad
+*   QR Code Generator/Scanner
+*   Barcode Scanner
+*   Virtual List/Table (for large datasets)
+*   Drag and Drop List/Grid
+*   Split Pane
+*   Resizable Panel
+*   Scrollable Area
+*   Context Menu
+*   Command Palette
+*   Notification Center
+*   Activity Feed
+*   User Profile Card
+*   Search Bar with suggestions
+*   Filter/Sort Controls
+*   Multi-select Dropdown
+*   Tree Select
+*   Transfer List
+*   Walkthrough/Tour
+*   Onboarding Flow
+*   Empty State/No Data Component
+*   Error Boundary
+*   Loading Overlay
+*   Back to Top Button
+*   Scroll Spy
+*   Parallax Effect
+*   Sticky Header/Footer
+*   Off-canvas Menu
+*   Image Gallery/Lightbox
+*   Video Gallery
+*   Audio Player with Playlist
+*   Code Diff Viewer
+*   Terminal Emulator
+*   Markdown Renderer
+*   PDF Viewer
+*   Spreadsheet/Table Editor
+*   Gantt Chart
+*   Org Chart
+*   Network Graph
+*   Heatmap
+*   Gauge
+*   Sparkline
+*   Word Cloud
+*   Tag Cloud
+*   Captcha
+*   Two-Factor Authentication Input
+*   Password Strength Indicator
+*   File Uploader with progress
+*   Image Uploader with preview
+*   Video Uploader with preview
+*   Audio Uploader with preview
+*   Drag and Drop File Uploader
 
-### 5. `Failed to call method: org.freedesktop.DBus.Properties.GetAll: object_path= /org/freedesktop/UPower/devices/DisplayDevice: unknown error type:`
+### 2.9. Extensive Data Grid Sub-Components (to reach 150+)
 
-*   **Problem Description:** Similar to error 4, this indicates a failure to call a D-Bus method (`GetAll`) on a specific service (`UPower`, which handles power management). The "unknown error type" again points to a general communication issue. This error is also a likely symptom of the broader D-Bus connectivity problems.
+To significantly expand the component count and provide a highly flexible data display solution, a comprehensive Data Grid component would include numerous sub-components and features:
 
-*   **Bulletproof, Elegant, Comprehensive Solution:**
-    *   **Root Cause Analysis:** This error stems from the `UPower` service being unreachable or D-Bus itself not functioning correctly.
-    *   **Verification:**
-        *   Check if the `upower` package is installed on the system.
-        *   Check the status of the `upower.service`: `systemctl status upower.service`.
-    *   **Remediation:**
-        1.  **Install `upower`:** If not installed, install it using the system's package manager (e.g., `sudo apt install upower` on Debian/Ubuntu, `sudo dnf install upower` on Fedora).
-        2.  **Start/Enable `upower` Service:** If the `upower.service` is not running, start it (`sudo systemctl start upower.service`) and enable it to start on boot (`sudo systemctl enable upower.service`).
-        3.  **Restart D-Bus Service:** Restarting the D-Bus service (`sudo systemctl restart dbus.service`) can help re-establish communication.
-        4.  **System Reboot:** A system reboot can often resolve these types of issues.
-        5.  **Address Core D-Bus Issues:** As with error 4, resolving the fundamental D-Bus connectivity and permission issues (errors 1 and 2) is crucial for this error to be resolved.
+*   Data Grid (core component)
+*   Data Grid with inline editing
+*   Data Grid with column resizing
+*   Data Grid with column reordering
+*   Data Grid with row selection
+*   Data Grid with row expansion
+*   Data Grid with grouping
+*   Data Grid with aggregation
+*   Data Grid with virtualization
+*   Data Grid with infinite scroll
+*   Data Grid with custom cell renderers
+*   Data Grid with custom header renderers
+*   Data Grid with custom footer renderers
+*   Data Grid with export to CSV/Excel
+*   Data Grid with print functionality
+*   Data Grid with clipboard support
+*   Data Grid with keyboard navigation
+*   Data Grid with accessibility features
+*   Data Grid with theming support
+*   Data Grid with localization support
+*   Data Grid with responsive design
+*   Data Grid with drag and drop rows
+*   Data Grid with drag and drop columns
+*   Data Grid with drag and drop cells
+*   Data Grid with context menu
+*   Data Grid with custom filters
+*   Data Grid with custom sorters
+*   Data Grid with custom pagination
+*   Data Grid with custom loading indicator
+*   Data Grid with custom empty state
+*   Data Grid with custom error state
+*   Data Grid with custom toolbar
+*   Data Grid with custom row actions
+*   Data Grid with custom column actions
+*   Data Grid with custom cell actions
+*   Data Grid with custom header actions
+*   Data Grid with custom footer actions
+*   Data Grid with custom toolbar actions
+*   Data Grid with custom row drag handle
+*   Data Grid with custom column drag handle
+*   Data Grid with custom cell drag handle
+*   Data Grid with custom row drop target
+*   Data Grid with custom column drop target
+*   Data Grid with custom cell drop target
+*   Data Grid with custom row reorder indicator
+*   Data Grid with custom column reorder indicator
+*   Data Grid with custom cell reorder indicator
+*   Data Grid with custom row resize handle
+*   Data Grid with custom column resize handle
+*   Data Grid with custom cell resize handle
+*   Data Grid with custom row selection checkbox
+*   Data Grid with custom header selection checkbox
+*   Data Grid with custom row expand/collapse icon
+*   Data Grid with custom header expand/collapse icon
+*   Data Grid with custom row grouping indicator
+*   Data Grid with custom header grouping indicator
+*   Data Grid with custom row aggregation indicator
+*   Data Grid with custom header aggregation indicator
+*   Data Grid with custom row filter indicator
+*   Data Grid with custom header filter indicator
+*   Data Grid with custom row sort indicator
+*   Data Grid with custom header sort indicator
+*   Data Grid with custom row pagination indicator
+*   Data Grid with custom header pagination indicator
+*   Data Grid with custom row loading indicator
+*   Data Grid with custom header loading indicator
+*   Data Grid with custom row empty state
+*   Data Grid with custom header empty state
+*   Data Grid with custom row error state
+*   Data Grid with custom header error state
+*   Data Grid with custom row toolbar
+*   Data Grid with custom header toolbar
+*   Data Grid with custom row actions menu
+*   Data Grid with custom column actions menu
+*   Data Grid with custom cell actions menu
+*   Data Grid with custom header actions menu
+*   Data Grid with custom footer actions menu
+*   Data Grid with custom toolbar actions menu
+*   Data Grid with custom row drag handle icon
+*   Data Grid with custom column drag handle icon
+*   Data Grid with custom cell drag handle icon
+*   Data Grid with custom row drop target indicator
+*   Data Grid with custom column drop target indicator
+*   Data Grid with custom cell drop target indicator
+*   Data Grid with custom row reorder indicator icon
+*   Data Grid with custom column reorder indicator icon
+*   Data Grid with custom cell reorder indicator icon
+*   Data Grid with custom row resize handle icon
+*   Data Grid with custom column resize handle icon
+*   Data Grid with custom cell resize handle icon
+*   Data Grid with custom row selection checkbox icon
+*   Data Grid with custom header selection checkbox icon
+*   Data Grid with custom row expand/collapse icon
+*   Data Grid with custom header expand/collapse icon
+*   Data Grid with custom row grouping indicator icon
+*   Data Grid with custom header grouping indicator icon
+*   Data Grid with custom row aggregation indicator icon
+*   Data Grid with custom header aggregation indicator icon
+*   Data Grid with custom row filter indicator icon
+*   Data Grid with custom header filter indicator icon
+*   Data Grid with custom row sort indicator icon
+*   Data Grid with custom header sort indicator icon
+*   Data Grid with custom row pagination indicator icon
+*   Data Grid with custom header pagination indicator icon
+*   Data Grid with custom row loading indicator icon
+*   Data Grid with custom header loading indicator icon
+*   Data Grid with custom row empty state icon
+*   Data Grid with custom header empty state icon
+*   Data Grid with custom row error state icon
+*   Data Grid with custom header error state icon
+*   Data Grid with custom row toolbar icon
+*   Data Grid with custom header toolbar icon
+*   Data Grid with custom row actions menu icon
+*   Data Grid with custom column actions menu icon
+*   Data Grid with custom cell actions menu icon
+*   Data Grid with custom header actions menu icon
+*   Data Grid with custom footer actions menu icon
+*   Data Grid with custom toolbar actions menu icon
 
-## Conclusion
+## 3. Scientific Research on UI/UX Best Practices
 
-The D-Bus errors observed during UI test execution are primarily environmental and configuration-related, rather than direct bugs in the application's UI code. The solutions involve ensuring proper D-Bus daemon operation, correct `XDG_RUNTIME_DIR` permissions, and proper escaping of D-Bus addresses in any application code that constructs them. Addressing these underlying D-Bus issues will lead to a cleaner test output and a more stable development environment.
+Effective UI/UX design is crucial for software adoption and user satisfaction. Key principles derived from scientific research include:
+
+*   **User-Centered Design (UCD):** Design with the end-user in mind, understanding their needs, behaviors, and motivations through research, interviews, and usability testing. Creating user personas and journey maps are valuable tools.
+*   **Usability:** Software must be easy to understand, learn, and use effectively and efficiently. This involves reducing the learning curve, ensuring clear navigation, and enabling task accomplishment with minimal effort.
+*   **Simplicity (KISS Principle):** Prioritize simple solutions over complex ones to reduce errors, improve performance, and save time.
+*   **Clear Workflow:** Automate repetitive processes to allow users to focus on core tasks.
+*   **Multiple Interfaces:** Support various interaction methods, such as Graphical User Interfaces (GUIs) and Command Line Interfaces (CLIs).
+*   **Feedback Mechanisms:** Provide clear and timely feedback to users about system state and actions.
+*   **Effective Data Visualization:** Display data with clarity and integrity, avoiding distortions. Provide context, choose appropriate visualization types, minimize clutter, use color strategically, and ensure scalability.
+*   **Consistency:** Maintain a consistent visual language, design patterns, and content throughout the product to enhance usability and reinforce brand identity.
+*   **Accessibility:** Ensure the design is usable by everyone, including people with disabilities, by adhering to accessibility guidelines.
+
+## 4. Scientific Research on Developer Experience (DX)
+
+Developer Experience (DX) is the overall quality of a developer's interaction with their tools, technologies, processes, and environments. A positive DX is vital for productivity, innovation, and problem-solving.
+
+*   **Definition and Scope:** DX optimizes the developer workflow, from coding and debugging to collaboration and deployment. It aims to make the development process more accessible, pleasurable, and accountable.
+*   **Importance:** A good DX allows developers to focus on core tasks and reduces friction caused by inefficient tools or processes, directly influencing productivity and innovation.
+*   **Challenges:** Developers often work on complex problems, specialized libraries, and high-performance computing, requiring robust tools for code verification, validation, and performance profiling.
+*   **Measurement:** DX can be measured using frameworks like SPACE (Satisfaction and wellbeing, Performance, Activity, Communication and collaboration, Efficiency and flow) and DORA metrics.
+*   **Improvement Strategies:** Providing intuitive tools, enabling easy code debugging, fostering collaboration, and ensuring clear and comprehensive documentation are key strategies for improving DX.
+
+This research provides a foundational understanding for designing and implementing a rich UI component library for Cortex, ensuring both excellent user experience (UI/UX) and a productive developer experience (DX).
