@@ -29,9 +29,12 @@ try {
   // 3. Bundle Web Component definitions into a single JavaScript file
   console.log('Bundling UI components...');
   const componentFiles = getAllJsFiles(uiComponentsDistDir);
-  let bundleContent = '';
+  let bundleContent = 'import { themeManager } from '../../theme/theme-manager.js';\n'; // Add themeManager import once
   for (const file of componentFiles) {
-    bundleContent += fs.readFileSync(file, 'utf8') + '\n';
+    let fileContent = fs.readFileSync(file, 'utf8');
+    // Remove existing themeManager imports from individual files
+    fileContent = fileContent.replace(/import\{themeManager\}from\s*['"]\.\.\/\.\.\/theme\/theme-manager\.js['"];?/g, '');
+    bundleContent += fileContent + '\n';
   }
   fs.writeFileSync(path.join(uiDistDir, 'ui-bundle.js'), minifyJs(bundleContent), 'utf8');
   console.log('UI components bundled and minified into ui-bundle.js.');
