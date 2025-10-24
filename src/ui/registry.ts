@@ -12,6 +12,9 @@ import { uiSelectMetadata } from './components/select/ui-select.metadata.js';
 import { uiLabelMetadata } from './components/label/ui-label.metadata.js';
 import { uiFormFieldMetadata } from './components/form-field/ui-form-field.metadata.js';
 import { uiTextareaMetadata } from './components/textarea/ui-textarea.metadata.js';
+import { uiRadioMetadata } from './components/radio/ui-radio.metadata.js';
+import { uiToggleMetadata } from './components/toggle/ui-toggle.metadata.js';
+import { uiNumberInputMetadata } from './components/number-input/ui-number-input.metadata.js';
 
 /**
  * Register all component metadata.
@@ -25,6 +28,9 @@ export function registerAllComponents(): void {
   globalRegistry.register(uiLabelMetadata);
   globalRegistry.register(uiFormFieldMetadata);
   globalRegistry.register(uiTextareaMetadata);
+  globalRegistry.register(uiRadioMetadata);
+  globalRegistry.register(uiToggleMetadata);
+  globalRegistry.register(uiNumberInputMetadata);
 }
 
 /**
