@@ -41,6 +41,8 @@ import { uiToastMetadata } from './components/toast/ui-toast.metadata.js';
 import { uiCodeMetadata } from './components/code/ui-code.metadata.js';
 import { uiTagMetadata } from './components/tag/ui-tag.metadata.js';
 import { uiEmptyStateMetadata } from './components/empty-state/ui-empty-state.metadata.js';
+import { uiRatingMetadata } from './components/rating/ui-rating.metadata.js';
+import { uiStatMetadata } from './components/stat/ui-stat.metadata.js';
 
 /**
  * Register all component metadata.
@@ -83,6 +85,8 @@ export function registerAllComponents(): void {
   globalRegistry.register(uiCodeMetadata);
   globalRegistry.register(uiTagMetadata);
   globalRegistry.register(uiEmptyStateMetadata);
+  globalRegistry.register(uiRatingMetadata);
+  globalRegistry.register(uiStatMetadata);
 }
 
 /**
