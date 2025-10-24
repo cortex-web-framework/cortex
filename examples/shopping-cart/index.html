@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shopping Cart - Cortex UI</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .page-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .info-section {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      color: #333;
+    }
+
+    .info-section h3 {
+      color: #667eea;
+      margin-bottom: 1rem;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .info-item {
+      background: #f5f5f5;
+      padding: 1rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    .info-item strong {
+      color: #667eea;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .checkout-result {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 8px;
+      padding: 2rem;
+      margin-top: 2rem;
+      color: #333;
+      display: none;
+    }
+
+    .checkout-result.show {
+      display: block;
+      border: 2px solid #4CAF50;
+    }
+
+    .checkout-result h3 {
+      color: #4CAF50;
+      margin-bottom: 1rem;
+    }
+
+    .checkout-result pre {
+      background: #f5f5f5;
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
+    .checkout-result button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      margin-top: 1rem;
+    }
+
+    .checkout-result button:hover {
+      background: #5568d3;
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 1.8rem;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <div class="header">
+      <h1>Shopping Cart</h1>
+      <p>Complete E-commerce Cart with Tax & Discounts - Zero Dependencies</p>
+    </div>
+
+    <div class="info-section">
+      <h3>✨ Features:</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <strong>🛍️ Product Browsing</strong>
+          Navigate through featured products
+        </div>
+        <div class="info-item">
+          <strong>🛒 Smart Cart</strong>
+          Auto-increment quantities for duplicate items
+        </div>
+        <div class="info-item">
+          <strong>💰 Price Calculation</strong>
+          Subtotal, tax, and total computed automatically
+        </div>
+        <div class="info-item">
+          <strong>🎟️ Coupon Codes</strong>
+          Apply discount codes (SAVE10, SAVE20, WELCOME5)
+        </div>
+        <div class="info-item">
+          <strong>💾 Persistent Cart</strong>
+          Cart saved to localStorage automatically
+        </div>
+        <div class="info-item">
+          <strong>📱 Responsive Design</strong>
+          Works perfectly on all devices
+        </div>
+      </div>
+    </div>
+
+    <ui-shopping-cart id="cart"></ui-shopping-cart>
+
+    <div class="checkout-result" id="checkoutResult">
+      <h3>✅ Order Summary</h3>
+      <pre id="orderData"></pre>
+      <button onclick="location.reload()">Continue Shopping</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import './ui-shopping-cart.js';
+
+    const cart = document.getElementById('cart');
+    const checkoutResult = document.getElementById('checkoutResult');
+    const orderData = document.getElementById('orderData');
+
+    // Listen for checkout events
+    cart.addEventListener('checkoutStart', (event) => {
+      const data = event.detail;
+
+      // Display formatted order data
+      const orderSummary = {
+        items: data.items.map((item) => ({
+          name: item.name,
+          quantity: item.quantity,
+          unitPrice: `$${item.price.toFixed(2)}`,
+          subtotal: `$${(item.price * item.quantity).toFixed(2)}`,
+        })),
+        pricing: {
+          subtotal: data.subtotal.toFixed(2),
+          discount: data.coupon ? `${data.discount.toFixed(2)} (${data.coupon})` : '0.00',
+          tax: data.tax.toFixed(2),
+          total: data.total.toFixed(2),
+        },
+      };
+
+      orderData.textContent = JSON.stringify(orderSummary, null, 2);
+      checkoutResult.classList.add('show');
+
+      // Scroll to result
+      setTimeout(() => {
+        checkoutResult.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+
+      console.log('Order placed:', data);
+    });
+  </script>
+</body>
+</html>
