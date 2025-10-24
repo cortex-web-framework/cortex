@@ -19,9 +19,9 @@ class UiWatermark extends HTMLElement implements IWatermarkElement {
 
   attributeChangedCallback(name: string, _: string | null, val: string | null) {
     if (name === 'text') this.state.text = val || undefined;
-    if (name === 'opacity') this.state.opacity = parseFloat(val || '0.1');
-    if (name === 'font-size') this.state.fontSize = parseInt(val || '20', 10);
-    if (name === 'angle') this.state.angle = parseInt(val || '-45', 10);
+    if (name === 'opacity') this.state.opacity = Math.max(0, Math.min(1, parseFloat(val || '0.1')));
+    if (name === 'font-size') this.state.fontSize = Math.max(1, parseInt(val || '20', 10));
+    if (name === 'angle') this.state.angle = parseInt(val || '-45', 10) % 360;
     this.render();
   }
 
@@ -41,8 +41,8 @@ class UiWatermark extends HTMLElement implements IWatermarkElement {
   }
 
   set opacity(val: number) {
-    this.state.opacity = val;
-    this.setAttribute('opacity', val.toString());
+    this.state.opacity = Math.max(0, Math.min(1, val));
+    this.setAttribute('opacity', this.state.opacity.toString());
     this.render();
   }
 
@@ -51,8 +51,8 @@ class UiWatermark extends HTMLElement implements IWatermarkElement {
   }
 
   set fontSize(val: number) {
-    this.state.fontSize = val;
-    this.setAttribute('font-size', val.toString());
+    this.state.fontSize = Math.max(1, val);
+    this.setAttribute('font-size', this.state.fontSize.toString());
     this.render();
   }
 
@@ -61,8 +61,8 @@ class UiWatermark extends HTMLElement implements IWatermarkElement {
   }
 
   set angle(val: number) {
-    this.state.angle = val;
-    this.setAttribute('angle', val.toString());
+    this.state.angle = val % 360;
+    this.setAttribute('angle', this.state.angle.toString());
     this.render();
   }
 
