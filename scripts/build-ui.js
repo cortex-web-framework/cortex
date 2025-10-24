@@ -28,14 +28,44 @@ try {
 
   // 3. Bundle Web Component definitions into a single JavaScript file
   console.log('Bundling UI components...');
+
+  let bundleContent = '';
+
+  // Include all theme files first to avoid import errors
+  const themeDir = path.join(uiDistDir, 'theme');
+  const themeFiles = [
+    'colors.js',
+    'typography.js',
+    'spacing.js',
+    'borders.js',
+    'effects.js',
+    'light-theme.js',
+    'dark-theme.js',
+    'theme-manager.js'
+  ];
+
+  // Add theme files - strip import statements to avoid broken imports
+  for (const themeFile of themeFiles) {
+    const themeFilePath = path.join(themeDir, themeFile);
+    if (fs.existsSync(themeFilePath)) {
+      let themeContent = fs.readFileSync(themeFilePath, 'utf8');
+      // Remove all import statements
+      themeContent = themeContent.replace(/import\s+{[^}]+}\s+from\s+['"][^'"]+['"];?/g, '');
+      // Remove source map references
+      themeContent = themeContent.replace(/\/\/# sourceMappingURL=.*$/gm, '');
+      bundleContent += themeContent + '\n';
+    }
+  }
+
+  // Add component files
   const componentFiles = getAllJsFiles(uiComponentsDistDir);
-  let bundleContent = 'import { themeManager } from \'../../theme/theme-manager.js\';\n'; // Add themeManager import once
   for (const file of componentFiles) {
     let fileContent = fs.readFileSync(file, 'utf8');
     // Remove existing themeManager imports from individual files (with flexible spacing and optional .js extension)
     fileContent = fileContent.replace(/import\s+{\s*themeManager\s*}\s+from\s+['"]\.\.\/\.\.\/theme\/theme-manager(?:\.js)?['"];?/g, '');
     bundleContent += fileContent + '\n';
   }
+
   fs.writeFileSync(path.join(uiDistDir, 'ui-bundle.js'), minifyJs(bundleContent), 'utf8');
   console.log('UI components bundled and minified into ui-bundle.js.');
 
