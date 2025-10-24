@@ -44,6 +44,7 @@ import { uiEmptyStateMetadata } from './components/empty-state/ui-empty-state.me
 import { uiRatingMetadata } from './components/rating/ui-rating.metadata.js';
 import { uiStatMetadata } from './components/stat/ui-stat.metadata.js';
 import { uiProgressCircleMetadata } from './components/progress-circle/ui-progress-circle.metadata.js';
+import { uiTimelineMetadata } from './components/timeline/ui-timeline.metadata.js';
 
 /**
  * Register all component metadata.
@@ -89,6 +90,7 @@ export function registerAllComponents(): void {
   globalRegistry.register(uiRatingMetadata);
   globalRegistry.register(uiStatMetadata);
   globalRegistry.register(uiProgressCircleMetadata);
+  globalRegistry.register(uiTimelineMetadata);
 }
 
 /**
