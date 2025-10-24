@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sortable Data Table - Cortex UI</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1000px;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .demo-info {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      color: #333;
+    }
+
+    .demo-info h3 {
+      margin-bottom: 0.5rem;
+      color: #667eea;
+    }
+
+    .demo-info ul {
+      list-style-position: inside;
+      line-height: 1.8;
+      font-size: 0.95rem;
+    }
+
+    .demo-info li {
+      margin-bottom: 0.5rem;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .feature {
+      background: #f5f5f5;
+      padding: 1rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    .feature strong {
+      color: #667eea;
+    }
+
+    @media (max-width: 640px) {
+      .header h1 {
+        font-size: 1.8rem;
+      }
+
+      body {
+        padding: 1rem;
+      }
+
+      .features {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Data Table</h1>
+      <p>Sortable, Paginated Table with Filtering - Zero Dependencies</p>
+    </div>
+
+    <div class="demo-info">
+      <h3>✨ Features:</h3>
+      <div class="features">
+        <div class="feature">
+          <strong>📊 Sorting</strong><br />
+          Click column headers to sort ascending/descending
+        </div>
+        <div class="feature">
+          <strong>📄 Pagination</strong><br />
+          Navigate through pages with customizable page size
+        </div>
+        <div class="feature">
+          <strong>🔍 Search</strong><br />
+          Real-time filtering across all columns
+        </div>
+        <div class="feature">
+          <strong>☑️ Selection</strong><br />
+          Select individual or all rows on page
+        </div>
+        <div class="feature">
+          <strong>📱 Responsive</strong><br />
+          Adapts to mobile and desktop layouts
+        </div>
+        <div class="feature">
+          <strong>⚡ Fast</strong><br />
+          Pure TypeScript, no external dependencies
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 2rem;">
+      <ui-data-table id="dataTable"></ui-data-table>
+    </div>
+
+    <div
+      id="selectionInfo"
+      style="
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        color: #333;
+        display: none;
+      "
+    >
+      <h3>Selected Rows:</h3>
+      <pre id="selectionData" style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto;"></pre>
+      <button
+        id="exportBtn"
+        style="
+          background: #4CAF50;
+          color: white;
+          border: none;
+          padding: 0.75rem 1.5rem;
+          border-radius: 4px;
+          cursor: pointer;
+          font-weight: 500;
+          margin-top: 1rem;
+        "
+      >
+        Export Selected Data
+      </button>
+    </div>
+  </div>
+
+  <script type="module">
+    import './ui-data-table.js';
+
+    const table = document.getElementById('dataTable');
+    const selectionInfo = document.getElementById('selectionInfo');
+    const selectionData = document.getElementById('selectionData');
+    const exportBtn = document.getElementById('exportBtn');
+
+    // Listen for selection changes
+    table.addEventListener('selectionChange', (event) => {
+      const selectedData = table.getSelectedData();
+
+      if (selectedData.length > 0) {
+        selectionInfo.style.display = 'block';
+        selectionData.textContent = JSON.stringify(selectedData, null, 2);
+      } else {
+        selectionInfo.style.display = 'none';
+      }
+    });
+
+    // Export button
+    exportBtn.addEventListener('click', () => {
+      const selectedData = table.getSelectedData();
+      const csv = convertToCSV(selectedData);
+      downloadCSV(csv, 'selected_data.csv');
+    });
+
+    function convertToCSV(data) {
+      if (data.length === 0) return '';
+
+      const headers = Object.keys(data[0]);
+      const rows = data.map((row) => headers.map((header) => `"${row[header]}"`).join(','));
+
+      return [headers.join(','), ...rows].join('\n');
+    }
+
+    function downloadCSV(csv, filename) {
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    }
+  </script>
+</body>
+</html>
