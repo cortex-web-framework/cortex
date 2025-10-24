@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chart Component - Cortex UI</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 3rem;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .demo-section {
+      background: white;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .demo-section h3 {
+      color: #667eea;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .controls {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .controls button {
+      padding: 0.5rem 1rem;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+
+    .controls button:hover {
+      background: #5568d3;
+    }
+
+    .controls button.active {
+      background: #764ba2;
+    }
+
+    .features {
+      background: white;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .features h3 {
+      color: #667eea;
+      margin-bottom: 1rem;
+    }
+
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    .feature-item {
+      padding: 1rem;
+      background: #f9f9f9;
+      border-radius: 4px;
+      border-left: 4px solid #667eea;
+    }
+
+    .feature-item h4 {
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-item p {
+      color: #666;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 768px) {
+      .demo-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header h1 {
+        font-size: 1.5rem;
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+
+      .controls button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Chart Component</h1>
+      <p>Interactive data visualization - Bar, Line, Pie, Area charts - Zero Dependencies</p>
+    </div>
+
+    <div class="demo-grid">
+      <!-- Bar Chart Demo -->
+      <div class="demo-section">
+        <h3>📊 Bar Chart</h3>
+        <div class="controls">
+          <button class="chart-type active" data-chart="bar" data-id="chart1">Bar</button>
+          <button class="chart-type" data-chart="line" data-id="chart1">Line</button>
+          <button class="chart-type" data-chart="area" data-id="chart1">Area</button>
+        </div>
+        <ui-chart id="chart1" type="bar"></ui-chart>
+      </div>
+
+      <!-- Pie Chart Demo -->
+      <div class="demo-section">
+        <h3>🥧 Pie Chart</h3>
+        <ui-chart id="chart2" type="pie"></ui-chart>
+      </div>
+
+      <!-- Multi-Dataset Chart -->
+      <div class="demo-section">
+        <h3>📈 Multi-Dataset Line Chart</h3>
+        <div class="controls">
+          <button class="chart-type" data-chart="line" data-id="chart3">Line</button>
+          <button class="chart-type" data-chart="area" data-id="chart3">Area</button>
+          <button class="chart-type" data-chart="bar" data-id="chart3">Bar</button>
+        </div>
+        <ui-chart id="chart3" type="line"></ui-chart>
+      </div>
+
+      <!-- Interactive Chart -->
+      <div class="demo-section">
+        <h3>⚡ Interactive with Custom Data</h3>
+        <div class="controls">
+          <button id="updateChartBtn">Update Data</button>
+          <button id="resetChartBtn">Reset</button>
+        </div>
+        <ui-chart id="chart4" type="bar"></ui-chart>
+      </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="features">
+      <h3>✨ Features & Capabilities</h3>
+      <div class="feature-list">
+        <div class="feature-item">
+          <h4>📊 Bar Charts</h4>
+          <p>Display vertical or customizable bar charts with multiple datasets and color-coded bars.</p>
+        </div>
+        <div class="feature-item">
+          <h4>📈 Line Charts</h4>
+          <p>Show trends with smooth lines, multiple series, and individual data points.</p>
+        </div>
+        <div class="feature-item">
+          <h4>🥧 Pie Charts</h4>
+          <p>Represent proportions with percentage labels and color-coded segments.</p>
+        </div>
+        <div class="feature-item">
+          <h4>📋 Area Charts</h4>
+          <p>Display filled areas showing values over time with semi-transparent overlays.</p>
+        </div>
+        <div class="feature-item">
+          <h4>🎨 Custom Colors</h4>
+          <p>Full control over dataset colors with beautiful default color schemes.</p>
+        </div>
+        <div class="feature-item">
+          <h4>📱 Responsive Design</h4>
+          <p>Automatically adapts to container size with proper scaling and mobile optimization.</p>
+        </div>
+        <div class="feature-item">
+          <h4>🔌 Public API</h4>
+          <p>Comprehensive methods for data updates, type changes, and legend management.</p>
+        </div>
+        <div class="feature-item">
+          <h4>🎯 Tooltips</h4>
+          <p>Hover over data points to see detailed information with smooth tooltip display.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import './ui-chart.js';
+
+    // Chart 1: Multi-dataset bar/line/area chart
+    const chart1 = document.getElementById('chart1');
+    const chart1Data = {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [
+        {
+          label: 'Sales',
+          data: [65, 59, 80, 81, 56, 75],
+          color: '#667eea',
+        },
+        {
+          label: 'Expenses',
+          data: [45, 55, 70, 75, 60, 65],
+          color: '#764ba2',
+        },
+      ],
+    };
+
+    chart1.setTitle('Monthly Sales vs Expenses');
+    chart1.setData(chart1Data);
+
+    // Chart type switching for chart 1
+    document.querySelectorAll('.chart-type[data-id="chart1"]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const type = btn.getAttribute('data-chart');
+        chart1.setChartType(type);
+
+        document.querySelectorAll('.chart-type[data-id="chart1"]').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // Chart 2: Pie chart
+    const chart2 = document.getElementById('chart2');
+    const chart2Data = {
+      labels: ['Product A', 'Product B', 'Product C', 'Product D'],
+      datasets: [
+        {
+          label: 'Market Share',
+          data: [30, 25, 20, 25],
+          color: '#667eea',
+        },
+      ],
+    };
+
+    chart2.setTitle('Market Share Distribution');
+    chart2.setData(chart2Data);
+
+    // Chart 3: Multi-dataset with switching
+    const chart3 = document.getElementById('chart3');
+    const chart3Data = {
+      labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'],
+      datasets: [
+        {
+          label: 'Mobile',
+          data: [45, 52, 48, 61, 55],
+          color: '#f093fb',
+        },
+        {
+          label: 'Desktop',
+          data: [65, 72, 70, 78, 82],
+          color: '#4facfe',
+        },
+        {
+          label: 'Tablet',
+          data: [30, 35, 32, 40, 38],
+          color: '#43e97b',
+        },
+      ],
+    };
+
+    chart3.setTitle('Website Traffic by Device');
+    chart3.setData(chart3Data);
+
+    document.querySelectorAll('.chart-type[data-id="chart3"]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const type = btn.getAttribute('data-chart');
+        chart3.setChartType(type);
+      });
+    });
+
+    // Chart 4: Interactive updates
+    const chart4 = document.getElementById('chart4');
+    const originalData = {
+      labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+      datasets: [
+        {
+          label: 'Revenue',
+          data: [100, 150, 120, 180],
+          color: '#fa709a',
+        },
+      ],
+    };
+
+    chart4.setTitle('Quarterly Revenue');
+    chart4.setData(originalData);
+
+    document.getElementById('updateChartBtn').addEventListener('click', () => {
+      const newData = {
+        labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+        datasets: [
+          {
+            label: 'Revenue',
+            data: [
+              Math.random() * 200,
+              Math.random() * 200,
+              Math.random() * 200,
+              Math.random() * 200,
+            ],
+            color: '#fee140',
+          },
+        ],
+      };
+      chart4.setData(newData);
+    });
+
+    document.getElementById('resetChartBtn').addEventListener('click', () => {
+      chart4.setData(originalData);
+    });
+
+    chart4.addEventListener('data-change', (e) => {
+      console.log('Chart data changed:', e.detail);
+    });
+  </script>
+</body>
+</html>
