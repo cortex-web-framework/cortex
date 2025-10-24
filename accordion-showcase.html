@@ -1,0 +1,34 @@
+<!-- Accordion Component Showcase -->
+<div class="component-card">
+  <h3>Accordion</h3>
+  <div class="example vertical">
+    <ui-accordion>
+      <div slot="item" data-id="item1" data-label="First Item">
+        <div slot="content">This is the first accordion item content. It can contain any HTML content.</div>
+      </div>
+      <div slot="item" data-id="item2" data-label="Second Item">
+        <div slot="content">This is the second accordion item content. You can put forms, images, or any other content here.</div>
+      </div>
+      <div slot="item" data-id="item3" data-label="Third Item" data-disabled="true">
+        <div slot="content">This is a disabled accordion item that cannot be opened.</div>
+      </div>
+    </ui-accordion>
+  </div>
+</div>
+
+<div class="component-card">
+  <h3>Accordion with Multiple Open</h3>
+  <div class="example vertical">
+    <ui-accordion allowMultiple>
+      <div slot="item" data-id="multi1" data-label="Multiple Item 1">
+        <div slot="content">This accordion allows multiple items to be open simultaneously.</div>
+      </div>
+      <div slot="item" data-id="multi2" data-label="Multiple Item 2">
+        <div slot="content">You can open both this item and the previous one at the same time.</div>
+      </div>
+      <div slot="item" data-id="multi3" data-label="Multiple Item 3">
+        <div slot="content">All three items can be open at once when allowMultiple is enabled.</div>
+      </div>
+    </ui-accordion>
+  </div>
+</div>
