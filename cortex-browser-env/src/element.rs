@@ -1,7 +1,7 @@
 /// Element Property and Method API
 /// Provides typed access to element properties and methods
 
-use crate::dom::{Document, NodeType, NodeData, ElementData};
+use crate::dom::{Document, NodeType, NodeData};
 
 /// Element reference wrapping a node index
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
