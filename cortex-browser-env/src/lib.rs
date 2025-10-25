@@ -9,3 +9,4 @@ pub mod query;
 pub mod element;
 pub mod error;
 pub mod integration;
+pub mod bindings;
