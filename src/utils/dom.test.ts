@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { test, describe } from 'node:test';
+import * as assert from 'node:assert';
 import {
   $,
   $$,
@@ -37,8 +38,19 @@ import {
   observeDOM,
 } from './dom';
 
+// Helper function to create mock functions
+function createMock(): { fn: () => void; called: boolean; callCount: number; reset: () => void } {
+  let callCount = 0;
+  return {
+    fn: function() { callCount++; },
+    get called() { return callCount > 0; },
+    get callCount() { return callCount; },
+    reset() { callCount = 0; },
+  };
+}
+
 describe('DOM Utilities - Selection', () => {
-  beforeEach(() => {
+  before(() => {
     document.body.innerHTML = `
       <div id="container">
         <div class="item" data-id="1">Item 1</div>
@@ -48,113 +60,127 @@ describe('DOM Utilities - Selection', () => {
     `;
   });
 
-  it('should select single element with $', () => {
+  test('should select single element with $', () => {
     const element = $('#container');
-    expect(element).not.toBeNull();
-    expect(element?.id).toBe('container');
+    assert.ok(element !== null, 'element should not be null');
+    assert.strictEqual(element?.id, 'container', 'element id should be "container"');
   });
 
-  it('should return null when element not found with $', () => {
+  test('should return null when element not found with $', () => {
     const element = $('.non-existent');
-    expect(element).toBeNull();
+    assert.strictEqual(element, null, 'non-existent element should return null');
   });
 
-  it('should select multiple elements with $$', () => {
+  test('should select multiple elements with $$', () => {
     const elements = $$('.item');
-    expect(elements).toHaveLength(3);
-    expect(elements[0].getAttribute('data-id')).toBe('1');
+    assert.strictEqual(elements.length, 3, 'should find 3 elements');
+    assert.strictEqual(elements[0].getAttribute('data-id'), '1', 'first element data-id should be "1"');
   });
 
-  it('should return empty array when no elements found with $$', () => {
+  test('should return empty array when no elements found with $$', () => {
     const elements = $$('.non-existent');
-    expect(elements).toHaveLength(0);
-    expect(Array.isArray(elements)).toBe(true);
+    assert.strictEqual(elements.length, 0, 'should return empty array');
+    assert.strictEqual(Array.isArray(elements), true, 'result should be array');
   });
 
-  it('should select within context', () => {
+  test('should select within context', () => {
     const container = $('#container');
     const items = $$('.item', container!);
-    expect(items).toHaveLength(3);
+    assert.strictEqual(items.length, 3, 'should find 3 items in context');
   });
 });
 
 describe('DOM Utilities - Classes', () => {
   let element: Element;
 
-  beforeEach(() => {
+  before(() => {
     document.body.innerHTML = '<div id="test"></div>';
     element = $('#test')!;
   });
 
-  it('should add single class', () => {
+  test('should add single class', () => {
+    document.body.innerHTML = '<div id="test"></div>';
+    element = $('#test')!;
     addClass(element, 'active');
-    expect(element.classList.contains('active')).toBe(true);
+    assert.strictEqual(element.classList.contains('active'), true);
   });
 
-  it('should add multiple classes', () => {
+  test('should add multiple classes', () => {
+    document.body.innerHTML = '<div id="test"></div>';
+    element = $('#test')!;
     addClass(element, 'active', 'visible', 'highlighted');
-    expect(element.classList.contains('active')).toBe(true);
-    expect(element.classList.contains('visible')).toBe(true);
-    expect(element.classList.contains('highlighted')).toBe(true);
+    assert.strictEqual(element.classList.contains('active'), true);
+    assert.strictEqual(element.classList.contains('visible'), true);
+    assert.strictEqual(element.classList.contains('highlighted'), true);
   });
 
-  it('should remove single class', () => {
+  test('should remove single class', () => {
+    document.body.innerHTML = '<div id="test"></div>';
+    element = $('#test')!;
     element.classList.add('active', 'visible');
     removeClass(element, 'active');
-    expect(element.classList.contains('active')).toBe(false);
-    expect(element.classList.contains('visible')).toBe(true);
+    assert.strictEqual(element.classList.contains('active'), false);
+    assert.strictEqual(element.classList.contains('visible'), true);
   });
 
-  it('should remove multiple classes', () => {
+  test('should remove multiple classes', () => {
+    document.body.innerHTML = '<div id="test"></div>';
+    element = $('#test')!;
     element.classList.add('active', 'visible', 'highlighted');
     removeClass(element, 'active', 'visible');
-    expect(element.classList.contains('active')).toBe(false);
-    expect(element.classList.contains('visible')).toBe(false);
-    expect(element.classList.contains('highlighted')).toBe(true);
+    assert.strictEqual(element.classList.contains('active'), false);
+    assert.strictEqual(element.classList.contains('visible'), false);
+    assert.strictEqual(element.classList.contains('highlighted'), true);
   });
 
-  it('should toggle class', () => {
+  test('should toggle class', () => {
+    document.body.innerHTML = '<div id="test"></div>';
+    element = $('#test')!;
     const result1 = toggleClass(element, 'active');
-    expect(result1).toBe(true);
-    expect(element.classList.contains('active')).toBe(true);
+    assert.strictEqual(result1, true);
+    assert.strictEqual(element.classList.contains('active'), true);
 
     const result2 = toggleClass(element, 'active');
-    expect(result2).toBe(false);
-    expect(element.classList.contains('active')).toBe(false);
+    assert.strictEqual(result2, false);
+    assert.strictEqual(element.classList.contains('active'), false);
   });
 
-  it('should toggle class with force parameter', () => {
+  test('should toggle class with force parameter', () => {
+    document.body.innerHTML = '<div id="test"></div>';
+    element = $('#test')!;
     toggleClass(element, 'active', true);
-    expect(element.classList.contains('active')).toBe(true);
+    assert.strictEqual(element.classList.contains('active'), true);
 
     toggleClass(element, 'active', true);
-    expect(element.classList.contains('active')).toBe(true);
+    assert.strictEqual(element.classList.contains('active'), true);
 
     toggleClass(element, 'active', false);
-    expect(element.classList.contains('active')).toBe(false);
+    assert.strictEqual(element.classList.contains('active'), false);
   });
 
-  it('should check if element has class', () => {
-    expect(hasClass(element, 'active')).toBe(false);
+  test('should check if element has class', () => {
+    document.body.innerHTML = '<div id="test"></div>';
+    element = $('#test')!;
+    assert.strictEqual(hasClass(element, 'active'), false);
     element.classList.add('active');
-    expect(hasClass(element, 'active')).toBe(true);
+    assert.strictEqual(hasClass(element, 'active'), true);
   });
 });
 
 describe('DOM Utilities - Attributes', () => {
   let element: Element;
 
-  beforeEach(() => {
+  before(() => {
     document.body.innerHTML = '<div id="test"></div>';
     element = $('#test')!;
   });
 
-  it('should set single attribute', () => {
+  test('should set single attribute', () => {
     setAttributes(element, { 'data-id': '123' });
     expect(element.getAttribute('data-id')).toBe('123');
   });
 
-  it('should set multiple attributes', () => {
+  test('should set multiple attributes', () => {
     setAttributes(element, {
       'data-id': '123',
       'data-name': 'test',
@@ -165,13 +191,13 @@ describe('DOM Utilities - Attributes', () => {
     expect(element.getAttribute('aria-label')).toBe('Test element');
   });
 
-  it('should remove attribute when value is null', () => {
+  test('should remove attribute when value is null', () => {
     element.setAttribute('data-id', '123');
     setAttributes(element, { 'data-id': null });
-    expect(element.hasAttribute('data-id')).toBe(false);
+    assert.strictEqual(element.hasAttribute('data-id'), false);
   });
 
-  it('should get all attributes', () => {
+  test('should get all attributes', () => {
     element.setAttribute('data-id', '123');
     element.setAttribute('data-name', 'test');
     const attrs = getAttributes(element);
@@ -180,100 +206,100 @@ describe('DOM Utilities - Attributes', () => {
     expect(attrs['data-name']).toBe('test');
   });
 
-  it('should remove multiple attributes', () => {
+  test('should remove multiple attributes', () => {
     element.setAttribute('data-id', '123');
     element.setAttribute('data-name', 'test');
     element.setAttribute('data-value', 'xyz');
     removeAttributes(element, 'data-id', 'data-name');
-    expect(element.hasAttribute('data-id')).toBe(false);
-    expect(element.hasAttribute('data-name')).toBe(false);
-    expect(element.hasAttribute('data-value')).toBe(true);
+    assert.strictEqual(element.hasAttribute('data-id'), false);
+    assert.strictEqual(element.hasAttribute('data-name'), false);
+    assert.strictEqual(element.hasAttribute('data-value'), true);
   });
 });
 
 describe('DOM Utilities - Position and Size', () => {
   let element: HTMLElement;
 
-  beforeEach(() => {
+  before(() => {
     document.body.innerHTML = '<div id="test" style="position: absolute; top: 100px; left: 50px; width: 200px; height: 150px;"></div>';
     element = $('#test') as HTMLElement;
   });
 
-  it('should get element offset', () => {
+  test('should get element offset', () => {
     const offset = getOffset(element);
-    expect(offset).toHaveProperty('top');
-    expect(offset).toHaveProperty('left');
-    expect(typeof offset.top).toBe('number');
-    expect(typeof offset.left).toBe('number');
+    assert.ok(offset["top"] !== undefined);
+    assert.ok(offset["left"] !== undefined);
+    assert.strictEqual(typeof offset.top, "number");
+    assert.strictEqual(typeof offset.left, "number");
   });
 
-  it('should get element position', () => {
+  test('should get element position', () => {
     const position = getPosition(element);
-    expect(position).toHaveProperty('x');
-    expect(position).toHaveProperty('y');
-    expect(typeof position.x).toBe('number');
-    expect(typeof position.y).toBe('number');
+    assert.ok(position["x"] !== undefined);
+    assert.ok(position["y"] !== undefined);
+    assert.strictEqual(typeof position.x, "number");
+    assert.strictEqual(typeof position.y, "number");
   });
 
-  it('should get element size', () => {
+  test('should get element size', () => {
     const size = getSize(element);
-    expect(size).toHaveProperty('width');
-    expect(size).toHaveProperty('height');
-    expect(size.width).toBeGreaterThanOrEqual(0);
-    expect(size.height).toBeGreaterThanOrEqual(0);
+    assert.ok(size["width"] !== undefined);
+    assert.ok(size["height"] !== undefined);
+    assert.ok(size.width >= 0);
+    assert.ok(size.height >= 0);
   });
 
-  it('should get viewport size', () => {
+  test('should get viewport size', () => {
     const viewport = getViewportSize();
-    expect(viewport).toHaveProperty('width');
-    expect(viewport).toHaveProperty('height');
-    expect(viewport.width).toBeGreaterThan(0);
-    expect(viewport.height).toBeGreaterThan(0);
+    assert.ok(viewport["width"] !== undefined);
+    assert.ok(viewport["height"] !== undefined);
+    assert.ok(viewport.width > 0);
+    assert.ok(viewport.height > 0);
   });
 });
 
 describe('DOM Utilities - Scroll', () => {
   let element: HTMLElement;
 
-  beforeEach(() => {
+  before(() => {
     document.body.innerHTML = '<div id="test" style="height: 100px; overflow: auto;"><div style="height: 500px;">Content</div></div>';
     element = $('#test') as HTMLElement;
   });
 
-  it('should get scroll position', () => {
+  test('should get scroll position', () => {
     const position = getScrollPosition();
-    expect(position).toHaveProperty('x');
-    expect(position).toHaveProperty('y');
-    expect(typeof position.x).toBe('number');
-    expect(typeof position.y).toBe('number');
+    assert.ok(position["x"] !== undefined);
+    assert.ok(position["y"] !== undefined);
+    assert.strictEqual(typeof position.x, "number");
+    assert.strictEqual(typeof position.y, "number");
   });
 
-  it('should scroll to element', () => {
+  test('should scroll to element', () => {
     scrollTo(element);
     // In test environment, just verify no errors thrown
-    expect(true).toBe(true);
+    assert.strictEqual(true, true);
   });
 
-  it('should check if element is in viewport', () => {
+  test('should check if element is in viewport', () => {
     const inViewport = isInViewport(element);
-    expect(typeof inViewport).toBe('boolean');
+    assert.strictEqual(typeof inViewport, "boolean");
   });
 
-  it('should attach scroll listener and return unbind function', () => {
-    const handler = vi.fn();
+  test('should attach scroll listener and return unbind function', () => {
+    const handler = createMock().fn;
     const unbind = onScroll(handler);
 
-    expect(typeof unbind).toBe('function');
+    assert.strictEqual(typeof unbind, "function");
     unbind();
 
     // Verify listener was attached and removed
     window.dispatchEvent(new Event('scroll'));
-    expect(handler).not.toHaveBeenCalled();
+    assert.ok(!handler.called);
   });
 });
 
 describe('DOM Utilities - Focus', () => {
-  beforeEach(() => {
+  before(() => {
     document.body.innerHTML = `
       <div id="container">
         <button id="btn1">Button 1</button>
@@ -285,23 +311,23 @@ describe('DOM Utilities - Focus', () => {
     `;
   });
 
-  it('should get all focusable elements', () => {
+  test('should get all focusable elements', () => {
     const container = $('#container')!;
     const focusable = getFocusableElements(container);
-    expect(focusable.length).toBeGreaterThanOrEqual(4);
+    assert.ok(focusable.length >= 4);
   });
 
-  it('should set focus on element', () => {
+  test('should set focus on element', () => {
     const input = $('#input1') as HTMLElement;
     setFocus(input);
     expect(document.activeElement).toBe(input);
   });
 
-  it('should trap focus within container', () => {
+  test('should trap focus within container', () => {
     const container = $('#container')!;
     const untrap = trapFocus(container);
 
-    expect(typeof untrap).toBe('function');
+    assert.strictEqual(typeof untrap, "function");
     untrap();
   });
 });
@@ -309,94 +335,94 @@ describe('DOM Utilities - Focus', () => {
 describe('DOM Utilities - Text and HTML', () => {
   let element: Element;
 
-  beforeEach(() => {
+  before(() => {
     document.body.innerHTML = '<div id="test">Initial content</div>';
     element = $('#test')!;
   });
 
-  it('should get text content', () => {
+  test('should get text content', () => {
     const text = getText(element);
     expect(text).toBe('Initial content');
   });
 
-  it('should set text content', () => {
+  test('should set text content', () => {
     setText(element, 'New content');
     expect(element.textContent).toBe('New content');
   });
 
-  it('should get HTML content', () => {
+  test('should get HTML content', () => {
     element.innerHTML = '<span>HTML content</span>';
     const html = getHTML(element);
-    expect(html).toContain('HTML content');
-    expect(html).toContain('<span>');
+    assert.ok(html.includes('HTML content'));
+    assert.ok(html.includes('<span>'));
   });
 
-  it('should set HTML content', () => {
+  test('should set HTML content', () => {
     setHTML(element, '<strong>Bold text</strong>');
-    expect(element.innerHTML).toContain('<strong>Bold text</strong>');
+    assert.ok(element.innerHTML.includes('<strong>Bold text</strong>'));
   });
 });
 
 describe('DOM Utilities - Events', () => {
   let element: Element;
 
-  beforeEach(() => {
+  before(() => {
     document.body.innerHTML = '<div id="test"></div>';
     element = $('#test')!;
   });
 
-  it('should trigger custom event', () => {
-    const handler = vi.fn();
+  test('should trigger custom event', () => {
+    const handler = createMock().fn;
     element.addEventListener('custom-event', handler);
 
     trigger(element, 'custom-event', { data: 'test' });
 
-    expect(handler).toHaveBeenCalled();
+    assert.ok(handler.called);
   });
 
-  it('should trigger event with detail', () => {
+  test('should trigger event with detail', () => {
     const handler = vi.fn((e: Event) => {
       const customEvent = e as CustomEvent;
-      expect(customEvent.detail).toEqual({ value: 123 });
+      assert.deepEqual(customEvent.detail, { value: 123 });
     });
     element.addEventListener('test-event', handler);
 
     trigger(element, 'test-event', { value: 123 });
 
-    expect(handler).toHaveBeenCalled();
+    assert.ok(handler.called);
   });
 
-  it('should listen for event once', () => {
-    const handler = vi.fn();
+  test('should listen for event once', () => {
+    const handler = createMock().fn;
     onceEvent(element, 'click', handler);
 
     element.dispatchEvent(new Event('click'));
     element.dispatchEvent(new Event('click'));
 
-    expect(handler).toHaveBeenCalledTimes(1);
+    assert.strictEqual(handler.callCount, 1);
   });
 });
 
 describe('DOM Utilities - CSS and Styles', () => {
   let element: HTMLElement;
 
-  beforeEach(() => {
+  before(() => {
     document.body.innerHTML = '<div id="test" style="color: red; font-size: 16px;"></div>';
     element = $('#test') as HTMLElement;
   });
 
-  it('should get computed style', () => {
+  test('should get computed style', () => {
     const style = getComputedStyle(element, 'color');
-    expect(style).toBeDefined();
+    assert.ok(style !== undefined);
   });
 
-  it('should get all computed styles', () => {
+  test('should get all computed styles', () => {
     const styles = getComputedStyle(element);
-    expect(styles).toBeDefined();
-    expect(typeof styles).toBe('object');
+    assert.ok(styles !== undefined);
+    assert.strictEqual(typeof styles, "object");
   });
 
-  it('should set multiple inline styles', () => {
+  test('should set multiple inline styles', () => {
     setStyles(element, {
       color: 'blue',
       backgroundColor: 'yellow',
@@ -407,7 +433,7 @@ describe('DOM Utilities - CSS and Styles', () => {
     expect(element.style.fontSize).toBe('20px');
   });
 
-  it('should get inline styles', () => {
+  test('should get inline styles', () => {
     const styles = getStyles(element);
     expect(styles.color).toBe('red');
     expect(styles['font-size']).toBe('16px');
@@ -415,7 +441,7 @@ describe('DOM Utilities - CSS and Styles', () => {
 });
 
 describe('DOM Utilities - Parent/Child Relationships', () => {
-  beforeEach(() => {
+  before(() => {
     document.body.innerHTML = `
       <div class="grandparent" id="gp">
         <div class="parent" id="p">
@@ -427,54 +453,54 @@ describe('DOM Utilities - Parent/Child Relationships', () => {
     `;
   });
 
-  it('should find closest ancestor', () => {
+  test('should find closest ancestor', () => {
     const child = $('#c1')!;
     const parent = closest(child, '.parent');
-    expect(parent).not.toBeNull();
+    assert.ok(parent !== null);
     expect(parent?.id).toBe('p');
   });
 
-  it('should return null when no ancestor matches', () => {
+  test('should return null when no ancestor matches', () => {
     const child = $('#c1')!;
     const result = closest(child, '.non-existent');
-    expect(result).toBeNull();
+    assert.strictEqual(result, null);
   });
 
-  it('should get parent element', () => {
+  test('should get parent element', () => {
     const child = $('#c1')!;
     const parent = getParent(child);
-    expect(parent).not.toBeNull();
+    assert.ok(parent !== null);
     expect(parent?.id).toBe('p');
   });
 
-  it('should get parent matching selector', () => {
+  test('should get parent matching selector', () => {
     const child = $('#c1')!;
     const grandparent = getParent(child, '.grandparent');
-    expect(grandparent).not.toBeNull();
+    assert.ok(grandparent !== null);
     expect(grandparent?.id).toBe('gp');
   });
 
-  it('should get all children', () => {
+  test('should get all children', () => {
     const parent = $('#p')!;
     const children = getChildren(parent);
     expect(children.length).toBe(3);
   });
 
-  it('should get filtered children', () => {
+  test('should get filtered children', () => {
     const parent = $('#p')!;
     const divChildren = getChildren(parent, 'div');
     expect(divChildren.length).toBe(2);
   });
 
-  it('should get siblings', () => {
+  test('should get siblings', () => {
     const child = $('#c2')!;
     const siblings = getSiblings(child);
     expect(siblings.length).toBe(2);
-    expect(siblings.some(s => s.id === 'c1')).toBe(true);
-    expect(siblings.some(s => s.id === 'c3')).toBe(true);
+    assert.strictEqual(siblings.some(s => s.id === 'c1'), true);
+    assert.strictEqual(siblings.some(s => s.id === 'c3'), true);
   });
 
-  it('should get filtered siblings', () => {
+  test('should get filtered siblings', () => {
     const child = $('#c2')!;
     const divSiblings = getSiblings(child, 'div');
     expect(divSiblings.length).toBe(1);
@@ -483,18 +509,18 @@ describe('DOM Utilities - Parent/Child Relationships', () => {
 });
 
 describe('DOM Utilities - DOM Ready and Mutations', () => {
-  it('should call callback when DOM is ready', () => {
-    const callback = vi.fn();
+  test('should call callback when DOM is ready', () => {
+    const callback = createMock().fn;
     onReady(callback);
 
     // In test environment, document is already ready
-    expect(callback).toHaveBeenCalled();
+    assert.ok(callback.called);
   });
 
-  it('should observe DOM mutations', () => {
+  test('should observe DOM mutations', () => {
     document.body.innerHTML = '<div id="container"></div>';
     const container = $('#container')!;
-    const callback = vi.fn();
+    const callback = createMock().fn;
 
     const stop = observeDOM(container, callback);
 
@@ -504,30 +530,30 @@ describe('DOM Utilities - DOM Ready and Mutations', () => {
     // Stop observing
     stop();
 
-    expect(typeof stop).toBe('function');
+    assert.strictEqual(typeof stop, "function");
   });
 });
 
 describe('DOM Utilities - Browser Safety', () => {
-  it('should handle selection when element does not exist', () => {
+  test('should handle selection when element does not exist', () => {
     const result = $('.completely-non-existent-element');
-    expect(result).toBeNull();
+    assert.strictEqual(result, null);
   });
 
-  it('should return empty array for non-existent elements', () => {
+  test('should return empty array for non-existent elements', () => {
     const results = $$('.completely-non-existent-elements');
-    expect(results).toEqual([]);
+    assert.deepEqual(results, []);
   });
 
-  it('should handle viewport size in test environment', () => {
+  test('should handle viewport size in test environment', () => {
     const viewport = getViewportSize();
-    expect(viewport.width).toBeGreaterThanOrEqual(0);
-    expect(viewport.height).toBeGreaterThanOrEqual(0);
+    assert.ok(viewport.width >= 0);
+    assert.ok(viewport.height >= 0);
   });
 
-  it('should handle scroll position in test environment', () => {
+  test('should handle scroll position in test environment', () => {
     const position = getScrollPosition();
-    expect(typeof position.x).toBe('number');
-    expect(typeof position.y).toBe('number');
+    assert.strictEqual(typeof position.x, "number");
+    assert.strictEqual(typeof position.y, "number");
   });
 });
