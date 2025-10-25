@@ -66,7 +66,8 @@ pub fn parse_html(html: &str) -> Document {
 fn consume_tag_name(chars: &mut Peekable<Chars>) -> String {
     let mut name = String::new();
     while let Some(&c) = chars.peek() {
-        if c.is_alphanumeric() {
+        // Allow alphanumeric, hyphens, and underscores for custom elements (e.g., ui-text-input)
+        if c.is_alphanumeric() || c == '-' || c == '_' {
             name.push(chars.next().unwrap());
         } else {
             break;

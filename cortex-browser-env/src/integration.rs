@@ -510,6 +510,7 @@ mod vanilla_components {
         let html = r#"
             <html>
             <body>
+                <h1>Username Input</h1>
                 <ui-text-input id="username" label="Username" placeholder="Enter username"></ui-text-input>
             </body>
             </html>

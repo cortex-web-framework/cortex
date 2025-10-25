@@ -1,5 +1,5 @@
 use raqote::{DrawTarget, Source, SolidSource, DrawOptions};
-use super::dom::{Document, Layout, NodeData};
+use super::dom::{Document, Layout, NodeData, ElementData};
 use super::css::ComputedStyle;
 
 /// Render a document to a DrawTarget at the specified dimensions (headless)
@@ -58,6 +58,9 @@ fn render_node(
         if let Some(ref data) = node.data {
             if let NodeData::Text(text) = data {
                 render_text(dt, layout, text);
+            } else if let NodeData::Element(elem) = data {
+                // Render element attributes as text (label, placeholder, value, etc.)
+                render_element_text(dt, layout, elem);
             }
         }
     }
@@ -117,23 +120,117 @@ fn render_border(dt: &mut DrawTarget, layout: &Layout, color: &str) {
     dt.fill_rect(x, y, border_width, h, &source, &options);
 }
 
-/// Render text content (simplified - just placeholder for now)
+/// Render text content as visible characters
 fn render_text(dt: &mut DrawTarget, layout: &Layout, text: &str) {
-    // For now, we'll just draw a small indicator that text would be here
-    // Full text rendering would require a font library like freetype or rusttype
-    if !text.is_empty() && layout.width > 0.0 && layout.height > 0.0 {
-        // Draw a simple rectangle to indicate text presence
-        let source = Source::Solid(SolidSource::from_unpremultiplied_argb(255, 0, 0, 0));
-        let options = DrawOptions::new();
+    if text.is_empty() || layout.width <= 0.0 || layout.height <= 0.0 {
+        return;
+    }
 
+    let char_width = 16.0; // Approximate character width in pixels (doubled for visibility)
+    let char_height = (layout.font_size * 2.0).max(28.0); // Make text more visible
+    let line_height = char_height + 8.0;
+
+    let source = Source::Solid(SolidSource::from_unpremultiplied_argb(255, 0, 0, 0)); // Black text
+    let options = DrawOptions::new();
+
+    let mut x = layout.x + 4.0;
+    let mut y = layout.y + 4.0;
+
+    // Draw each character as a small block
+    for ch in text.chars() {
+        if ch == '\n' {
+            x = layout.x + 4.0;
+            y += line_height;
+            continue;
+        }
+
+        // Don't draw past the layout bounds
+        if x + char_width > layout.x + layout.width {
+            x = layout.x + 4.0;
+            y += line_height;
+        }
+
+        if y + char_height > layout.y + layout.height {
+            break;
+        }
+
+        // Draw character block
         dt.fill_rect(
-            layout.x + 2.0,
-            layout.y + 2.0,
-            (layout.width - 4.0).max(0.0),
-            (layout.font_size - 2.0).max(0.0),
+            x,
+            y,
+            char_width,
+            char_height,
             &source,
             &options,
         );
+
+        x += char_width;
+    }
+}
+
+/// Render element attributes as visible text (label, placeholder, value, etc.)
+fn render_element_text(dt: &mut DrawTarget, layout: &Layout, elem: &ElementData) {
+    if layout.width <= 0.0 || layout.height <= 0.0 {
+        return;
+    }
+
+    let char_width = 16.0;  // Double size for visibility
+    let char_height = 28.0;  // Double size for visibility
+    let line_height = char_height + 8.0;
+
+    let source = Source::Solid(SolidSource::from_unpremultiplied_argb(255, 0, 0, 0)); // Black text
+    let options = DrawOptions::new();
+
+    // Prioritize rendering these attributes in order
+    let text_attrs = vec!["label", "placeholder", "value", "text"];
+    let mut rendered_text = String::new();
+
+    for attr_name in text_attrs {
+        if let Some(attr_value) = elem.attributes.get(attr_name) {
+            rendered_text = attr_value.clone();
+            break;
+        }
+    }
+
+    // Also add tag name indicator for custom elements
+    if elem.tag_name.contains("-") {
+        rendered_text.insert_str(0, &format!("[{}] ", elem.tag_name));
+    }
+
+    if rendered_text.is_empty() {
+        return;
+    }
+
+    let mut x = layout.x + 4.0;
+    let mut y = layout.y + 4.0;
+
+    // Draw text
+    for ch in rendered_text.chars() {
+        if ch == '\n' {
+            x = layout.x + 4.0;
+            y += line_height;
+            continue;
+        }
+
+        if x + char_width > layout.x + layout.width {
+            x = layout.x + 4.0;
+            y += line_height;
+        }
+
+        if y + char_height > layout.y + layout.height {
+            break;
+        }
+
+        dt.fill_rect(
+            x,
+            y,
+            char_width,
+            char_height,
+            &source,
+            &options,
+        );
+
+        x += char_width;
     }
 }
 
