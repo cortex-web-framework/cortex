@@ -160,7 +160,7 @@ fn render_text(dt: &mut DrawTarget, layout: &Layout, text: &str) {
     }
 }
 
-/// Draw a simple ASCII-style character
+/// Draw a character with actual readable bitmap patterns
 fn draw_simple_char(
     dt: &mut DrawTarget,
     ch: char,
@@ -171,33 +171,198 @@ fn draw_simple_char(
     source: &Source,
     options: &DrawOptions,
 ) {
-    let h = height * 0.8;
-    let w = width * 0.8;
-    let x_offset = x + width * 0.1;
-    let y_offset = y + height * 0.1;
+    let px = width / 8.0; // Pixel size
+    let py = height / 12.0;
+
+    // Helper macro to draw a pixel at grid position
+    macro_rules! draw_px {
+        ($x:expr, $y:expr) => {{
+            let px_x = x + ($x as f32) * px;
+            let px_y = y + ($y as f32) * py;
+            if px_x >= x && px_y >= y && px_x < x + width && px_y < y + height {
+                dt.fill_rect(px_x, px_y, px * 0.9, py * 0.9, source, options);
+            }
+        }};
+    }
 
     match ch {
-        // Draw vertical bars for letters like 'l', 'i', 't'
-        'l' | 'i' | 'I' | 't' | 'j' | '|' => {
-            dt.fill_rect(x_offset + w * 0.4, y_offset, w * 0.2, h, source, options);
+        // Uppercase letters
+        'A' => {
+            for row in 0..12 { draw_px!(2, row); draw_px!(5, row); }
+            for col in 2..=5 { draw_px!(col, 6); }
         }
-        // Wide characters
-        'W' | 'M' => {
-            dt.fill_rect(x_offset, y_offset, w * 0.25, h, source, options);
-            dt.fill_rect(x_offset + w * 0.375, y_offset, w * 0.25, h, source, options);
-            dt.fill_rect(x_offset + w * 0.75, y_offset, w * 0.25, h, source, options);
+        'B' => {
+            for row in 0..12 { draw_px!(2, row); draw_px!(5, row); }
+            for col in 2..=5 { draw_px!(col, 0); draw_px!(col, 6); draw_px!(col, 11); }
         }
-        // Draw boxes for rectangular letters
-        'O' | 'C' | 'D' | 'Q' | 'R' | 'B' | '0' | 'S' | 'G' => {
-            dt.fill_rect(x_offset, y_offset, w, h, source, options);
+        'C' => {
+            for row in 0..12 { draw_px!(2, row); }
+            for col in 2..=5 { draw_px!(col, 0); draw_px!(col, 11); }
         }
-        // Draw horizontal bar letters
-        'E' | 'F' | 'L' => {
-            dt.fill_rect(x_offset, y_offset, w, h, source, options);
+        'D' => {
+            for row in 0..12 { draw_px!(2, row); draw_px!(5, row); }
+            for col in 2..=5 { draw_px!(col, 0); draw_px!(col, 11); }
         }
-        // Default: filled rectangle (for most other characters)
+        'E' => {
+            for row in 0..12 { draw_px!(2, row); }
+            for col in 2..=5 { draw_px!(col, 0); draw_px!(col, 6); draw_px!(col, 11); }
+        }
+        'F' => {
+            for row in 0..12 { draw_px!(2, row); }
+            for col in 2..=5 { draw_px!(col, 0); draw_px!(col, 6); }
+        }
+        'G' => {
+            for row in 0..12 { draw_px!(2, row); draw_px!(5, row); }
+            for col in 2..=5 { draw_px!(col, 0); draw_px!(col, 11); }
+            draw_px!(5, 6);
+        }
+        'H' => {
+            for row in 0..12 { draw_px!(2, row); draw_px!(5, row); }
+            for col in 2..=5 { draw_px!(col, 6); }
+        }
+        'I' => {
+            for row in 0..12 { draw_px!(3, row); }
+            for col in 2..=4 { draw_px!(col, 0); draw_px!(col, 11); }
+        }
+        'L' => {
+            for row in 0..12 { draw_px!(2, row); }
+            for col in 2..=5 { draw_px!(col, 11); }
+        }
+        'M' => {
+            for row in 0..12 { draw_px!(1, row); draw_px!(7, row); }
+            draw_px!(3, 2); draw_px!(5, 2);
+            draw_px!(4, 3);
+        }
+        'N' => {
+            for row in 0..12 { draw_px!(2, row); draw_px!(5, row); }
+            draw_px!(3, 2); draw_px!(4, 3); draw_px!(4, 4);
+        }
+        'O' => {
+            for row in 0..12 { draw_px!(2, row); draw_px!(5, row); }
+            for col in 2..=5 { draw_px!(col, 0); draw_px!(col, 11); }
+        }
+        'P' => {
+            for row in 0..12 { draw_px!(2, row); draw_px!(5, row); }
+            for col in 2..=5 { draw_px!(col, 0); draw_px!(col, 6); }
+        }
+        'R' => {
+            for row in 0..12 { draw_px!(2, row); draw_px!(5, row); }
+            for col in 2..=5 { draw_px!(col, 0); draw_px!(col, 6); }
+            draw_px!(5, 7); draw_px!(5, 8); draw_px!(5, 9);
+        }
+        'S' => {
+            for col in 2..=5 { draw_px!(col, 0); draw_px!(col, 6); draw_px!(col, 11); }
+            draw_px!(2, 3); draw_px!(5, 3); draw_px!(5, 9); draw_px!(2, 9);
+        }
+        'T' => {
+            for col in 1..=6 { draw_px!(col, 0); }
+            for row in 0..12 { draw_px!(3, row); }
+        }
+        'U' => {
+            for row in 0..12 { draw_px!(2, row); draw_px!(5, row); }
+            for col in 2..=5 { draw_px!(col, 11); }
+        }
+        'V' => {
+            draw_px!(2, 0); draw_px!(5, 0);
+            draw_px!(3, 4); draw_px!(4, 4);
+            draw_px!(3, 8); draw_px!(4, 8);
+        }
+        'W' => {
+            for row in 0..12 { draw_px!(1, row); draw_px!(7, row); }
+            draw_px!(3, 6); draw_px!(4, 6); draw_px!(5, 6);
+        }
+        'X' => {
+            draw_px!(2, 0); draw_px!(5, 0);
+            draw_px!(3, 4); draw_px!(4, 4);
+            draw_px!(2, 11); draw_px!(5, 11);
+        }
+        'Y' => {
+            draw_px!(2, 0); draw_px!(5, 0);
+            draw_px!(3, 3); draw_px!(4, 3);
+            for row in 3..12 { draw_px!(3, row); }
+        }
+        'Z' => {
+            for col in 2..=5 { draw_px!(col, 0); draw_px!(col, 11); }
+            for row in 1..11 { draw_px!(2 + (11 - row) / 2, row); }
+        }
+
+        // Lowercase letters (simplified)
+        'a'..='z' => {
+            // Simple filled rectangle for lowercase
+            let px_w = width * 0.7;
+            let px_h = height * 0.6;
+            dt.fill_rect(x + width * 0.15, y + height * 0.2, px_w, px_h, source, options);
+        }
+
+        // Numbers
+        '0' => {
+            for row in 0..12 { draw_px!(2, row); draw_px!(5, row); }
+            for col in 2..=5 { draw_px!(col, 0); draw_px!(col, 11); }
+        }
+        '1' => {
+            for row in 0..12 { draw_px!(3, row); }
+            draw_px!(2, 1);
+        }
+        '2' => {
+            for col in 2..=5 { draw_px!(col, 0); draw_px!(col, 6); draw_px!(col, 11); }
+            draw_px!(5, 3); draw_px!(2, 9);
+        }
+        '3' => {
+            for col in 2..=5 { draw_px!(col, 0); draw_px!(col, 6); draw_px!(col, 11); }
+            draw_px!(5, 3); draw_px!(5, 9);
+        }
+        '4' => {
+            draw_px!(2, 0); draw_px!(5, 0);
+            for row in 0..12 { draw_px!(2, row); draw_px!(5, row); }
+            for col in 2..=5 { draw_px!(col, 6); }
+        }
+        '5' => {
+            for col in 2..=5 { draw_px!(col, 0); draw_px!(col, 6); draw_px!(col, 11); }
+            draw_px!(2, 3); draw_px!(5, 9);
+        }
+        '6' => {
+            for row in 0..12 { draw_px!(2, row); draw_px!(5, row); }
+            for col in 2..=5 { draw_px!(col, 0); draw_px!(col, 6); draw_px!(col, 11); }
+        }
+        '7' => {
+            for col in 2..=5 { draw_px!(col, 0); }
+            for row in 0..12 { draw_px!(5, row); }
+        }
+        '8' => {
+            for row in 0..12 { draw_px!(2, row); draw_px!(5, row); }
+            for col in 2..=5 { draw_px!(col, 0); draw_px!(col, 6); draw_px!(col, 11); }
+        }
+        '9' => {
+            for row in 0..12 { draw_px!(2, row); draw_px!(5, row); }
+            for col in 2..=5 { draw_px!(col, 0); draw_px!(col, 6); draw_px!(col, 11); }
+        }
+
+        // Symbols
+        '[' | '{' | '(' => {
+            for row in 0..12 { draw_px!(4, row); }
+            for col in 2..=4 { draw_px!(col, 0); draw_px!(col, 11); }
+        }
+        ']' | '}' | ')' => {
+            for row in 0..12 { draw_px!(3, row); }
+            for col in 3..=5 { draw_px!(col, 0); draw_px!(col, 11); }
+        }
+        '-' | '_' => {
+            for col in 2..=5 { draw_px!(col, 6); }
+        }
+        '.' | ',' => {
+            draw_px!(3, 10); draw_px!(3, 11);
+        }
+        ':' => {
+            draw_px!(3, 3); draw_px!(3, 9);
+        }
+        ' ' => {
+            // Space - do nothing
+        }
+
+        // Default: draw a box
         _ => {
-            dt.fill_rect(x_offset, y_offset, w, h, source, options);
+            for row in 0..12 { draw_px!(2, row); draw_px!(5, row); }
+            for col in 2..=5 { draw_px!(col, 0); draw_px!(col, 11); }
         }
     }
 }
