@@ -8,11 +8,11 @@
     "build": "tsc",
     "build:docs": "npm run build && node scripts/build-docs.js",
     "test:compile": "tsc --project tsconfig.test.json",
-    "test:run": "node --test dist-tests/tests/**/*.test.js dist/ui/**/*.test.js",
+    "test:run": "node --test dist-tests/tests dist/ui-test-compiled/src",
     "test": "npm run test:compile && npm run test:run",
-    "test:watch": "tsc --project tsconfig.test.json --watch & node --test --watch dist-tests/tests/**/*.test.js dist/ui/**/*.test.js",
-    "test:debug": "node --inspect-brk --test dist-tests/tests/**/*.test.js dist/ui/**/*.test.js",
-    "test:coverage": "node --test --experimental-test-coverage dist-tests/tests/**/*.test.js dist/ui/**/*.test.js",
+    "test:watch": "tsc --project tsconfig.test.json --watch & node --test --watch dist-tests/tests dist/ui-test-compiled/src",
+    "test:debug": "node --inspect-brk --test dist-tests/tests dist/ui-test-compiled/src",
+    "test:coverage": "node --test --experimental-test-coverage dist-tests/tests dist/ui-test-compiled/src",
     "test:single": "npm run test:compile && node --test",
     "pretest": "npm run build"
   },
@@ -23,7 +23,6 @@
   "devDependencies": {
     "@open-wc/testing": "^4.0.0",
     "@types/node": "^24.8.1",
-    "lit": "^3.3.1",
     "ts-morph": "^27.0.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"

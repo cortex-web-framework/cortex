@@ -380,7 +380,7 @@ describe('ui-stepper', () => {
 
     it('should handle many steps', () => {
       const el = element as any;
-      const steps = [];
+      const steps: Array<{ id: string; label: string }> = [];
       for (let i = 0; i < 20; i++) {
         steps.push({ id: String(i), label: `Step ${i}` });
       }

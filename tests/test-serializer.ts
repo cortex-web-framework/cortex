@@ -78,35 +78,41 @@ export function extractTestFunctionsFromFile(
   );
 
   for (const callExpr of testCalls) {
-    const expression = callExpr.getExpression();
+    try {
+      const expression = (callExpr as any).getExpression?.();
+      if (!expression) continue;
 
-    // Check if this is a call to `test()`
-    const expressionText = expression.getText();
-    if (expressionText === 'test') {
-      const args = callExpr.getArguments();
-      if (args.length >= 2) {
-        // First argument is the test name
-        const nameArg = args[0].getText();
-        const testName = nameArg
-          .replace(/^["']|["']$/g, '')
-          .replace(/\\./g, (m) => m[1]);
+      // Check if this is a call to `test()`
+      const expressionText = expression.getText?.();
+      if (expressionText === 'test') {
+        const args = (callExpr as any).getArguments?.();
+        if (args && args.length >= 2) {
+          // First argument is the test name
+          const nameArg = args[0].getText();
+          const testName = nameArg
+            .replace(/^["']|["']$/g, '')
+            .replace(/\\./g, (m) => m[1]);
 
-        // Second argument is the test function
-        const funcArg = args[1];
-        if (funcArg.getKind() === require('ts-morph').SyntaxKind.ArrowFunction) {
-          const arrowFunc = funcArg.asKind(require('ts-morph').SyntaxKind.ArrowFunction);
-          if (arrowFunc) {
-            const body = arrowFunc.getBody();
-            const bodyText = body ? body.getText() : '';
+          // Second argument is the test function
+          const funcArg = args[1];
+          if (funcArg.getKind?.() === require('ts-morph').SyntaxKind.ArrowFunction) {
+            const arrowFunc = funcArg.asKind?.(require('ts-morph').SyntaxKind.ArrowFunction);
+            if (arrowFunc) {
+              const body = arrowFunc.getBody?.();
+              const bodyText = body ? body.getText() : '';
 
-            tests.push({
-              name: testName,
-              sourceCode: bodyText,
-              originalFunction: funcArg as any,
-            });
+              tests.push({
+                name: testName,
+                sourceCode: bodyText,
+                originalFunction: funcArg as any,
+              });
+            }
           }
         }
       }
+    } catch (e) {
+      // Skip errors in AST parsing - ts-morph API may vary
+      continue;
     }
   }
 

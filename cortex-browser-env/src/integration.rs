@@ -495,3 +495,114 @@ mod tests {
         assert_eq!(summary.exit_code(), 0);
     }
 }
+
+// ============================================================================
+// VANILLA WEB COMPONENTS TESTS (Zero Dependencies)
+// ============================================================================
+
+#[cfg(test)]
+mod vanilla_components {
+    use crate::{parser, layout, render, screenshot};
+    use std::path::Path;
+
+    #[test]
+    fn test_vanilla_ui_text_input_basic() {
+        let html = r#"
+            <html>
+            <body>
+                <ui-text-input id="username" label="Username" placeholder="Enter username"></ui-text-input>
+            </body>
+            </html>
+        "#;
+
+        let mut document = parser::parse_html(html);
+        layout::calculate_layout(&mut document, 800.0, 400.0);
+        let draw_target = render::render_document(&document, 800, 400);
+
+        let screenshot_result = screenshot::save_screenshot(
+            &draw_target,
+            Path::new("/tmp/vanilla_text_input_basic.png")
+        );
+
+        assert!(screenshot_result.is_ok());
+    }
+
+    #[test]
+    fn test_vanilla_multiple_input_types() {
+        let html = r#"
+            <html>
+            <body>
+                <ui-text-input label="Text" type="text"></ui-text-input>
+                <ui-text-input label="Email" type="email"></ui-text-input>
+                <ui-text-input label="Password" type="password"></ui-text-input>
+            </body>
+            </html>
+        "#;
+
+        let mut document = parser::parse_html(html);
+        layout::calculate_layout(&mut document, 800.0, 400.0);
+        let draw_target = render::render_document(&document, 800, 400);
+
+        let screenshot_result = screenshot::save_screenshot(
+            &draw_target,
+            Path::new("/tmp/vanilla_input_types.png")
+        );
+
+        assert!(screenshot_result.is_ok());
+    }
+
+    #[test]
+    fn test_vanilla_disabled_field() {
+        let html = r#"
+            <html>
+            <body>
+                <ui-text-input label="Enabled" value="Can type"></ui-text-input>
+                <ui-text-input label="Disabled" value="Cannot type" disabled></ui-text-input>
+            </body>
+            </html>
+        "#;
+
+        let mut document = parser::parse_html(html);
+        layout::calculate_layout(&mut document, 800.0, 400.0);
+        let draw_target = render::render_document(&document, 800, 400);
+
+        let screenshot_result = screenshot::save_screenshot(
+            &draw_target,
+            Path::new("/tmp/vanilla_disabled.png")
+        );
+
+        assert!(screenshot_result.is_ok());
+    }
+
+    #[test]
+    fn test_vanilla_form_layout() {
+        let html = r#"
+            <html>
+            <head>
+                <style>
+                    body { padding: 20px; font-family: Arial; }
+                    h1 { color: #333; }
+                    ui-text-input { display: block; margin-bottom: 20px; }
+                </style>
+            </head>
+            <body>
+                <h1>Contact Form</h1>
+                <ui-text-input label="Name" placeholder="Your name"></ui-text-input>
+                <ui-text-input label="Email" type="email" placeholder="your@email.com"></ui-text-input>
+                <ui-text-input label="Phone" type="tel" placeholder="+1 (555) 000-0000"></ui-text-input>
+            </body>
+            </html>
+        "#;
+
+        let mut document = parser::parse_html(html);
+        layout::calculate_layout(&mut document, 1000.0, 600.0);
+        let draw_target = render::render_document(&document, 1000, 600);
+
+        let screenshot_result = screenshot::save_screenshot(
+            &draw_target,
+            Path::new("/tmp/vanilla_form_layout.png")
+        );
+
+        assert!(screenshot_result.is_ok());
+    }
+}

@@ -37,7 +37,7 @@
  * // Cleanup when component unmounts
  * handleSearch.cancel();
  */
-export function debounce<T extends (...args: unknown[]) => unknown>(
+export function debounce<T extends (...args: any[]) => any>(
   fn: T,
   delay: number
 ): ((...args: Parameters<T>) => void) & { cancel: () => void } {
@@ -96,7 +96,7 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
  * // Cleanup
  * handleScroll.cancel();
  */
-export function throttle<T extends (...args: unknown[]) => unknown>(
+export function throttle<T extends (...args: any[]) => any>(
   fn: T,
   interval: number
 ): ((...args: Parameters<T>) => void) & { cancel: () => void } {
@@ -163,7 +163,7 @@ export function throttle<T extends (...args: unknown[]) => unknown>(
  * const result1 = initialize(); // Logs and returns { initialized: true }
  * const result2 = initialize(); // Returns undefined
  */
-export function once<T extends (...args: unknown[]) => unknown>(
+export function once<T extends (...args: any[]) => any>(
   fn: T
 ): (...args: Parameters<T>) => ReturnType<T> | void {
   let called = false;
@@ -300,7 +300,7 @@ export function waitFor(
  * // Cleanup
  * updatePosition.cancel();
  */
-export function rafThrottle<T extends (...args: unknown[]) => unknown>(
+export function rafThrottle<T extends (...args: any[]) => any>(
   fn: T
 ): ((...args: Parameters<T>) => void) & { cancel: () => void } {
   let rafId: number | null = null;
@@ -348,7 +348,7 @@ export interface EventEmitter {
    * @param {Function} handler - Event handler function
    * @returns {Function} Unbind function to remove the handler
    */
-  on(event: string, handler: (...args: unknown[]) => void): () => void;
+  on(event: string, handler: (...args: any[]) => void): () => void;
 
   /**
    * Removes an event handler for the specified event.
@@ -356,15 +356,15 @@ export interface EventEmitter {
    * @param {string} event - Event name
    * @param {Function} handler - Event handler function to remove
    */
-  off(event: string, handler: (...args: unknown[]) => void): void;
+  off(event: string, handler: (...args: any[]) => void): void;
 
   /**
    * Emits an event, calling all registered handlers with provided arguments.
    *
    * @param {string} event - Event name
-   * @param {...unknown[]} args - Arguments to pass to handlers
+   * @param {...any[]} args - Arguments to pass to handlers
    */
-  emit(event: string, ...args: unknown[]): void;
+  emit(event: string, ...args: any[]): void;
 
   /**
    * Registers an event handler that executes only once.
@@ -373,7 +373,7 @@ export interface EventEmitter {
    * @param {Function} handler - Event handler function
    * @returns {Function} Unbind function to remove the handler before it fires
    */
-  once(event: string, handler: (...args: unknown[]) => void): () => void;
+  once(event: string, handler: (...args: any[]) => void): () => void;
 }
 
 /**
@@ -409,10 +409,10 @@ export interface EventEmitter {
  * unbind();
  */
 export function createEventEmitter(): EventEmitter {
-  const events = new Map<string, Set<(...args: unknown[]) => void>>();
+  const events = new Map<string, Set<(...args: any[]) => void>>();
 
   return {
-    on(event: string, handler: (...args: unknown[]) => void): () => void {
+    on(event: string, handler: (...args: any[]) => void): () => void {
       if (!events.has(event)) {
         events.set(event, new Set());
       }
@@ -424,7 +424,7 @@ export function createEventEmitter(): EventEmitter {
       };
     },
 
-    off(event: string, handler: (...args: unknown[]) => void): void {
+    off(event: string, handler: (...args: any[]) => void): void {
       const handlers = events.get(event);
       if (handlers) {
         handlers.delete(handler);
@@ -434,7 +434,7 @@ export function createEventEmitter(): EventEmitter {
       }
     },
 
-    emit(event: string, ...args: unknown[]): void {
+    emit(event: string, ...args: any[]): void {
       const handlers = events.get(event);
       if (handlers) {
         // Create a copy to avoid issues if handlers are removed during iteration
@@ -445,8 +445,8 @@ export function createEventEmitter(): EventEmitter {
       }
     },
 
-    once(event: string, handler: (...args: unknown[]) => void): () => void {
-      const onceHandler = (...args: unknown[]): void => {
+    once(event: string, handler: (...args: any[]) => void): () => void {
+      const onceHandler = (...args: any[]): void => {
         this.off(event, onceHandler);
         handler(...args);
       };
