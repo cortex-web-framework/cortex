@@ -51,6 +51,10 @@ try {
       let themeContent = fs.readFileSync(themeFilePath, 'utf8');
       // Remove all import statements
       themeContent = themeContent.replace(/import\s+{[^}]+}\s+from\s+['"][^'"]+['"];?/g, '');
+      // If it's theme-manager.js, remove the 'export' keyword from the themeManager declaration
+      if (themeFile === 'theme-manager.js') {
+        themeContent = themeContent.replace('export const themeManager', 'const themeManager');
+      }
       // Remove source map references
       themeContent = themeContent.replace(/\/\/# sourceMappingURL=.*$/gm, '');
       bundleContent += themeContent + '\n';

@@ -1,362 +1,429 @@
 /**
- * Format utilities - NO external dependencies
- * Number, date, and value formatting functions
+ * Format Utilities Library
+ * Zero External Dependencies - Super Clean Code - Strict TypeScript
+ *
+ * Provides comprehensive formatting functions for:
+ * - Currency (USD, EUR, GBP, etc.)
+ * - Numbers with locale support
+ * - Percentages
+ * - Ordinal numbers (1st, 2nd, 3rd, etc.)
+ * - Dates and times (no external libraries)
+ * - Relative time (ago/in)
+ * - File sizes
+ * - Phone numbers
+ * - Credit cards
+ * - Time durations
  */
 
 /**
- * Formats number as currency
- * @param amount Amount to format
- * @param currency Currency code (default: 'USD')
- * @param locale Locale for formatting (default: 'en-US')
+ * Formats a number as currency with locale support.
+ *
+ * @param value - The numeric value to format
+ * @param currency - ISO 4217 currency code (default: 'USD')
+ * @param locale - BCP 47 locale code (default: 'en-US')
  * @returns Formatted currency string
+ *
+ * @example
+ * formatCurrency(1000) // "$1,000.00"
+ * formatCurrency(1000, 'EUR', 'de-DE') // "1.000,00 €"
+ * formatCurrency(-500, 'GBP') // "-£500.00"
  */
-export function formatCurrency(amount: number, currency: string = 'USD', locale: string = 'en-US'): string {
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency: currency,
-  }).format(amount);
+export function formatCurrency(
+  value: number,
+  currency: string = 'USD',
+  locale: string = 'en-US'
+): string {
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(value);
+  } catch (error) {
+    // Fallback for invalid currency/locale
+    return `${value.toFixed(2)}`;
+  }
 }
 
 /**
- * Formats number as percentage
- * @param value Value to format (0-1 or 0-100)
- * @param decimals Number of decimal places (default: 0)
- * @param asDecimal If true, expects 0-1 value (default: false)
- * @returns Formatted percentage string
- */
-export function formatPercent(value: number, decimals: number = 0, asDecimal: boolean = false): string {
-  const num = asDecimal ? value * 100 : value;
-  return num.toFixed(decimals) + '%';
-}
-
-/**
- * Formats number with thousands separator
- * @param num Number to format
- * @param decimals Number of decimal places (default: 0)
- * @param separator Thousands separator (default: ',')
+ * Formats a number with thousands separators and decimal places.
+ *
+ * @param value - The numeric value to format
+ * @param decimals - Number of decimal places (default: 2)
+ * @param locale - BCP 47 locale code (default: 'en-US')
  * @returns Formatted number string
+ *
+ * @example
+ * formatNumber(1234.5678) // "1,234.57"
+ * formatNumber(1234.5678, 3) // "1,234.568"
+ * formatNumber(1234.56, 2, 'de-DE') // "1.234,56"
  */
-export function formatNumber(num: number, decimals: number = 0, separator: string = ','): string {
-  const fixed = num.toFixed(decimals);
-  const parts = fixed.split('.');
-  const integerPart = parts[0];
-  const decimalPart = parts[1];
-
-  const formatted = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
-  return decimalPart ? formatted + '.' + decimalPart : formatted;
+export function formatNumber(
+  value: number,
+  decimals: number = 2,
+  locale: string = 'en-US'
+): string {
+  try {
+    return new Intl.NumberFormat(locale, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    }).format(value);
+  } catch (error) {
+    return value.toFixed(decimals);
+  }
 }
 
 /**
- * Formats bytes to human-readable size
- * @param bytes Number of bytes
- * @param decimals Number of decimal places (default: 2)
- * @returns Formatted file size string
+ * Formats a decimal value as a percentage.
+ *
+ * @param value - The decimal value (0.456 = 45.6%)
+ * @param decimals - Number of decimal places (default: 2)
+ * @returns Formatted percentage string
+ *
+ * @example
+ * formatPercent(0.456) // "45.60%"
+ * formatPercent(0.456, 0) // "46%"
+ * formatPercent(1) // "100.00%"
  */
-export function formatFileSize(bytes: number, decimals: number = 2): string {
-  if (bytes === 0) return '0 Bytes';
-
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) + ' ' + sizes[i];
+export function formatPercent(value: number, decimals: number = 2): string {
+  const percentage = value * 100;
+  return `${percentage.toFixed(decimals)}%`;
 }
 
 /**
- * Formats date to string
- * @param date Date to format
- * @param format Format string (default: 'YYYY-MM-DD')
- *   Supported tokens: YYYY, YY, MM, DD, HH, mm, ss, ms
- * @returns Formatted date string
- */
-export function formatDate(date: Date | string | number, format: string = 'YYYY-MM-DD'): string {
-  const d = new Date(date);
-
-  if (isNaN(d.getTime())) {
-    throw new Error('Invalid date');
-  }
-
-  const tokens: Record<string, string> = {
-    YYYY: d.getFullYear().toString(),
-    YY: d.getFullYear().toString().slice(-2),
-    MM: String(d.getMonth() + 1).padStart(2, '0'),
-    DD: String(d.getDate()).padStart(2, '0'),
-    HH: String(d.getHours()).padStart(2, '0'),
-    mm: String(d.getMinutes()).padStart(2, '0'),
-    ss: String(d.getSeconds()).padStart(2, '0'),
-    ms: String(d.getMilliseconds()).padStart(3, '0'),
-  };
-
-  let result = format;
-  for (const [token, value] of Object.entries(tokens)) {
-    result = result.replace(new RegExp(token, 'g'), value);
-  }
-
-  return result;
-}
-
-/**
- * Formats time to string
- * @param date Date to format time from
- * @param format Format string (default: 'HH:mm:ss')
- * @returns Formatted time string
- */
-export function formatTime(date: Date | string | number = new Date(), format: string = 'HH:mm:ss'): string {
-  return formatDate(date, format);
-}
-
-/**
- * Formats date in relative terms (e.g., "2 hours ago")
- * @param date Date to format
- * @returns Relative time string
- */
-export function formatRelativeTime(date: Date | string | number): string {
-  const now = new Date();
-  const d = new Date(date);
-  const seconds = Math.floor((now.getTime() - d.getTime()) / 1000);
-
-  if (seconds < 0) {
-    return 'in the future';
-  }
-
-  const intervals: Array<[number, string, number]> = [
-    [31536000, 'year', 1],
-    [2592000, 'month', 1],
-    [86400, 'day', 1],
-    [3600, 'hour', 1],
-    [60, 'minute', 1],
-    [1, 'second', 1],
-  ];
-
-  for (const [secondsInInterval, intervalName, divider] of intervals) {
-    const interval = Math.floor(seconds / secondsInInterval) / divider;
-
-    if (interval >= 1) {
-      const count = Math.floor(interval);
-      return count === 1 ? `${count} ${intervalName} ago` : `${count} ${intervalName}s ago`;
-    }
-  }
-
-  return 'just now';
-}
-
-/**
- * Formats duration in milliseconds to string
- * @param ms Duration in milliseconds
- * @param format Format: 'long', 'short', 'compact' (default: 'short')
- * @returns Formatted duration string
- */
-export function formatDuration(ms: number, format: 'long' | 'short' | 'compact' = 'short'): string {
-  const seconds = Math.floor((ms / 1000) % 60);
-  const minutes = Math.floor((ms / (1000 * 60)) % 60);
-  const hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
-  const days = Math.floor(ms / (1000 * 60 * 60 * 24));
-
-  const parts: string[] = [];
-
-  if (format === 'long') {
-    if (days > 0) parts.push(`${days} day${days > 1 ? 's' : ''}`);
-    if (hours > 0) parts.push(`${hours} hour${hours > 1 ? 's' : ''}`);
-    if (minutes > 0) parts.push(`${minutes} minute${minutes > 1 ? 's' : ''}`);
-    if (seconds > 0) parts.push(`${seconds} second${seconds > 1 ? 's' : ''}`);
-  } else if (format === 'short') {
-    if (days > 0) parts.push(`${days}d`);
-    if (hours > 0) parts.push(`${hours}h`);
-    if (minutes > 0) parts.push(`${minutes}m`);
-    if (seconds > 0) parts.push(`${seconds}s`);
-  } else {
-    // compact format: HH:mm:ss or mm:ss or ss
-    if (hours > 0) {
-      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    }
-    if (minutes > 0) {
-      return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    }
-    return String(seconds).padStart(2, '0');
-  }
-
-  return parts.join(', ') || '0s';
-}
-
-/**
- * Formats phone number
- * @param phone Phone number string
- * @param format Format type: 'US' or 'INTL' (default: 'US')
- * @returns Formatted phone number
- */
-export function formatPhone(phone: string, format: 'US' | 'INTL' = 'US'): string {
-  const cleaned = phone.replace(/\D/g, '');
-
-  if (format === 'US') {
-    if (cleaned.length !== 10) {
-      throw new Error('US phone number must be 10 digits');
-    }
-    return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
-  }
-
-  // International format
-  if (cleaned.length < 7 || cleaned.length > 15) {
-    throw new Error('International phone number must be 7-15 digits');
-  }
-
-  // Basic formatting: +1234567890
-  return '+' + cleaned;
-}
-
-/**
- * Formats credit card number
- * @param cardNumber Card number
- * @param masked Whether to mask the number (default: false)
- * @returns Formatted card number
- */
-export function formatCreditCard(cardNumber: string, masked: boolean = false): string {
-  const cleaned = cardNumber.replace(/\D/g, '');
-
-  if (cleaned.length < 13 || cleaned.length > 19) {
-    throw new Error('Card number must be 13-19 digits');
-  }
-
-  if (masked) {
-    const lastFour = cleaned.slice(-4);
-    return `•••• •••• •••• ${lastFour}`;
-  }
-
-  // Format with spaces every 4 digits
-  return cleaned.replace(/(\d{4})(?=\d)/g, '$1 ');
-}
-
-/**
- * Formats number with ordinal suffix (1st, 2nd, 3rd, etc.)
- * @param num Number to format
- * @returns Number with ordinal suffix
+ * Formats a number as an ordinal (1st, 2nd, 3rd, etc.).
+ *
+ * @param num - The number to format
+ * @returns Ordinal string
+ *
+ * @example
+ * formatOrdinal(1) // "1st"
+ * formatOrdinal(2) // "2nd"
+ * formatOrdinal(21) // "21st"
+ * formatOrdinal(11) // "11th" (special case)
  */
 export function formatOrdinal(num: number): string {
-  if (typeof num !== 'number' || num % 1 !== 0) {
-    throw new Error('Input must be an integer');
+  const lastDigit = num % 10;
+  const lastTwoDigits = num % 100;
+
+  // Special case for 11, 12, 13
+  if (lastTwoDigits >= 11 && lastTwoDigits <= 13) {
+    return `${num}th`;
   }
 
-  const abs = Math.abs(num);
-  const suffix =
-    abs % 100 === 11 || abs % 100 === 12 || abs % 100 === 13
-      ? 'th'
-      : abs % 10 === 1
-        ? 'st'
-        : abs % 10 === 2
-          ? 'nd'
-          : abs % 10 === 3
-            ? 'rd'
-            : 'th';
-
-  return num + suffix;
+  // Standard cases
+  switch (lastDigit) {
+    case 1:
+      return `${num}st`;
+    case 2:
+      return `${num}nd`;
+    case 3:
+      return `${num}rd`;
+    default:
+      return `${num}th`;
+  }
 }
 
 /**
- * Formats bytes as binary units (1024-based)
- * @param bytes Number of bytes
- * @param decimals Number of decimal places (default: 2)
- * @returns Binary units string
+ * Pads a number with leading zeros.
+ *
+ * @param num - The number to pad
+ * @param length - Target length (default: 2)
+ * @returns Zero-padded string
+ *
+ * @internal
  */
-export function formatBinary(bytes: number, decimals: number = 2): string {
+function padZero(num: number, length: number = 2): string {
+  return String(num).padStart(length, '0');
+}
+
+/**
+ * Formats a date according to a pattern.
+ * Supports: YYYY, MM, DD
+ *
+ * @param date - Date object or ISO date string
+ * @param format - Format pattern (default: 'YYYY-MM-DD')
+ * @returns Formatted date string
+ *
+ * @example
+ * formatDate(new Date(2024, 5, 15)) // "2024-06-15"
+ * formatDate(new Date(2024, 5, 15), 'DD/MM/YYYY') // "15/06/2024"
+ */
+export function formatDate(date: Date | string, format: string = 'YYYY-MM-DD'): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+
+  if (isNaN(d.getTime())) {
+    return 'Invalid Date';
+  }
+
+  const year = d.getFullYear();
+  const month = d.getMonth() + 1;
+  const day = d.getDate();
+
+  return format
+    .replace('YYYY', String(year))
+    .replace('MM', padZero(month))
+    .replace('DD', padZero(day));
+}
+
+/**
+ * Formats a time according to a pattern.
+ * Supports: hh (12-hour), mm (minutes), ss (seconds), A (AM/PM), a (am/pm)
+ *
+ * @param date - Date object or ISO date string
+ * @param format - Format pattern (default: 'HH:mm:ss' for 24-hour)
+ * @returns Formatted time string
+ *
+ * @example
+ * formatTime(new Date(2024, 5, 15, 14, 5, 30)) // "14:05:30"
+ * formatTime(new Date(2024, 5, 15, 14, 5, 30), 'hh:mm:ss A') // "02:05:30 PM"
+ */
+export function formatTime(date: Date | string, format: string = 'HH:mm:ss'): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+
+  if (isNaN(d.getTime())) {
+    return 'Invalid Time';
+  }
+
+  const hours24 = d.getHours();
+  const hours12 = hours24 % 12 || 12;
+  const minutes = d.getMinutes();
+  const seconds = d.getSeconds();
+  const ampm = hours24 >= 12 ? 'PM' : 'AM';
+
+  return format
+    .replace('HH', padZero(hours24))
+    .replace('hh', padZero(hours12))
+    .replace('mm', padZero(minutes))
+    .replace('ss', padZero(seconds))
+    .replace('A', ampm)
+    .replace('a', ampm.toLowerCase());
+}
+
+/**
+ * Formats a date and time according to a pattern.
+ * Combines date and time formatting.
+ *
+ * @param date - Date object or ISO date string
+ * @param format - Format pattern (default: 'YYYY-MM-DD HH:mm:ss')
+ * @returns Formatted datetime string
+ *
+ * @example
+ * formatDateTime(new Date(2024, 5, 15, 14, 5, 30)) // "2024-06-15 14:05:30"
+ * formatDateTime(new Date(2024, 5, 15, 14, 5, 30), 'YYYY-MM-DD hh:mm:ss A') // "2024-06-15 02:05:30 PM"
+ */
+export function formatDateTime(date: Date | string, format: string = 'YYYY-MM-DD HH:mm:ss'): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+
+  if (isNaN(d.getTime())) {
+    return 'Invalid DateTime';
+  }
+
+  const year = d.getFullYear();
+  const month = d.getMonth() + 1;
+  const day = d.getDate();
+  const hours24 = d.getHours();
+  const hours12 = hours24 % 12 || 12;
+  const minutes = d.getMinutes();
+  const seconds = d.getSeconds();
+  const ampm = hours24 >= 12 ? 'PM' : 'AM';
+
+  return format
+    .replace('YYYY', String(year))
+    .replace('MM', padZero(month))
+    .replace('DD', padZero(day))
+    .replace('HH', padZero(hours24))
+    .replace('hh', padZero(hours12))
+    .replace('mm', padZero(minutes))
+    .replace('ss', padZero(seconds))
+    .replace('A', ampm)
+    .replace('a', ampm.toLowerCase());
+}
+
+/**
+ * Formats a date as relative time (e.g., "2 hours ago", "in 5 minutes").
+ *
+ * @param date - Date object or ISO date string
+ * @returns Relative time string
+ *
+ * @example
+ * formatRelativeTime(new Date(Date.now() - 7200000)) // "2 hours ago"
+ * formatRelativeTime(new Date(Date.now() + 300000)) // "in 5 minutes"
+ */
+export function formatRelativeTime(date: Date | string): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+
+  if (isNaN(d.getTime())) {
+    return 'Invalid Date';
+  }
+
+  const now = Date.now();
+  const then = d.getTime();
+  const diff = now - then;
+  const absDiff = Math.abs(diff);
+  const isFuture = diff < 0;
+
+  const seconds = Math.floor(absDiff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (seconds < 10) {
+    return 'just now';
+  }
+
+  if (seconds < 60) {
+    return isFuture ? `in ${seconds} seconds` : `${seconds} seconds ago`;
+  }
+
+  if (minutes < 60) {
+    const unit = minutes === 1 ? 'minute' : 'minutes';
+    return isFuture ? `in ${minutes} ${unit}` : `${minutes} ${unit} ago`;
+  }
+
+  if (hours < 24) {
+    const unit = hours === 1 ? 'hour' : 'hours';
+    return isFuture ? `in ${hours} ${unit}` : `${hours} ${unit} ago`;
+  }
+
+  const unit = days === 1 ? 'day' : 'days';
+  return isFuture ? `in ${days} ${unit}` : `${days} ${unit} ago`;
+}
+
+/**
+ * Formats bytes as human-readable file size.
+ *
+ * @param bytes - Number of bytes
+ * @returns Formatted file size string
+ *
+ * @example
+ * formatFileSize(1024) // "1.00 KB"
+ * formatFileSize(1048576) // "1.00 MB"
+ * formatFileSize(1073741824) // "1.00 GB"
+ */
+export function formatFileSize(bytes: number): string {
   if (bytes === 0) return '0 B';
 
+  const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
   const k = 1024;
-  const sizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) + ' ' + sizes[i];
+  if (i === 0) {
+    return `${bytes} ${units[i]}`;
+  }
+
+  const size = bytes / Math.pow(k, i);
+  return `${size.toFixed(2)} ${units[i]}`;
 }
 
 /**
- * Formats bytes as decimal units (1000-based)
- * @param bytes Number of bytes
- * @param decimals Number of decimal places (default: 2)
- * @returns Decimal units string
+ * Formats a phone number according to region.
+ *
+ * @param phone - Phone number string (digits only or with formatting)
+ * @param region - Region code ('US' or 'INTL', default: 'US')
+ * @returns Formatted phone number
+ *
+ * @example
+ * formatPhone('1234567890', 'US') // "(123) 456-7890"
+ * formatPhone('1234567890', 'INTL') // "+1 123-456-7890"
  */
-export function formatDecimal(bytes: number, decimals: number = 2): string {
-  if (bytes === 0) return '0 B';
+export function formatPhone(phone: string, region: string = 'US'): string {
+  // Remove all non-digit characters
+  const digits = phone.replace(/\D/g, '');
 
-  const k = 1000;
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  if (digits.length !== 10) {
+    return phone; // Return original if not 10 digits
+  }
 
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) + ' ' + sizes[i];
+  const areaCode = digits.slice(0, 3);
+  const middle = digits.slice(3, 6);
+  const last = digits.slice(6, 10);
+
+  if (region === 'INTL') {
+    return `+1 ${areaCode}-${middle}-${last}`;
+  }
+
+  // Default US format
+  return `(${areaCode}) ${middle}-${last}`;
 }
 
 /**
- * Truncates text to word boundary
- * @param text Text to truncate
- * @param maxLength Maximum length
- * @param suffix Suffix for truncated text (default: '...')
- * @returns Truncated text
+ * Formats a credit card number with spaces.
+ * Supports 15-digit (Amex) and 16-digit cards.
+ *
+ * @param card - Credit card number string
+ * @returns Formatted credit card number
+ *
+ * @example
+ * formatCreditCard('4532015112830366') // "4532 0151 1283 0366"
+ * formatCreditCard('378282246310005') // "3782 822463 10005" (Amex)
  */
-export function truncateText(text: string, maxLength: number, suffix: string = '...'): string {
-  if (text.length <= maxLength) {
-    return text;
+export function formatCreditCard(card: string): string {
+  // Remove all non-digit characters
+  const digits = card.replace(/\D/g, '');
+
+  // Amex format (15 digits): 4-6-5
+  if (digits.length === 15) {
+    return `${digits.slice(0, 4)} ${digits.slice(4, 10)} ${digits.slice(10, 15)}`;
   }
 
-  let truncated = text.slice(0, maxLength - suffix.length).trim();
-  const lastSpace = truncated.lastIndexOf(' ');
-
-  if (lastSpace > 0) {
-    truncated = truncated.slice(0, lastSpace);
+  // Standard format (16 digits): 4-4-4-4
+  if (digits.length === 16) {
+    return `${digits.slice(0, 4)} ${digits.slice(4, 8)} ${digits.slice(8, 12)} ${digits.slice(12, 16)}`;
   }
 
-  return truncated + suffix;
+  return card; // Return original if not standard length
 }
 
 /**
- * Formats JSON with indentation
- * @param obj Object to format
- * @param indent Indentation spaces (default: 2)
- * @returns Formatted JSON string
+ * Formats milliseconds as a duration string.
+ *
+ * @param milliseconds - Duration in milliseconds
+ * @param format - 'short' (1h 1m 1s) or 'long' (1 hour 1 minute 1 second), default: 'short'
+ * @returns Formatted duration string
+ *
+ * @example
+ * formatDuration(3661000, 'short') // "1h 1m 1s"
+ * formatDuration(3661000, 'long') // "1 hour 1 minute 1 second"
  */
-export function formatJSON(obj: any, indent: number = 2): string {
-  return JSON.stringify(obj, null, indent);
-}
+export function formatDuration(milliseconds: number, format: 'short' | 'long' = 'short'): string {
+  const seconds = Math.floor(milliseconds / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
 
-/**
- * Formats value based on type
- * @param value Value to format
- * @param options Formatting options
- * @returns Formatted value
- */
-export function format(
-  value: any,
-  options: {
-    type?: 'number' | 'date' | 'currency' | 'percent' | 'filesize' | 'phone';
-    decimals?: number;
-    currency?: string;
-    locale?: string;
-    dateFormat?: string;
-    phoneFormat?: 'US' | 'INTL';
-  } = {}
-): string {
-  const { type, decimals = 2, currency = 'USD', locale = 'en-US', dateFormat = 'YYYY-MM-DD', phoneFormat = 'US' } =
-    options;
+  const s = seconds % 60;
+  const m = minutes % 60;
+  const h = hours;
 
-  if (type === 'number') {
-    return formatNumber(value, decimals);
+  if (format === 'long') {
+    const parts: string[] = [];
+
+    if (h > 0) {
+      parts.push(`${h} ${h === 1 ? 'hour' : 'hours'}`);
+    }
+    if (m > 0) {
+      parts.push(`${m} ${m === 1 ? 'minute' : 'minutes'}`);
+    }
+    if (s > 0) {
+      parts.push(`${s} ${s === 1 ? 'second' : 'seconds'}`);
+    }
+
+    return parts.length > 0 ? parts.join(' ') : '0 seconds';
   }
 
-  if (type === 'date') {
-    return formatDate(value, dateFormat);
+  // Short format
+  const parts: string[] = [];
+
+  if (h > 0) {
+    parts.push(`${h}h`);
+  }
+  if (m > 0) {
+    parts.push(`${m}m`);
+  }
+  if (s > 0 || parts.length === 0) {
+    parts.push(`${s}s`);
   }
 
-  if (type === 'currency') {
-    return formatCurrency(value, currency, locale);
-  }
-
-  if (type === 'percent') {
-    return formatPercent(value, decimals);
-  }
-
-  if (type === 'filesize') {
-    return formatFileSize(value, decimals);
-  }
-
-  if (type === 'phone') {
-    return formatPhone(value, phoneFormat);
-  }
-
-  return String(value);
+  return parts.join(' ');
 }

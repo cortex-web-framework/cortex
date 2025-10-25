@@ -160,6 +160,12 @@ class AssertionMethods {
     }
   }
 
+  toBeDefined(): void {
+    if (this.actual === undefined) {
+      throw new Error(`Expected ${this.actual} to be defined`);
+    }
+  }
+
   toBeGreaterThan(expected: number): void {
     if (typeof this.actual !== 'number') {
       throw new Error(`Expected ${this.actual} to be a number`);

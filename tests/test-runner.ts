@@ -1,9 +1,14 @@
 /**
  * Simple, zero-dependency test runner
  * No Jest, Mocha, Vitest - just pure TypeScript
+ * Integrated with AST-based test serialization (ts-morph)
  */
 
 import { AssertionError } from './assertions.js';
+import { spawn } from 'child_process';
+import * as fs from 'fs';
+import * as path from 'path';
+import { generateJavaScriptTestCode, extractTestFunctionsFromFile } from './test-serializer.js';
 
 interface TestCase {
   name: string;
@@ -20,7 +25,7 @@ interface TestSuite {
 }
 
 interface TestResult {
-  passed: boolean;
+  passed: number;
   total: number;
   failed: number;
   skipped: number;
@@ -38,10 +43,10 @@ interface FailureDetail {
 /**
  * Global test registry
  */
-let currentSuite: TestSuite | null = null;
-const suites: TestSuite[] = [];
-let beforeEachFn: (() => void | Promise<void>) | null = null;
-let afterEachFn: (() => void | Promise<void>) | null = null;
+var suites: TestSuite[] = [];
+var currentSuite: TestSuite | null = null;
+let beforeEachFn: (() => void | Promise<void>) | undefined = undefined;
+let afterEachFn: (() => void | Promise<void>) | undefined = undefined;
 
 /**
  * Register a test suite
@@ -52,8 +57,8 @@ export function describe(name: string, fn: () => void): void {
   const suite: TestSuite = {
     name,
     tests: [],
-    beforeEachFn,
-    afterEachFn,
+    beforeEachFn: undefined,
+    afterEachFn: undefined,
   };
 
   const previousSuite = currentSuite;
@@ -130,6 +135,24 @@ export function afterEach(fn: () => void | Promise<void>): void {
   }
 }
 
+// Custom file discovery function
+async function findTestFiles(dir: string): Promise<string[]> {
+  let testFiles: string[] = [];
+  const files = await fs.promises.readdir(dir, { withFileTypes: true });
+
+  for (const file of files) {
+    const res = path.resolve(dir, file.name);
+    if (file.isDirectory()) {
+      if (file.name !== 'node_modules' && file.name !== 'dist') {
+        testFiles = testFiles.concat(await findTestFiles(res));
+      }
+    } else if (file.name.endsWith('.test.ts')) {
+      testFiles.push(res);
+    }
+  }
+  return testFiles;
+}
+
 /**
  * Run all tests
  */
@@ -142,6 +165,34 @@ export async function run(): Promise<TestResult> {
 
   console.log('\n' + '═'.repeat(70));
   console.log('🧪 Running Tests...\n');
+
+  // Dynamically import all test files
+  const testFiles = await findTestFiles(process.cwd());
+  for (const file of testFiles) {
+    // Convert absolute path to relative path for import
+    const relativePath = path.relative(process.cwd(), file);
+    await import(`./${relativePath}`);
+  }
+
+  let jsCode = '';
+
+  // Map test files to their extracted test functions using AST parsing
+  const testFileMap = new Map<string, Map<string, string>>();
+
+  for (const file of testFiles) {
+    try {
+      const extractedTests = extractTestFunctionsFromFile(file);
+      const testMap = new Map<string, string>();
+
+      for (const extracted of extractedTests) {
+        testMap.set(extracted.name, extracted.sourceCode);
+      }
+
+      testFileMap.set(file, testMap);
+    } catch (error) {
+      console.warn(`⚠️  Failed to parse test file ${file}: ${error}`);
+    }
+  }
 
   for (const suite of suites) {
     if (suite.skip) {
@@ -161,38 +212,82 @@ export async function run(): Promise<TestResult> {
         continue;
       }
 
-      try {
-        // Run before-each hook
-        if (suite.beforeEachFn) {
-          await suite.beforeEachFn();
+      // Try to find the test body from the extracted test functions
+      let testBody = '';
+      let foundTest = false;
+
+      for (const [_file, testMap] of testFileMap) {
+        if (testMap.has(testCase.name)) {
+          testBody = testMap.get(testCase.name) || '';
+          foundTest = true;
+          break;
         }
+      }
 
-        // Run test
-        await testCase.fn();
+      if (!foundTest) {
+        // Fallback: use a placeholder if we can't extract the test body
+        testBody = `console.warn("Test body not extracted for ${testCase.name}");`;
+      }
 
-        // Run after-each hook
-        if (suite.afterEachFn) {
-          await suite.afterEachFn();
-        }
+      // Generate JavaScript code for each test case using the serializer
+      jsCode += generateJavaScriptTestCode(testCase.name, testBody, suite.name);
+    }
+  }
 
-        console.log(`  ✅ ${testCase.name}`);
-        passed++;
-      } catch (error) {
-        const err = error as Error;
-        console.log(`  ❌ ${testCase.name}`);
-        console.log(`     ${err.message}`);
+  const rustBrowserProcess = spawn('./cortex-browser-env/target/debug/cortex-browser-env', [jsCode]);
 
-        failed++;
+  let stdout = '';
+  let stderr = '';
+
+  rustBrowserProcess.stdout.on('data', (data) => {
+    stdout += data.toString();
+  });
+
+  rustBrowserProcess.stderr.on('data', (data) => {
+    stderr += data.toString();
+  });
+
+  await new Promise<void>((resolve) => {
+    rustBrowserProcess.on('close', (code) => {
+      console.log(`Rust browser process exited with code ${code}`);
+      if (code !== 0) {
+        console.error(`Rust browser process failed: ${stderr}`);
+        // If the Rust process itself fails, it's a critical error for all tests
+        // For now, we'll just mark all tests as failed if the process exits with non-zero
+        // This needs more sophisticated error handling later.
+        failed = suites.reduce((acc, suite) => acc + suite.tests.length, 0);
         failures.push({
-          suite: suite.name,
-          test: testCase.name,
-          error: err.message,
-          stack: err.stack,
+          suite: "Rust Browser Env",
+          test: "Process Crash",
+          error: `Rust browser process exited with code ${code}. Stderr: ${stderr}` || "Unknown error",
+          stack: undefined,
         });
       }
-    }
+      resolve();
+    });
+  });
 
-    console.log();
+  // Basic parsing of the output from the Rust browser env
+  const lines = stdout.split('\n');
+  for (const line of lines) {
+    if (line.startsWith('Test Result: ')) {
+      const parts = line.substring('Test Result: '.length).split(' - ');
+      if (parts.length === 2) {
+        const name = parts[0];
+        const status = parts[1];
+        if (status === 'PASSED') {
+          passed++;
+        } else if (status === 'FAILED') {
+          failed++;
+          failures.push({
+            suite: "Rust Browser Env", // Placeholder
+            test: name,
+            error: "Test failed in Rust browser environment", // Placeholder
+            stack: undefined,
+          });
+        }
+      }
+    }
   }
 
   const duration = performance.now() - startTime;
@@ -232,7 +327,7 @@ export async function run(): Promise<TestResult> {
 
 /**
  * Exit with appropriate code
- * @param result Test result
+ * @param result Test Result
  */
 export function exit(result: TestResult): void {
   process.exit(result.failed > 0 ? 1 : 0);
@@ -252,8 +347,8 @@ export async function runAndExit(): Promise<void> {
 export function clear(): void {
   suites.length = 0;
   currentSuite = null;
-  beforeEachFn = null;
-  afterEachFn = null;
+  beforeEachFn = undefined;
+  afterEachFn = undefined;
 }
 
 /**

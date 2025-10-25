@@ -1,396 +1,457 @@
 /**
- * Event utilities - NO external dependencies
- * Debounce, throttle, and event handling functions
+ * Event Utilities Library
+ *
+ * A comprehensive collection of event handling utilities with zero dependencies.
+ * Provides debouncing, throttling, event delegation, and custom event emitters
+ * with proper memory management and cleanup.
+ *
+ * @module events
+ * @author Cortex Project
+ * @license MIT
  */
 
 /**
- * Debounces function calls
- * @param fn Function to debounce
- * @param delay Delay in milliseconds
- * @param immediate Call on leading edge (default: false)
- * @returns Debounced function
+ * Debounces a function, delaying its execution until after a specified delay
+ * has elapsed since the last time it was invoked.
+ *
+ * Useful for handling events that fire rapidly (e.g., typing, window resizing)
+ * where you only want to execute the function after the user has stopped performing
+ * the action.
+ *
+ * Memory Management:
+ * - Call `cancel()` to clear pending timeouts and prevent memory leaks
+ * - Automatically clears previous timeout on each new invocation
+ *
+ * @template T - Function type to debounce
+ * @param {T} fn - The function to debounce
+ * @param {number} delay - Delay in milliseconds to wait before executing
+ * @returns {Function} Debounced function with a `cancel()` method
+ *
+ * @example
+ * const handleSearch = debounce((query: string) => {
+ *   console.log('Searching for:', query);
+ * }, 300);
+ *
+ * input.addEventListener('input', (e) => handleSearch(e.target.value));
+ *
+ * // Cleanup when component unmounts
+ * handleSearch.cancel();
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   fn: T,
-  delay: number,
-  immediate: boolean = false
-): (...args: Parameters<T>) => void {
+  delay: number
+): ((...args: Parameters<T>) => void) & { cancel: () => void } {
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
-  let lastCallTime = 0;
-  let lastResult: any;
 
-  return function (...args: Parameters<T>) {
-    const now = Date.now();
-    const shouldCallNow = immediate && now - lastCallTime > delay;
-
+  const debounced = function(this: unknown, ...args: Parameters<T>): void {
+    // Clear existing timeout
     if (timeoutId !== null) {
       clearTimeout(timeoutId);
     }
 
+    // Set new timeout
     timeoutId = setTimeout(() => {
-      if (!immediate) {
-        lastResult = fn(...args);
-      }
+      fn.apply(this, args);
       timeoutId = null;
-      lastCallTime = Date.now();
     }, delay);
-
-    if (shouldCallNow) {
-      lastResult = fn(...args);
-      lastCallTime = now;
-    }
-
-    return lastResult;
   };
+
+  debounced.cancel = function(): void {
+    if (timeoutId !== null) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+  };
+
+  return debounced;
 }
 
 /**
- * Throttles function calls
- * @param fn Function to throttle
- * @param limit Time limit in milliseconds
- * @param options Options object
- * @returns Throttled function
+ * Throttles a function, ensuring it is executed at most once per specified interval.
+ * Executes immediately on first call, then limits subsequent executions.
+ *
+ * Useful for limiting the rate of expensive operations (e.g., scroll handlers,
+ * window resize handlers, API calls).
+ *
+ * Behavior:
+ * - First call executes immediately
+ * - Subsequent calls within interval are queued (trailing call)
+ * - Trailing call executes with the latest arguments after interval expires
+ *
+ * Memory Management:
+ * - Call `cancel()` to clear pending timeouts and prevent trailing execution
+ *
+ * @template T - Function type to throttle
+ * @param {T} fn - The function to throttle
+ * @param {number} interval - Minimum interval in milliseconds between executions
+ * @returns {Function} Throttled function with a `cancel()` method
+ *
+ * @example
+ * const handleScroll = throttle(() => {
+ *   console.log('Scroll position:', window.scrollY);
+ * }, 100);
+ *
+ * window.addEventListener('scroll', handleScroll);
+ *
+ * // Cleanup
+ * handleScroll.cancel();
  */
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   fn: T,
-  limit: number,
-  options: { leading?: boolean; trailing?: boolean } = {}
-): (...args: Parameters<T>) => void {
-  const { leading = true, trailing = true } = options;
-
-  let lastCallTime = leading ? 0 : Date.now();
+  interval: number
+): ((...args: Parameters<T>) => void) & { cancel: () => void } {
+  let lastCallTime = 0;
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
-  let lastResult: any;
+  let lastArgs: Parameters<T> | null = null;
+  let lastContext: unknown = null;
 
-  return function (...args: Parameters<T>) {
+  const throttled = function(this: unknown, ...args: Parameters<T>): void {
     const now = Date.now();
+    lastArgs = args;
+    lastContext = this;
 
-    if (leading && now - lastCallTime >= limit) {
-      lastResult = fn(...args);
+    // Execute immediately if enough time has passed
+    if (now - lastCallTime >= interval) {
       lastCallTime = now;
+      fn.apply(this, args);
+      lastArgs = null;
+      lastContext = null;
     } else {
-      if (timeoutId !== null) {
-        clearTimeout(timeoutId);
-      }
-
-      if (trailing) {
+      // Queue trailing call if not already queued
+      if (timeoutId === null) {
         timeoutId = setTimeout(() => {
-          lastResult = fn(...args);
-          lastCallTime = trailing ? Date.now() : lastCallTime;
+          lastCallTime = Date.now();
+          if (lastArgs !== null) {
+            fn.apply(lastContext, lastArgs);
+          }
           timeoutId = null;
-        }, limit - (now - lastCallTime));
+          lastArgs = null;
+          lastContext = null;
+        }, interval - (now - lastCallTime));
       }
     }
-
-    return lastResult;
   };
+
+  throttled.cancel = function(): void {
+    if (timeoutId !== null) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+    lastArgs = null;
+    lastContext = null;
+  };
+
+  return throttled;
 }
 
 /**
- * Calls function only once
- * @param fn Function to call once
- * @returns Function that can be called multiple times
+ * Creates a function that can only be executed once. Subsequent calls return undefined.
+ *
+ * Useful for initialization functions, event handlers that should only fire once,
+ * or ensuring idempotent operations.
+ *
+ * @template T - Function type to wrap
+ * @param {T} fn - The function to execute only once
+ * @returns {Function} Function that executes only on first call
+ *
+ * @example
+ * const initialize = once(() => {
+ *   console.log('Initializing application...');
+ *   return { initialized: true };
+ * });
+ *
+ * const result1 = initialize(); // Logs and returns { initialized: true }
+ * const result2 = initialize(); // Returns undefined
  */
-export function once<T extends (...args: any[]) => any>(fn: T): (...args: Parameters<T>) => ReturnType<T> | undefined {
+export function once<T extends (...args: unknown[]) => unknown>(
+  fn: T
+): (...args: Parameters<T>) => ReturnType<T> | void {
   let called = false;
-  let result: ReturnType<T>;
+  let result: ReturnType<T> | void;
 
-  return function (...args: Parameters<T>) {
+  return function(this: unknown, ...args: Parameters<T>): ReturnType<T> | void {
     if (!called) {
       called = true;
-      result = fn(...args);
+      result = fn.apply(this, args) as ReturnType<T>;
+      return result;
     }
-    return result;
+    return undefined;
   };
 }
 
 /**
- * Creates a memoized version of function
- * @param fn Function to memoize
- * @param keyGenerator Function to generate cache key (default: uses first argument)
- * @returns Memoized function
+ * Sets up event delegation for handling events on child elements matching a selector.
+ *
+ * Event delegation allows you to attach a single event listener to a parent element
+ * instead of multiple listeners to child elements. This improves performance and
+ * handles dynamically added elements automatically.
+ *
+ * Memory Management:
+ * - Returns an unbind function to remove the event listener
+ * - Always call unbind when the parent element is removed from DOM
+ *
+ * @param {Element} element - Parent element to attach listener to
+ * @param {string} selector - CSS selector to match child elements
+ * @param {string} event - Event type (e.g., 'click', 'mousedown')
+ * @param {EventListener} handler - Event handler function
+ * @returns {Function} Unbind function to remove the event listener
+ *
+ * @example
+ * const list = document.querySelector('.todo-list');
+ * const unbind = delegate(list, '.delete-button', 'click', (e) => {
+ *   const item = e.target.closest('.todo-item');
+ *   item?.remove();
+ * });
+ *
+ * // Cleanup when list is removed
+ * unbind();
  */
-export function memoize<T extends (...args: any[]) => any>(
-  fn: T,
-  keyGenerator?: (args: any[]) => string
-): (...args: Parameters<T>) => ReturnType<T> {
-  const cache = new Map<string, ReturnType<T>>();
-  const makeKey = keyGenerator || ((first: any) => String(first));
-
-  return function (...args: Parameters<T>) {
-    const key = makeKey(args);
-
-    if (cache.has(key)) {
-      return cache.get(key)!;
-    }
-
-    const result = fn(...args);
-    cache.set(key, result);
-    return result;
-  };
-}
-
-/**
- * Retries function with exponential backoff
- * @param fn Function to retry
- * @param maxAttempts Maximum number of attempts
- * @param delay Initial delay in milliseconds
- * @param maxDelay Maximum delay in milliseconds
- * @param onAttempt Called on each attempt
- * @returns Promise that resolves with result or rejects with error
- */
-export async function retry<T>(
-  fn: () => Promise<T> | T,
-  maxAttempts: number = 3,
-  delay: number = 1000,
-  maxDelay: number = 10000,
-  onAttempt?: (attempt: number, error: Error) => void
-): Promise<T> {
-  let lastError: Error | null = null;
-
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    try {
-      return await Promise.resolve(fn());
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error(String(error));
-
-      if (onAttempt) {
-        onAttempt(attempt, lastError);
-      }
-
-      if (attempt < maxAttempts) {
-        const backoffDelay = Math.min(delay * Math.pow(2, attempt - 1), maxDelay);
-        await new Promise((resolve) => setTimeout(resolve, backoffDelay));
-      }
-    }
-  }
-
-  throw lastError || new Error('Max retries exceeded');
-}
-
-/**
- * Attaches event listener with automatic cleanup
- * @param target Event target
- * @param event Event name
- * @param handler Event handler
- * @param options Event listener options
- * @returns Cleanup function
- */
-export function on<K extends keyof HTMLElementEventMap>(
-  target: HTMLElement | Window,
-  event: K,
-  handler: (this: any, ev: HTMLElementEventMap[K]) => any,
-  options?: boolean | AddEventListenerOptions
+export function delegate(
+  element: Element,
+  selector: string,
+  event: string,
+  handler: EventListener
 ): () => void {
-  target.addEventListener(event as string, handler as EventListener, options);
+  const delegateHandler = (e: Event): void => {
+    const target = e.target as Element;
+    // Check if target or any of its ancestors match the selector
+    const match = target.closest(selector);
+    if (match && element.contains(match)) {
+      handler.call(match, e);
+    }
+  };
+
+  element.addEventListener(event, delegateHandler);
 
   return () => {
-    target.removeEventListener(event as string, handler as EventListener, options);
+    element.removeEventListener(event, delegateHandler);
   };
 }
 
 /**
- * Attaches event listener that fires once
- * @param target Event target
- * @param event Event name
- * @param handler Event handler
- * @param options Event listener options
- * @returns Cleanup function
+ * Waits for a condition to become true, polling at specified intervals.
+ *
+ * Useful for waiting for DOM elements to load, state changes, or async operations
+ * to complete.
+ *
+ * @param {Function} condition - Function that returns true when condition is met
+ * @param {number} [timeout=5000] - Maximum time to wait in milliseconds
+ * @param {number} [interval=100] - Polling interval in milliseconds
+ * @returns {Promise<void>} Resolves when condition is true, rejects on timeout
+ *
+ * @example
+ * // Wait for element to appear in DOM
+ * await waitFor(() => document.querySelector('.loaded') !== null, 3000);
+ *
+ * // Wait for state change
+ * await waitFor(() => app.isReady, 5000, 50);
  */
-export function once_event<K extends keyof HTMLElementEventMap>(
-  target: HTMLElement | Window,
-  event: K,
-  handler: (this: any, ev: HTMLElementEventMap[K]) => any,
-  options?: boolean | AddEventListenerOptions
-): () => void {
-  const eventOptions = typeof options === 'boolean'
-    ? { capture: options, once: true }
-    : { ...options, once: true };
-
-  target.addEventListener(event as string, handler as EventListener, eventOptions);
-
-  return () => {
-    target.removeEventListener(event as string, handler as EventListener, options);
-  };
-}
-
-/**
- * Emits custom event
- * @param target Event target
- * @param eventName Event name
- * @param detail Event detail
- * @returns True if not cancelled
- */
-export function emit<T = any>(
-  target: HTMLElement | Window,
-  eventName: string,
-  detail?: T
-): boolean {
-  const event = new CustomEvent(eventName, { detail, bubbles: true, cancelable: true });
-  return target.dispatchEvent(event);
-}
-
-/**
- * Listens to custom event
- * @param target Event target
- * @param eventName Event name
- * @param handler Event handler
- * @returns Cleanup function
- */
-export function onCustom<T = any>(
-  target: HTMLElement | Window,
-  eventName: string,
-  handler: (detail: T) => void
-): () => void {
-  const listener = (event: Event) => {
-    if (event instanceof CustomEvent) {
-      handler(event.detail);
-    }
-  };
-
-  target.addEventListener(eventName, listener);
-
-  return () => {
-    target.removeEventListener(eventName, listener);
-  };
-}
-
-/**
- * Waits for an event
- * @param target Event target
- * @param eventName Event name
- * @param timeout Timeout in milliseconds (optional)
- * @returns Promise that resolves with event
- */
-export function waitForEvent<K extends keyof HTMLElementEventMap>(
-  target: HTMLElement | Window,
-  eventName: K,
-  timeout?: number
-): Promise<HTMLElementEventMap[K]> {
+export function waitFor(
+  condition: () => boolean,
+  timeout: number = 5000,
+  interval: number = 100
+): Promise<void> {
   return new Promise((resolve, reject) => {
-    const handler = (event: Event) => {
-      target.removeEventListener(eventName as string, handler);
-      if (timeoutId) clearTimeout(timeoutId);
-      resolve(event as HTMLElementEventMap[K]);
+    const startTime = Date.now();
+
+    const checkCondition = (): void => {
+      if (condition()) {
+        resolve();
+        return;
+      }
+
+      if (Date.now() - startTime >= timeout) {
+        reject(new Error('waitFor timeout exceeded'));
+        return;
+      }
+
+      setTimeout(checkCondition, interval);
     };
 
-    target.addEventListener(eventName as string, handler);
-
-    let timeoutId: ReturnType<typeof setTimeout> | null = null;
-    if (timeout) {
-      timeoutId = setTimeout(() => {
-        target.removeEventListener(eventName as string, handler);
-        reject(new Error(`Event timeout: ${String(eventName)}`));
-      }, timeout);
-    }
+    checkCondition();
   });
 }
 
 /**
- * Waits for custom event
- * @param target Event target
- * @param eventName Event name
- * @param timeout Timeout in milliseconds (optional)
- * @returns Promise that resolves with detail
+ * Throttles a function using requestAnimationFrame for optimal rendering performance.
+ *
+ * Similar to throttle, but uses RAF for smooth animations and visual updates.
+ * Ensures function executes at most once per animation frame (~60fps).
+ *
+ * Ideal for:
+ * - Scroll handlers that update UI
+ * - Mouse/touch move handlers
+ * - Animation loops
+ *
+ * Memory Management:
+ * - Call `cancel()` to cancel pending RAF and prevent execution
+ *
+ * @template T - Function type to throttle
+ * @param {T} fn - The function to throttle
+ * @returns {Function} RAF-throttled function with a `cancel()` method
+ *
+ * @example
+ * const updatePosition = rafThrottle((x: number, y: number) => {
+ *   element.style.transform = `translate(${x}px, ${y}px)`;
+ * });
+ *
+ * document.addEventListener('mousemove', (e) => updatePosition(e.clientX, e.clientY));
+ *
+ * // Cleanup
+ * updatePosition.cancel();
  */
-export function waitForCustomEvent<T = any>(
-  target: HTMLElement | Window,
-  eventName: string,
-  timeout?: number
-): Promise<T> {
-  return new Promise((resolve, reject) => {
-    const listener = (event: Event) => {
-      target.removeEventListener(eventName, listener);
-      if (timeoutId) clearTimeout(timeoutId);
-      if (event instanceof CustomEvent) {
-        resolve(event.detail);
+export function rafThrottle<T extends (...args: unknown[]) => unknown>(
+  fn: T
+): ((...args: Parameters<T>) => void) & { cancel: () => void } {
+  let rafId: number | null = null;
+  let lastArgs: Parameters<T> | null = null;
+  let lastContext: unknown = null;
+
+  const throttled = function(this: unknown, ...args: Parameters<T>): void {
+    lastArgs = args;
+    lastContext = this;
+
+    if (rafId === null) {
+      rafId = requestAnimationFrame(() => {
+        if (lastArgs !== null) {
+          fn.apply(lastContext, lastArgs);
+        }
+        rafId = null;
+        lastArgs = null;
+        lastContext = null;
+      });
+    }
+  };
+
+  throttled.cancel = function(): void {
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+    lastArgs = null;
+    lastContext = null;
+  };
+
+  return throttled;
+}
+
+/**
+ * Event emitter interface for custom event handling.
+ *
+ * Provides methods for subscribing to, emitting, and managing custom events.
+ */
+export interface EventEmitter {
+  /**
+   * Registers an event handler for the specified event.
+   *
+   * @param {string} event - Event name
+   * @param {Function} handler - Event handler function
+   * @returns {Function} Unbind function to remove the handler
+   */
+  on(event: string, handler: (...args: unknown[]) => void): () => void;
+
+  /**
+   * Removes an event handler for the specified event.
+   *
+   * @param {string} event - Event name
+   * @param {Function} handler - Event handler function to remove
+   */
+  off(event: string, handler: (...args: unknown[]) => void): void;
+
+  /**
+   * Emits an event, calling all registered handlers with provided arguments.
+   *
+   * @param {string} event - Event name
+   * @param {...unknown[]} args - Arguments to pass to handlers
+   */
+  emit(event: string, ...args: unknown[]): void;
+
+  /**
+   * Registers an event handler that executes only once.
+   *
+   * @param {string} event - Event name
+   * @param {Function} handler - Event handler function
+   * @returns {Function} Unbind function to remove the handler before it fires
+   */
+  once(event: string, handler: (...args: unknown[]) => void): () => void;
+}
+
+/**
+ * Creates a custom event emitter for publish-subscribe pattern.
+ *
+ * Event emitters allow different parts of your application to communicate
+ * without tight coupling. Components can emit events and other components
+ * can listen for those events.
+ *
+ * Memory Management:
+ * - Use `off()` or the returned unbind function to remove listeners
+ * - Remove all listeners when the emitter is no longer needed
+ *
+ * @returns {EventEmitter} Event emitter instance
+ *
+ * @example
+ * const emitter = createEventEmitter();
+ *
+ * // Subscribe to events
+ * const unbind = emitter.on('user:login', (user) => {
+ *   console.log('User logged in:', user);
+ * });
+ *
+ * // Emit events
+ * emitter.emit('user:login', { id: 1, name: 'John' });
+ *
+ * // One-time listeners
+ * emitter.once('app:ready', () => {
+ *   console.log('App is ready!');
+ * });
+ *
+ * // Cleanup
+ * unbind();
+ */
+export function createEventEmitter(): EventEmitter {
+  const events = new Map<string, Set<(...args: unknown[]) => void>>();
+
+  return {
+    on(event: string, handler: (...args: unknown[]) => void): () => void {
+      if (!events.has(event)) {
+        events.set(event, new Set());
       }
-    };
+      events.get(event)!.add(handler);
 
-    target.addEventListener(eventName, listener);
+      // Return unbind function
+      return () => {
+        this.off(event, handler);
+      };
+    },
 
-    let timeoutId: ReturnType<typeof setTimeout> | null = null;
-    if (timeout) {
-      timeoutId = setTimeout(() => {
-        target.removeEventListener(eventName, listener);
-        reject(new Error(`Event timeout: ${eventName}`));
-      }, timeout);
+    off(event: string, handler: (...args: unknown[]) => void): void {
+      const handlers = events.get(event);
+      if (handlers) {
+        handlers.delete(handler);
+        if (handlers.size === 0) {
+          events.delete(event);
+        }
+      }
+    },
+
+    emit(event: string, ...args: unknown[]): void {
+      const handlers = events.get(event);
+      if (handlers) {
+        // Create a copy to avoid issues if handlers are removed during iteration
+        const handlersCopy = Array.from(handlers);
+        handlersCopy.forEach(handler => {
+          handler(...args);
+        });
+      }
+    },
+
+    once(event: string, handler: (...args: unknown[]) => void): () => void {
+      const onceHandler = (...args: unknown[]): void => {
+        this.off(event, onceHandler);
+        handler(...args);
+      };
+
+      return this.on(event, onceHandler);
     }
-  });
-}
-
-/**
- * Batch multiple function calls
- * @param fn Function to batch
- * @param batchSize Batch size
- * @param delay Delay between batches in milliseconds
- * @returns Batched function
- */
-export function batch<T extends (...args: any[]) => any>(
-  fn: T,
-  batchSize: number = 10,
-  delay: number = 100
-): (...args: Parameters<T>) => void {
-  let queue: Parameters<T>[] = [];
-  let timeoutId: ReturnType<typeof setTimeout> | null = null;
-
-  const processBatch = () => {
-    if (queue.length === 0) return;
-
-    const batch_items = queue.splice(0, batchSize);
-    batch_items.forEach((args) => fn(...args));
-
-    if (queue.length > 0) {
-      timeoutId = setTimeout(processBatch, delay);
-    }
-  };
-
-  return function (...args: Parameters<T>) {
-    queue.push(args);
-
-    if (queue.length >= batchSize) {
-      if (timeoutId) clearTimeout(timeoutId);
-      processBatch();
-    } else if (!timeoutId) {
-      timeoutId = setTimeout(processBatch, delay);
-    }
-  };
-}
-
-/**
- * Chains functions in sequence
- * @param fns Functions to chain
- * @returns Chained function
- */
-export function chain<T extends (...args: any[]) => any>(...fns: T[]): (...args: Parameters<T>) => void {
-  return function (...args: Parameters<T>) {
-    fns.forEach((fn) => fn(...args));
-  };
-}
-
-/**
- * Creates conditional event listener
- * @param target Event target
- * @param eventName Event name
- * @param condition Condition function
- * @param handler Event handler
- * @returns Cleanup function
- */
-export function onWhen<K extends keyof HTMLElementEventMap>(
-  target: HTMLElement | Window,
-  eventName: K,
-  condition: (ev: HTMLElementEventMap[K]) => boolean,
-  handler: (ev: HTMLElementEventMap[K]) => void
-): () => void {
-  const conditionalHandler = (event: Event) => {
-    if (condition(event as HTMLElementEventMap[K])) {
-      handler(event as HTMLElementEventMap[K]);
-    }
-  };
-
-  target.addEventListener(eventName as string, conditionalHandler as EventListener);
-
-  return () => {
-    target.removeEventListener(eventName as string, conditionalHandler as EventListener);
   };
 }

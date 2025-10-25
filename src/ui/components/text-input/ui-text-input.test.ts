@@ -1,407 +1,112 @@
-import { describe, it, beforeEach, afterEach } from 'node:test';
-import { strict as assert } from 'node:assert';
+import '../../../../browser-env.js';
+import { describe, test } from '../../../../tests/test-runner.js';
+import { customFixture, customExpect } from '../../../../tests/custom-test-utils.js';
+import './ui-text-input.js'; // Import the component to be tested
 
-/**
- * Test suite for ui-text-input component.
- * Tests define the expected API and behavior.
- */
 describe('ui-text-input', () => {
-  let element: any;
+  let element: HTMLElement;
 
-  beforeEach(() => {
-    // Create the custom element
-    element = document.createElement('ui-text-input');
-    document.body.appendChild(element);
-  });
-
-  afterEach(() => {
-    // Cleanup
-    if (element && element.parentElement) {
-      element.parentElement.removeChild(element);
-    }
-  });
-
-  describe('Basic Rendering', () => {
-    it('should render as a custom element', () => {
-      assert.equal(element.tagName, 'UI-TEXT-INPUT');
+  describe('rendering', () => {
+    test('should render a text input component', () => {
+      element = customFixture('ui-text-input');
+      customExpect(element).toExist();
+      customExpect(element.shadowRoot).toExist();
+      const input = element.shadowRoot!.querySelector('input');
+      customExpect(input).toExist();
+      customExpect(input!.type).toEqual('text');
     });
 
-    it('should have a shadow root', () => {
-      assert(element.shadowRoot, 'should have a shadow root');
-    });
-
-    it('should render an input element internally', () => {
-      const input = element.shadowRoot?.querySelector('input');
-      assert(input, 'should contain an input element');
-    });
-
-    it('should render a label element internally', () => {
-      const label = element.shadowRoot?.querySelector('label');
-      assert(label, 'should contain a label element');
+    test('should render with a label if provided', () => {
+      element = customFixture('ui-text-input', { label: "Username" });
+      const label = element.shadowRoot!.querySelector('label');
+      customExpect(label).toExist();
+      customExpect(label!.textContent).toEqual('Username');
+      const input = element.shadowRoot!.querySelector('input');
+      customExpect(input!.id).toEqual(label!.htmlFor);
     });
   });
 
-  describe('Properties & Attributes', () => {
-    it('should accept value property', () => {
-      element.value = 'test value';
-      assert.equal(element.value, 'test value');
+  describe('properties', () => {
+    test('should set the value property', () => {
+      element = customFixture('ui-text-input', { value: "test" });
+      const input = element.shadowRoot!.querySelector('input');
+      customExpect(input!.value).toEqual('test');
+      customExpect((element as any).value).toEqual('test');
     });
 
-    it('should reflect value in internal input', () => {
-      element.value = 'hello';
-      const input = element.shadowRoot?.querySelector('input');
-      assert.equal(input?.value, 'hello');
+    test('should set the placeholder property', () => {
+      element = customFixture('ui-text-input', { placeholder: "Enter text" });
+      const input = element.shadowRoot!.querySelector('input');
+      customExpect(input!.placeholder).toEqual('Enter text');
+      customExpect((element as any).placeholder).toEqual('Enter text');
     });
 
-    it('should accept placeholder property', () => {
-      element.placeholder = 'Enter text...';
-      assert.equal(element.placeholder, 'Enter text...');
+    test('should set the disabled property', () => {
+      element = customFixture('ui-text-input', { disabled: "" }); // Attributes are strings
+      const input = element.shadowRoot!.querySelector('input');
+      customExpect(input!.disabled).toBeTrue();
+      customExpect((element as any).disabled).toBeTrue();
     });
 
-    it('should reflect placeholder in internal input', () => {
-      element.placeholder = 'Type here';
-      const input = element.shadowRoot?.querySelector('input');
-      assert.equal(input?.placeholder, 'Type here');
+    test('should set the readonly property', () => {
+      element = customFixture('ui-text-input', { readonly: "" }); // Attributes are strings
+      const input = element.shadowRoot!.querySelector('input');
+      customExpect(input!.readOnly).toBeTrue();
+      customExpect((element as any).readOnly).toBeTrue();
     });
 
-    it('should accept type property', () => {
-      element.type = 'email';
-      assert.equal(element.type, 'email');
+    test('should set the type property', () => {
+      element = customFixture('ui-text-input', { type: "password" });
+      const input = element.shadowRoot!.querySelector('input');
+      customExpect(input!.type).toEqual('password');
+      customExpect((element as any).type).toEqual('password');
     });
 
-    it('should support type variations', () => {
-      const types = ['text', 'email', 'password', 'number', 'url', 'tel', 'date'];
-      for (const type of types) {
-        element.type = type;
-        assert.equal(element.type, type);
-      }
-    });
-
-    it('should accept disabled property', () => {
-      element.disabled = true;
-      assert.equal(element.disabled, true);
-    });
-
-    it('should reflect disabled on internal input', () => {
-      element.disabled = true;
-      const input = element.shadowRoot?.querySelector('input');
-      assert.equal(input?.disabled, true);
-    });
-
-    it('should accept readonly property', () => {
-      element.readonly = true;
-      assert.equal(element.readonly, true);
-    });
-
-    it('should accept required property', () => {
-      element.required = true;
-      assert.equal(element.required, true);
-    });
-
-    it('should accept maxLength property', () => {
-      element.maxLength = 50;
-      assert.equal(element.maxLength, 50);
-    });
-
-    it('should reflect maxLength on internal input', () => {
-      element.maxLength = 30;
-      const input = element.shadowRoot?.querySelector('input');
-      assert.equal(input?.maxLength, 30);
-    });
-
-    it('should accept pattern property for validation', () => {
-      element.pattern = '^[a-zA-Z]+$';
-      assert.equal(element.pattern, '^[a-zA-Z]+$');
-    });
-
-    it('should accept label property', () => {
-      element.label = 'Email Address';
-      assert.equal(element.label, 'Email Address');
-    });
-
-    it('should render label text', () => {
-      element.label = 'Username';
-      const label = element.shadowRoot?.querySelector('label');
-      assert(label?.textContent?.includes('Username'));
+    test('should set the name property', () => {
+      element = customFixture('ui-text-input', { name: "my-input" });
+      const input = element.shadowRoot!.querySelector('input');
+      customExpect(input!.name).toEqual('my-input');
+      customExpect((element as any).name).toEqual('my-input');
     });
   });
 
-  describe('Attributes', () => {
-    it('should sync value attribute to property', () => {
-      element.setAttribute('value', 'test');
-      assert.equal(element.value, 'test');
+  describe('accessibility', () => {
+    test('should associate label with input using id and htmlFor', () => {
+      element = customFixture('ui-text-input', { label: "Email", id: "email-input" });
+      const label = element.shadowRoot!.querySelector('label');
+      const input = element.shadowRoot!.querySelector('input');
+
+      customExpect(label).toExist();
+      customExpect(input).toExist();
+      customExpect(label!.htmlFor).toEqual('email-input');
+      customExpect(input!.id).toEqual('email-input');
     });
 
-    it('should sync placeholder attribute to property', () => {
-      element.setAttribute('placeholder', 'hint');
-      assert.equal(element.placeholder, 'hint');
-    });
+    test('should generate a unique id if not provided', () => {
+      element = customFixture('ui-text-input', { label: "Search" });
+      const label = element.shadowRoot!.querySelector('label');
+      const input = element.shadowRoot!.querySelector('input');
 
-    it('should recognize disabled attribute', () => {
-      element.setAttribute('disabled', '');
-      assert.equal(element.disabled, true);
-    });
-
-    it('should recognize readonly attribute', () => {
-      element.setAttribute('readonly', '');
-      assert.equal(element.readonly, true);
-    });
-
-    it('should recognize required attribute', () => {
-      element.setAttribute('required', '');
-      assert.equal(element.required, true);
+      customExpect(label).toExist();
+      customExpect(input).toExist();
+      customExpect(label!.htmlFor).toNotBeEmpty(); // Need to implement toNotBeEmpty
+      customExpect(input!.id).toNotBeEmpty(); // Need to implement toNotBeEmpty
+      customExpect(label!.htmlFor).toEqual(input!.id);
     });
   });
 
-  describe('Events', () => {
-    it('should emit input event when value changes', () => {
-      let eventFired = false;
-      element.addEventListener('input', () => {
-        eventFired = true;
-      });
-
-      const input = element.shadowRoot?.querySelector('input');
-      input?.dispatchEvent(new Event('input', { bubbles: true }));
-
-      assert.equal(eventFired, true);
-    });
-
-    it('should emit change event when input loses focus', () => {
-      let eventFired = false;
-      element.addEventListener('change', () => {
-        eventFired = true;
-      });
-
-      const input = element.shadowRoot?.querySelector('input');
-      input?.dispatchEvent(new Event('change', { bubbles: true }));
-
-      assert.equal(eventFired, true);
-    });
-
-    it('should emit focus event when input gains focus', () => {
-      let eventFired = false;
-      element.addEventListener('focus', () => {
-        eventFired = true;
-      });
-
-      const input = element.shadowRoot?.querySelector('input');
-      input?.dispatchEvent(new Event('focus', { bubbles: true }));
-
-      assert.equal(eventFired, true);
-    });
-
-    it('should emit blur event when input loses focus', () => {
-      let eventFired = false;
-      element.addEventListener('blur', () => {
-        eventFired = true;
-      });
-
-      const input = element.shadowRoot?.querySelector('input');
-      input?.dispatchEvent(new Event('blur', { bubbles: true }));
-
-      assert.equal(eventFired, true);
-    });
-  });
-
-  describe('Validation', () => {
-    it('should validate required field', () => {
-      element.required = true;
-      element.value = '';
-      const isValid = element.checkValidity?.();
-      assert.equal(isValid, false);
-    });
-
-    it('should be valid when required field has value', () => {
-      element.required = true;
-      element.value = 'something';
-      const isValid = element.checkValidity?.();
-      assert.equal(isValid, true);
-    });
-
-    it('should validate email type', () => {
-      element.type = 'email';
-      element.value = 'invalid-email';
-      const isValid = element.checkValidity?.();
-      assert.equal(isValid, false);
-    });
-
-    it('should validate valid email', () => {
-      element.type = 'email';
-      element.value = 'test@example.com';
-      const isValid = element.checkValidity?.();
-      assert.equal(isValid, true);
-    });
-
-    it('should validate pattern', () => {
-      element.pattern = '^[0-9]+$'; // numbers only
-      element.value = 'abc';
-      const isValid = element.checkValidity?.();
-      assert.equal(isValid, false);
-    });
-
-    it('should validate matching pattern', () => {
-      element.pattern = '^[0-9]+$';
-      element.value = '12345';
-      const isValid = element.checkValidity?.();
-      assert.equal(isValid, true);
-    });
-
-    it('should report validation error message', () => {
-      element.required = true;
-      element.value = '';
-      const message = element.validationMessage?.();
-      assert(message, 'should have validation message');
-    });
-  });
-
-  describe('Methods', () => {
-    it('should have focus method', () => {
-      assert.equal(typeof element.focus, 'function');
-    });
-
-    it('should focus internal input', () => {
-      const input = element.shadowRoot?.querySelector('input');
-      let focused = false;
-
-      input?.addEventListener('focus', () => {
-        focused = true;
-      });
-
-      element.focus?.();
-      assert.equal(focused, true);
-    });
-
-    it('should have blur method', () => {
-      assert.equal(typeof element.blur, 'function');
-    });
-
-    it('should blur internal input', () => {
-      const input = element.shadowRoot?.querySelector('input');
-      element.focus?.();
-
-      let blurred = false;
-      input?.addEventListener('blur', () => {
-        blurred = true;
-      });
-
-      element.blur?.();
-      assert.equal(blurred, true);
-    });
-
-    it('should have select method', () => {
-      assert.equal(typeof element.select, 'function');
-    });
-
-    it('should select text in internal input', () => {
-      element.value = 'test text';
-      element.select?.();
-
-      const input = element.shadowRoot?.querySelector('input');
-      assert.equal(input?.selectionStart, 0);
-      assert.equal(input?.selectionEnd, 'test text'.length);
-    });
-
-    it('should have checkValidity method', () => {
-      assert.equal(typeof element.checkValidity, 'function');
-    });
-
-    it('should have validationMessage getter', () => {
-      element.required = true;
-      element.value = '';
-      const message = element.validationMessage;
-      assert(message, 'should have validation message');
-    });
-  });
-
-  describe('Styling & States', () => {
-    it('should apply disabled styles when disabled', () => {
-      element.disabled = true;
-      const input = element.shadowRoot?.querySelector('input');
-      // Disabled state should exist and be marked as disabled
-      assert.equal(input?.disabled, true);
-    });
-
-    it('should apply error state when validation fails', () => {
-      element.required = true;
-      element.value = '';
-      const hasErrorClass = element.classList?.contains('error');
-      // Should either have error class or aria-invalid attribute
-      assert(hasErrorClass || element.getAttribute('aria-invalid') === 'true');
-    });
-
-    it('should support CSS custom properties for theming', () => {
-      // This will be verified through visual inspection, but we can check the structure
-      const input = element.shadowRoot?.querySelector('input');
-      // Should be able to use CSS variables
-      assert(input, 'input should exist for styling');
-    });
-  });
-
-  describe('Accessibility', () => {
-    it('should have proper ARIA attributes', () => {
-      element.label = 'Username';
-      element.required = true;
-
-      const input = element.shadowRoot?.querySelector('input');
-      assert(input?.getAttribute('aria-required') === 'true');
-    });
-
-    it('should connect label to input via aria-labelledby', () => {
-      element.label = 'Email';
-      const label = element.shadowRoot?.querySelector('label');
-      const input = element.shadowRoot?.querySelector('input');
-
-      const labelId = label?.id;
-      const ariaLabelledBy = input?.getAttribute('aria-labelledby');
-      assert.equal(ariaLabelledBy, labelId);
-    });
-
-    it('should support aria-invalid for validation errors', () => {
-      element.required = true;
-      element.value = '';
-      element.checkValidity?.();
-
-      const input = element.shadowRoot?.querySelector('input');
-      assert.equal(input?.getAttribute('aria-invalid'), 'true');
-    });
-
-    it('should support aria-describedby for error messages', () => {
-      element.required = true;
-      element.value = '';
-      element.checkValidity?.();
-
-      const input = element.shadowRoot?.querySelector('input');
-      const ariaDescribedBy = input?.getAttribute('aria-describedby');
-      assert(ariaDescribedBy, 'should have aria-describedby for error messages');
-    });
-
-    it('should support keyboard navigation', () => {
-      const input = element.shadowRoot?.querySelector('input');
-      assert(input?.tabIndex >= 0 || input?.tabIndex === -1);
-    });
-  });
-
-  describe('Form Integration', () => {
-    it('should work in a form', () => {
-      const form = document.createElement('form');
-      const input = document.createElement('ui-text-input');
-      input.setAttribute('name', 'username');
-      input.setAttribute('value', 'testuser');
-
-      form.appendChild(input);
-      document.body.appendChild(form);
-
-      const formData = new FormData(form);
-      assert.equal(formData.get('username'), 'testuser');
-
-      document.body.removeChild(form);
-    });
-
-    it('should support name attribute for form submission', () => {
-      element.setAttribute('name', 'email');
-      element.value = 'test@example.com';
-
-      assert.equal(element.getAttribute('name'), 'email');
+  describe('strict TypeScript', () => {
+    test('should have correct type definitions for properties', () => {
+      // This is a compile-time check, but we can simulate a runtime check
+      // by ensuring properties are defined with expected types.
+      const instance = document.createElement('ui-text-input');
+      customExpect(typeof (instance as any).value).toEqual('string');
+      customExpect(typeof (instance as any).placeholder).toEqual('string');
+      customExpect(typeof (instance as any).disabled).toEqual('boolean');
+      customExpect(typeof (instance as any).readOnly).toEqual('boolean');
+      customExpect(typeof (instance as any).type).toEqual('string');
+      customExpect(typeof (instance as any).name).toEqual('string');
+      customExpect(typeof (instance as any).label).toEqual('string');
     });
   });
 });

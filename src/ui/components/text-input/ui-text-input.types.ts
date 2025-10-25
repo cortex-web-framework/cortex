@@ -28,6 +28,11 @@ export interface TextInputChangeEvent extends CustomEvent {
 }
 
 /**
+ * Input size type.
+ */
+export type TextInputSize = 'small' | 'medium' | 'large';
+
+/**
  * Validation error type.
  */
 export type ValidationError =
@@ -35,6 +40,7 @@ export type ValidationError =
   | 'invalid-email'
   | 'invalid-pattern'
   | 'too-long'
+  | 'too-short'
   | 'invalid-type';
 
 /**
@@ -91,6 +97,11 @@ export interface TextInputConfig {
   maxLength?: number;
 
   /**
+   * Minimum length of input value.
+   */
+  minLength?: number;
+
+  /**
    * Validation pattern (regex).
    */
   pattern?: string;
@@ -99,6 +110,21 @@ export interface TextInputConfig {
    * Form field name for form submission.
    */
   name?: string;
+
+  /**
+   * Size of the input (affects height).
+   */
+  size?: TextInputSize;
+
+  /**
+   * External error message to display.
+   */
+  error?: string;
+
+  /**
+   * Help text to display below the input.
+   */
+  help?: string;
 
   /**
    * Custom CSS class for styling.
@@ -151,6 +177,11 @@ export interface ITextInputElement extends HTMLElement {
   maxLength: number;
 
   /**
+   * Get/set minimum length.
+   */
+  minLength: number;
+
+  /**
    * Get/set validation pattern.
    */
   pattern: string;
@@ -159,6 +190,21 @@ export interface ITextInputElement extends HTMLElement {
    * Get/set form field name.
    */
   name: string;
+
+  /**
+   * Get/set input size.
+   */
+  size: TextInputSize;
+
+  /**
+   * Get/set external error message.
+   */
+  error: string;
+
+  /**
+   * Get/set help text.
+   */
+  help: string;
 
   /**
    * Check if the input is valid.
@@ -221,8 +267,12 @@ export interface TextInputState {
   readonly: boolean;
   required: boolean;
   maxLength: number;
+  minLength: number;
   pattern: string;
   name: string;
+  size: TextInputSize;
+  error: string;
+  help: string;
   isDirty: boolean;
   isFocused: boolean;
   isValid: boolean;

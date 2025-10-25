@@ -1,12 +1,20 @@
 /**
- * Array utilities - NO external dependencies (no lodash)
+ * Array Utilities Library
+ * ZERO external dependencies - Pure TypeScript implementation
+ * Comprehensive array manipulation, analysis, transformation, and utility functions
  */
 
+// ============================================
+// ARRAY MANIPULATION
+// ============================================
+
 /**
- * Chunks an array into smaller arrays of specified size
- * @param arr Array to chunk
- * @param size Size of each chunk
+ * Splits an array into smaller chunks of specified size
+ * @param arr - Array to chunk
+ * @param size - Size of each chunk (must be positive)
  * @returns Array of chunks
+ * @example
+ * chunk([1, 2, 3, 4, 5], 2) // [[1, 2], [3, 4], [5]]
  */
 export function chunk<T>(arr: T[], size: number): T[][] {
   if (size <= 0) {
@@ -21,21 +29,39 @@ export function chunk<T>(arr: T[], size: number): T[][] {
 }
 
 /**
- * Returns unique values from array
- * @param arr Array
- * @returns Array with unique values
+ * Flattens a nested array one level deep
+ * @param arr - Nested array to flatten
+ * @returns Flattened array
+ * @example
+ * flatten([[1, 2], [3], [4, 5]]) // [1, 2, 3, 4, 5]
  */
-export function unique<T>(arr: T[]): T[] {
-  return Array.from(new Set(arr));
+export function flatten<T>(arr: (T | T[])[]): T[] {
+  const result: T[] = [];
+  for (const item of arr) {
+    if (Array.isArray(item)) {
+      result.push(...item);
+    } else {
+      result.push(item);
+    }
+  }
+  return result;
 }
 
 /**
- * Returns unique values based on a predicate
- * @param arr Array
- * @param key Function to get unique key
+ * Returns unique values from array
+ * Supports optional key function for custom uniqueness comparison
+ * @param arr - Array to process
+ * @param key - Optional function to extract comparison key
  * @returns Array with unique values
+ * @example
+ * unique([1, 2, 2, 3]) // [1, 2, 3]
+ * unique([{id:1,name:'a'}, {id:1,name:'b'}], item => item.id) // [{id:1,name:'a'}]
  */
-export function uniqueBy<T>(arr: T[], key: (item: T) => any): T[] {
+export function unique<T>(arr: T[], key?: (item: T) => any): T[] {
+  if (!key) {
+    return Array.from(new Set(arr));
+  }
+
   const seen = new Set<any>();
   return arr.filter((item) => {
     const k = key(item);
@@ -48,73 +74,63 @@ export function uniqueBy<T>(arr: T[], key: (item: T) => any): T[] {
 }
 
 /**
- * Flattens a nested array
- * @param arr Nested array
- * @param depth Depth to flatten (default: Infinity)
- * @returns Flattened array
+ * Removes null and undefined values from array
+ * Note: keeps falsy values like false, 0, and empty strings
+ * @param arr - Array to compact
+ * @returns Array without null/undefined
+ * @example
+ * compact([1, null, 2, undefined, 3]) // [1, 2, 3]
  */
-export function flatten<T>(arr: any[], depth: number = Infinity): T[] {
-  if (depth === 0) {
-    return arr;
-  }
-
-  return arr.reduce((acc: T[], item) => {
-    if (Array.isArray(item)) {
-      return acc.concat(flatten(item, depth - 1));
-    }
-    return acc.concat(item);
-  }, []);
+export function compact<T>(arr: (T | null | undefined)[]): T[] {
+  return arr.filter((item): item is T => item !== null && item !== undefined);
 }
 
-/**
- * Finds the index of an element matching a predicate
- * @param arr Array
- * @param predicate Function to test
- * @returns Index or -1
- */
-export function findIndex<T>(arr: T[], predicate: (item: T) => boolean): number {
-  for (let i = 0; i < arr.length; i++) {
-    if (predicate(arr[i])) {
-      return i;
-    }
-  }
-  return -1;
-}
+// ============================================
+// ARRAY ANALYSIS
+// ============================================
 
 /**
  * Groups array items by a key
- * @param arr Array
- * @param key Function to get grouping key
- * @returns Object with groups
+ * @param arr - Array to group
+ * @param key - Function to extract grouping key or property name
+ * @returns Object with grouped arrays
+ * @example
+ * groupBy([{role:'admin',name:'Alice'}, {role:'user',name:'Bob'}], item => item.role)
+ * // { admin: [{...}], user: [{...}] }
  */
-export function groupBy<T>(arr: T[], key: (item: T) => string): Record<string, T[]> {
-  return arr.reduce(
-    (acc, item) => {
-      const k = key(item);
-      if (!acc[k]) {
-        acc[k] = [];
-      }
-      acc[k].push(item);
-      return acc;
-    },
-    {} as Record<string, T[]>
-  );
+export function groupBy<T, K extends string | number | symbol>(
+  arr: T[],
+  key: ((item: T) => K) | K
+): Record<K, T[]> {
+  const result = {} as Record<K, T[]>;
+  const getKey = typeof key === 'function' ? key : (item: T) => (item as any)[key];
+
+  for (const item of arr) {
+    const k = getKey(item);
+    if (!result[k]) {
+      result[k] = [];
+    }
+    result[k].push(item);
+  }
+
+  return result;
 }
 
 /**
- * Sorts array by a specific key/property
- * @param arr Array
- * @param key Property name or function
- * @param order Sort order: 'asc' or 'desc'
- * @returns Sorted array (new copy)
+ * Sorts array by a specific key or property
+ * @param arr - Array to sort
+ * @param key - Function to extract sort value or property name
+ * @param order - Sort order: 'asc' or 'desc' (default: 'asc')
+ * @returns New sorted array (original unchanged)
+ * @example
+ * sortBy([{id:3}, {id:1}, {id:2}], 'id') // [{id:1}, {id:2}, {id:3}]
  */
 export function sortBy<T>(
   arr: T[],
-  key: ((item: T) => any) | string,
+  key: ((item: T) => any) | keyof T,
   order: 'asc' | 'desc' = 'asc'
 ): T[] {
   const sorted = [...arr];
-
   const getValue = typeof key === 'function' ? key : (item: T) => (item as any)[key];
 
   sorted.sort((a, b) => {
@@ -134,167 +150,68 @@ export function sortBy<T>(
 }
 
 /**
- * Removes duplicates while preserving order
- * @param arr Array
- * @param key Optional key function for custom comparison
- * @returns Array without duplicates
+ * Finds the first index of element matching predicate
+ * @param arr - Array to search
+ * @param predicate - Function to test each element
+ * @returns Index of first match, or -1 if not found
+ * @example
+ * findIndex([1, 2, 3, 4], (item) => item === 3) // 2
  */
-export function removeDuplicates<T>(
+export function findIndex<T>(
   arr: T[],
-  key?: (item: T) => any
-): T[] {
-  if (!key) {
-    return unique(arr);
-  }
-
-  return uniqueBy(arr, key);
-}
-
-/**
- * Checks if all items in array pass a test
- * @param arr Array
- * @param predicate Test function
- * @returns True if all pass
- */
-export function all<T>(arr: T[], predicate: (item: T) => boolean): boolean {
-  return arr.every(predicate);
-}
-
-/**
- * Checks if any item in array passes a test
- * @param arr Array
- * @param predicate Test function
- * @returns True if any passes
- */
-export function any<T>(arr: T[], predicate: (item: T) => boolean): boolean {
-  return arr.some(predicate);
-}
-
-/**
- * Counts items matching a predicate
- * @param arr Array
- * @param predicate Test function
- * @returns Count of matching items
- */
-export function count<T>(arr: T[], predicate: (item: T) => boolean): number {
-  return arr.filter(predicate).length;
-}
-
-/**
- * Sums numeric values in array
- * @param arr Array of numbers
- * @returns Sum
- */
-export function sum(arr: number[]): number {
-  return arr.reduce((acc, val) => acc + val, 0);
-}
-
-/**
- * Averages numeric values in array
- * @param arr Array of numbers
- * @returns Average
- */
-export function average(arr: number[]): number {
-  if (arr.length === 0) {
-    return 0;
-  }
-  return sum(arr) / arr.length;
-}
-
-/**
- * Finds minimum value in array
- * @param arr Array
- * @returns Minimum value
- */
-export function min(arr: number[]): number {
-  return Math.min(...arr);
-}
-
-/**
- * Finds maximum value in array
- * @param arr Array
- * @returns Maximum value
- */
-export function max(arr: number[]): number {
-  return Math.max(...arr);
-}
-
-/**
- * Creates a range of numbers
- * @param start Start number
- * @param end End number (exclusive)
- * @param step Step size (default: 1)
- * @returns Array of numbers
- */
-export function range(start: number, end: number, step: number = 1): number[] {
-  const result: number[] = [];
-  for (let i = start; i < end; i += step) {
-    result.push(i);
-  }
-  return result;
-}
-
-/**
- * Fills array with a value
- * @param arr Array
- * @param value Value to fill
- * @returns Filled array
- */
-export function fill<T>(arr: T[], value: T): T[] {
-  return arr.map(() => value);
-}
-
-/**
- * Transposes a 2D array
- * @param arr 2D array
- * @returns Transposed array
- */
-export function transpose<T>(arr: T[][]): T[][] {
-  if (arr.length === 0) {
-    return [];
-  }
-
-  const maxLength = Math.max(...arr.map((row) => row.length));
-  const result: T[][] = [];
-
-  for (let i = 0; i < maxLength; i++) {
-    const row: T[] = [];
-    for (let j = 0; j < arr.length; j++) {
-      if (i < arr[j].length) {
-        row.push(arr[j][i]);
-      }
+  predicate: (item: T, index: number) => boolean
+): number {
+  for (let i = 0; i < arr.length; i++) {
+    if (predicate(arr[i], i)) {
+      return i;
     }
-    result.push(row);
   }
-
-  return result;
+  return -1;
 }
 
 /**
- * Zips multiple arrays into tuples
- * @param arrays Arrays to zip
- * @returns Array of tuples
+ * Finds the last index of element matching predicate
+ * @param arr - Array to search
+ * @param predicate - Function to test each element
+ * @returns Index of last match, or -1 if not found
+ * @example
+ * findLastIndex([1, 2, 3, 2], (item) => item === 2) // 3
  */
-export function zip<T>(...arrays: T[][]): T[][] {
-  if (arrays.length === 0) {
-    return [];
+export function findLastIndex<T>(
+  arr: T[],
+  predicate: (item: T, index: number) => boolean
+): number {
+  for (let i = arr.length - 1; i >= 0; i--) {
+    if (predicate(arr[i], i)) {
+      return i;
+    }
   }
+  return -1;
+}
 
-  const minLength = Math.min(...arrays.map((arr) => arr.length));
-  const result: T[][] = [];
+// ============================================
+// ARRAY TRANSFORMATION
+// ============================================
 
-  for (let i = 0; i < minLength; i++) {
-    result.push(arrays.map((arr) => arr[i]));
-  }
-
-  return result;
+/**
+ * Extracts values of a specific property from array of objects
+ * @param arr - Array of objects
+ * @param key - Property key to extract
+ * @returns Array of property values
+ * @example
+ * pluck([{id:1, name:'a'}, {id:2, name:'b'}], 'name') // ['a', 'b']
+ */
+export function pluck<T, K extends keyof T>(arr: T[], key: K): T[K][] {
+  return arr.map((item) => item[key]);
 }
 
 /**
- * Partition array into two based on predicate
- * @param arr Array
- * @param predicate Test function
- * @returns Tuple of [passing, failing]
+ * Splits array into two groups based on predicate
+ * @param arr - Array to partition
+ * @param predicate - Function to test each element
+ * @returns Tuple: [passing elements, failing elements]
+ * @example
+ * partition([1, 2, 3, 4], item => item % 2 === 1) // [[1, 3], [2, 4]]
  */
 export function partition<T>(
   arr: T[],
@@ -303,64 +220,77 @@ export function partition<T>(
   const pass: T[] = [];
   const fail: T[] = [];
 
-  arr.forEach((item) => {
+  for (const item of arr) {
     if (predicate(item)) {
       pass.push(item);
     } else {
       fail.push(item);
     }
-  });
+  }
 
   return [pass, fail];
 }
 
 /**
- * Compacts array (removes null and undefined)
- * @param arr Array
- * @returns Array without null/undefined
+ * Returns unique values from array (alias for unique with no key)
+ * @param arr - Array to process
+ * @returns Array with unique values
+ * @example
+ * uniq([1, 2, 2, 3, 3, 3]) // [1, 2, 3]
  */
-export function compact<T>(arr: (T | null | undefined)[]): T[] {
-  return arr.filter((item): item is T => item !== null && item !== undefined);
+export function uniq<T>(arr: T[]): T[] {
+  return unique(arr);
 }
 
 /**
- * Intersects two arrays
- * @param arr1 First array
- * @param arr2 Second array
- * @returns Array of common elements
+ * Returns array excluding specified values
+ * @param arr - Source array
+ * @param values - Values to exclude
+ * @returns New array without specified values
+ * @example
+ * without([1, 2, 3, 4], 2, 4) // [1, 3]
+ */
+export function without<T>(arr: T[], ...values: T[]): T[] {
+  const excludeSet = new Set(values);
+  return arr.filter((item) => !excludeSet.has(item));
+}
+
+/**
+ * Returns intersection of two arrays (common elements)
+ * @param arr1 - First array
+ * @param arr2 - Second array
+ * @returns Array of elements present in both arrays
+ * @example
+ * intersection([1, 2, 3], [2, 3, 4]) // [2, 3]
  */
 export function intersection<T>(arr1: T[], arr2: T[]): T[] {
-  return arr1.filter((item) => arr2.includes(item));
+  const set2 = new Set(arr2);
+  return arr1.filter((item) => set2.has(item));
 }
 
 /**
- * Differences between two arrays
- * @param arr1 First array
- * @param arr2 Second array
+ * Returns difference between two arrays (elements in first but not second)
+ * @param arr1 - First array
+ * @param arr2 - Second array
  * @returns Elements in arr1 but not in arr2
+ * @example
+ * difference([1, 2, 3], [2, 3, 4]) // [1]
  */
 export function difference<T>(arr1: T[], arr2: T[]): T[] {
-  return arr1.filter((item) => !arr2.includes(item));
+  const set2 = new Set(arr2);
+  return arr1.filter((item) => !set2.has(item));
 }
 
-/**
- * Moves an element from one index to another
- * @param arr Array
- * @param fromIndex Current index
- * @param toIndex Target index
- * @returns New array with element moved
- */
-export function move<T>(arr: T[], fromIndex: number, toIndex: number): T[] {
-  const result = [...arr];
-  const item = result.splice(fromIndex, 1)[0];
-  result.splice(toIndex, 0, item);
-  return result;
-}
+// ============================================
+// SAMPLING
+// ============================================
 
 /**
- * Shuffles array (Fisher-Yates algorithm)
- * @param arr Array to shuffle
- * @returns Shuffled array
+ * Randomly shuffles array elements using Fisher-Yates algorithm
+ * @param arr - Array to shuffle
+ * @returns New shuffled array (original unchanged)
+ * @example
+ * shuffle([1, 2, 3]) // [2, 1, 3] (random order)
  */
 export function shuffle<T>(arr: T[]): T[] {
   const result = [...arr];
@@ -374,11 +304,69 @@ export function shuffle<T>(arr: T[]): T[] {
 }
 
 /**
- * Samples random elements from array
- * @param arr Array
- * @param count Number of elements to sample
- * @returns Random elements
+ * Returns random sample(s) from array
+ * @param arr - Array to sample from
+ * @param count - Number of elements to sample (optional)
+ * @returns Single element if count not specified, array of elements otherwise
+ * @example
+ * sample([1, 2, 3, 4, 5]) // 3 (random single element)
+ * sample([1, 2, 3, 4, 5], 3) // [2, 4, 1] (random 3 elements)
  */
-export function sample<T>(arr: T[], count: number = 1): T[] {
-  return shuffle(arr).slice(0, count);
+export function sample<T>(arr: T[], count?: number): T | T[] {
+  if (count === undefined) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  const shuffled = shuffle(arr);
+  return shuffled.slice(0, Math.min(count, arr.length));
+}
+
+// ============================================
+// UTILITY
+// ============================================
+
+/**
+ * Creates an array of numbers in specified range
+ * @param start - Start number (inclusive)
+ * @param end - End number (inclusive)
+ * @param step - Step size (default: 1)
+ * @returns Array of numbers
+ * @example
+ * range(1, 5) // [1, 2, 3, 4, 5]
+ * range(0, 10, 2) // [0, 2, 4, 6, 8, 10]
+ */
+export function range(start: number, end: number, step: number = 1): number[] {
+  const result: number[] = [];
+
+  if (step > 0) {
+    for (let i = start; i <= end; i += step) {
+      result.push(i);
+    }
+  } else if (step < 0) {
+    for (let i = start; i >= end; i += step) {
+      result.push(i);
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Creates an array filled with specified value or function-generated values
+ * @param length - Length of array to create
+ * @param value - Value to fill with, or function to generate values
+ * @returns Array filled with values
+ * @example
+ * fill(3, 'x') // ['x', 'x', 'x']
+ * fill(3, () => Math.random()) // [0.123, 0.456, 0.789]
+ */
+export function fill<T>(length: number, value: T | (() => T)): T[] {
+  const result: T[] = [];
+  const isFunction = typeof value === 'function';
+
+  for (let i = 0; i < length; i++) {
+    result.push(isFunction ? (value as () => T)() : value);
+  }
+
+  return result;
 }

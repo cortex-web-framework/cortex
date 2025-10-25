@@ -1,88 +1,130 @@
 /**
- * Form validation utilities - NO external dependencies
- * Pure TypeScript validation functions
+ * Validation Utility Library
+ * Zero external dependencies, pure functions with strict TypeScript
+ *
+ * @module validation
  */
 
+// Constants for validation
+const EMAIL_REGEX = /^[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const URL_REGEX = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
+const PHONE_REGEX = /^\+?[\d\s\-()]{10,}$/;
+const MIN_PASSWORD_LENGTH = 8;
+const STRONG_PASSWORD_LENGTH = 12;
+
 /**
- * Validates email format
- * @param email Email address
- * @returns True if valid email
+ * Validation rule interface for custom validators
+ */
+export interface ValidationRule {
+  readonly name: string;
+  readonly validate: (value: unknown) => boolean;
+  readonly message: string;
+}
+
+/**
+ * Validation result interface
+ */
+export interface ValidationResult {
+  readonly valid: boolean;
+  readonly errors: readonly string[];
+}
+
+/**
+ * Password strength result interface
+ */
+export interface PasswordStrengthResult {
+  readonly valid: boolean;
+  readonly strength: 'weak' | 'medium' | 'strong';
+  readonly issues: readonly string[];
+}
+
+/**
+ * Validates an email address using RFC 5322 simplified pattern
+ *
+ * @param email - The email address to validate
+ * @returns True if the email is valid, false otherwise
+ *
+ * @example
+ * validateEmail('user@example.com'); // true
+ * validateEmail('invalid@'); // false
  */
 export function validateEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
-/**
- * Validates password strength
- * Returns error message if invalid, null if valid
- * @param password Password to validate
- * @returns Error message or null if valid
- *
- * Requirements:
- * - At least 8 characters
- * - At least one uppercase letter
- * - At least one number
- * - At least one special character
- */
-export function validatePassword(password: string): string | null {
-  if (password.length < 8) {
-    return 'Password must be at least 8 characters';
-  }
-
-  if (!/[A-Z]/.test(password)) {
-    return 'Password must contain at least one uppercase letter';
-  }
-
-  if (!/[0-9]/.test(password)) {
-    return 'Password must contain at least one number';
-  }
-
-  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
-    return 'Password must contain at least one special character';
-  }
-
-  return null;
-}
-
-/**
- * Validates phone number format
- * @param phone Phone number
- * @param format Format: 'US' or 'INTL'
- * @returns True if valid
- */
-export function validatePhone(phone: string, format: 'US' | 'INTL' = 'US'): boolean {
-  const cleanPhone = phone.replace(/\D/g, '');
-
-  if (format === 'US') {
-    // US format: 10 digits
-    return cleanPhone.length === 10;
-  }
-
-  // International format: 7-15 digits
-  return cleanPhone.length >= 7 && cleanPhone.length <= 15;
-}
-
-/**
- * Validates URL format
- * @param url URL to validate
- * @returns True if valid URL
- */
-export function validateURL(url: string): boolean {
-  try {
-    new URL(url);
-    return true;
-  } catch {
+  if (!email || typeof email !== 'string') {
     return false;
   }
+
+  // Check for consecutive dots
+  if (email.includes('..')) {
+    return false;
+  }
+
+  // Check for spaces
+  if (email.includes(' ')) {
+    return false;
+  }
+
+  return EMAIL_REGEX.test(email);
+}
+
+/**
+ * Validates a URL
+ *
+ * @param url - The URL to validate
+ * @returns True if the URL is valid, false otherwise
+ *
+ * @example
+ * validateURL('https://www.example.com'); // true
+ * validateURL('not-a-url'); // false
+ */
+export function validateURL(url: string): boolean {
+  if (!url || typeof url !== 'string') {
+    return false;
+  }
+
+  return URL_REGEX.test(url);
+}
+
+/**
+ * Validates an international phone number
+ *
+ * @param phone - The phone number to validate
+ * @param region - Optional region code (for future expansion)
+ * @returns True if the phone number is valid, false otherwise
+ *
+ * @example
+ * validatePhone('+1234567890'); // true
+ * validatePhone('123'); // false
+ */
+export function validatePhone(phone: string, region?: string): boolean {
+  if (!phone || typeof phone !== 'string') {
+    return false;
+  }
+
+  // Remove common formatting characters
+  const cleaned = phone.replace(/[\s\-()]/g, '');
+
+  // Must have at least 10 digits
+  const digitCount = (cleaned.match(/\d/g) || []).length;
+  if (digitCount < 10) {
+    return false;
+  }
+
+  // Must only contain digits, +, spaces, hyphens, and parentheses
+  return PHONE_REGEX.test(phone);
 }
 
 /**
  * Validates that a value is not empty
- * @param value Value to check
- * @returns True if not empty
+ *
+ * @param value - The value to validate
+ * @returns True if the value is not empty, false otherwise
+ *
+ * @example
+ * validateRequired('text'); // true
+ * validateRequired(''); // false
+ * validateRequired(null); // false
  */
-export function validateRequired(value: any): boolean {
+export function validateRequired(value: unknown): boolean {
   if (value === null || value === undefined) {
     return false;
   }
@@ -91,93 +133,213 @@ export function validateRequired(value: any): boolean {
     return value.trim().length > 0;
   }
 
-  if (Array.isArray(value)) {
-    return value.length > 0;
+  return true;
+}
+
+/**
+ * Validates that a string meets minimum length requirement
+ *
+ * @param value - The string to validate
+ * @param min - Minimum length required
+ * @returns True if the string meets minimum length, false otherwise
+ *
+ * @example
+ * validateMinLength('hello', 3); // true
+ * validateMinLength('hi', 5); // false
+ */
+export function validateMinLength(value: string, min: number): boolean {
+  if (typeof value !== 'string') {
+    return false;
+  }
+
+  return value.length >= min;
+}
+
+/**
+ * Validates that a string does not exceed maximum length
+ *
+ * @param value - The string to validate
+ * @param max - Maximum length allowed
+ * @returns True if the string does not exceed maximum length, false otherwise
+ *
+ * @example
+ * validateMaxLength('hello', 10); // true
+ * validateMaxLength('hello world', 5); // false
+ */
+export function validateMaxLength(value: string, max: number): boolean {
+  if (typeof value !== 'string') {
+    return false;
+  }
+
+  return value.length <= max;
+}
+
+/**
+ * Validates that a string matches a given pattern
+ *
+ * @param value - The string to validate
+ * @param pattern - Regular expression pattern (as RegExp or string)
+ * @returns True if the string matches the pattern, false otherwise
+ *
+ * @example
+ * validatePattern('abc123', /^[a-z0-9]+$/); // true
+ * validatePattern('ABC', /^[a-z]+$/); // false
+ */
+export function validatePattern(value: string, pattern: RegExp | string): boolean {
+  if (typeof value !== 'string') {
+    return false;
+  }
+
+  const regex = typeof pattern === 'string' ? new RegExp(pattern) : pattern;
+  return regex.test(value);
+}
+
+/**
+ * Validates that a number falls within a specified range
+ *
+ * @param value - The number to validate
+ * @param min - Optional minimum value (inclusive)
+ * @param max - Optional maximum value (inclusive)
+ * @returns True if the number is within range, false otherwise
+ *
+ * @example
+ * validateNumberRange(5, 1, 10); // true
+ * validateNumberRange(15, 1, 10); // false
+ */
+export function validateNumberRange(
+  value: number,
+  min?: number,
+  max?: number
+): boolean {
+  if (typeof value !== 'number' || isNaN(value)) {
+    return false;
+  }
+
+  if (min !== undefined && value < min) {
+    return false;
+  }
+
+  if (max !== undefined && value > max) {
+    return false;
   }
 
   return true;
 }
 
 /**
- * Validates minimum length
- * @param value String value
- * @param min Minimum length
- * @returns True if valid
+ * Validates password strength and returns detailed feedback
+ *
+ * @param password - The password to validate
+ * @returns Object containing validity, strength level, and issues array
+ *
+ * @example
+ * validatePasswordStrength('MyP@ssw0rd123');
+ * // { valid: true, strength: 'strong', issues: [] }
  */
-export function validateMinLength(value: string, min: number): boolean {
-  return value.length >= min;
+export function validatePasswordStrength(
+  password: string
+): PasswordStrengthResult {
+  const issues: string[] = [];
+  let score = 0;
+
+  if (typeof password !== 'string') {
+    return {
+      valid: false,
+      strength: 'weak',
+      issues: ['Password must be a string'],
+    };
+  }
+
+  // Check minimum length
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    issues.push('Password must be at least 8 characters long');
+  } else {
+    score += 1;
+  }
+
+  // Check for uppercase letters
+  if (!/[A-Z]/.test(password)) {
+    issues.push('Password must contain at least one uppercase letter');
+  } else {
+    score += 1;
+  }
+
+  // Check for lowercase letters
+  if (!/[a-z]/.test(password)) {
+    issues.push('Password must contain at least one lowercase letter');
+  } else {
+    score += 1;
+  }
+
+  // Check for numbers
+  if (!/\d/.test(password)) {
+    issues.push('Password must contain at least one number');
+  } else {
+    score += 1;
+  }
+
+  // Check for special characters
+  if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
+    issues.push('Password must contain at least one special character');
+  } else {
+    score += 1;
+  }
+
+  // Bonus for longer passwords
+  if (password.length >= STRONG_PASSWORD_LENGTH) {
+    score += 1;
+  }
+
+  // Determine strength
+  let strength: 'weak' | 'medium' | 'strong';
+  if (score <= 2) {
+    strength = 'weak';
+  } else if (score <= 5) {
+    strength = 'medium';
+  } else {
+    strength = 'strong';
+  }
+
+  // Valid if no issues
+  const valid = issues.length === 0;
+
+  return {
+    valid,
+    strength,
+    issues,
+  };
 }
 
 /**
- * Validates maximum length
- * @param value String value
- * @param max Maximum length
- * @returns True if valid
- */
-export function validateMaxLength(value: string, max: number): boolean {
-  return value.length <= max;
-}
-
-/**
- * Validates exact length
- * @param value String value
- * @param length Required length
- * @returns True if valid
- */
-export function validateLength(value: string, length: number): boolean {
-  return value.length === length;
-}
-
-/**
- * Validates that value matches a pattern
- * @param value String value
- * @param pattern Regular expression
- * @returns True if matches
- */
-export function validatePattern(value: string, pattern: RegExp): boolean {
-  return pattern.test(value);
-}
-
-/**
- * Validates number is within range
- * @param value Number value
- * @param min Minimum value
- * @param max Maximum value
- * @returns True if valid
- */
-export function validateNumberRange(value: number, min: number, max: number): boolean {
-  return value >= min && value <= max;
-}
-
-/**
- * Validates that number is minimum value
- * @param value Number value
- * @param min Minimum value
- * @returns True if valid
- */
-export function validateMin(value: number, min: number): boolean {
-  return value >= min;
-}
-
-/**
- * Validates that number is maximum value
- * @param value Number value
- * @param max Maximum value
- * @returns True if valid
- */
-export function validateMax(value: number, max: number): boolean {
-  return value <= max;
-}
-
-/**
- * Validates credit card number (basic Luhn algorithm)
- * @param cardNumber Credit card number
- * @returns True if valid
+ * Validates a credit card number using the Luhn algorithm
+ *
+ * @param cardNumber - The credit card number to validate (can include spaces/dashes)
+ * @returns True if the card number is valid, false otherwise
+ *
+ * @example
+ * validateCreditCard('4532015112830366'); // true
+ * validateCreditCard('1234567890123456'); // false
  */
 export function validateCreditCard(cardNumber: string): boolean {
-  const cleanNumber = cardNumber.replace(/\D/g, '');
+  if (!cardNumber || typeof cardNumber !== 'string') {
+    return false;
+  }
 
-  if (cleanNumber.length < 13 || cleanNumber.length > 19) {
+  // Remove spaces and dashes
+  const cleaned = cardNumber.replace(/[\s-]/g, '');
+
+  // Check if it contains only digits
+  if (!/^\d+$/.test(cleaned)) {
+    return false;
+  }
+
+  // Check minimum length (typically 13-19 digits)
+  if (cleaned.length < 13 || cleaned.length > 19) {
+    return false;
+  }
+
+  // Reject all zeros or all same digit
+  if (/^(.)\1+$/.test(cleaned)) {
     return false;
   }
 
@@ -185,8 +347,9 @@ export function validateCreditCard(cardNumber: string): boolean {
   let sum = 0;
   let isEven = false;
 
-  for (let i = cleanNumber.length - 1; i >= 0; i--) {
-    let digit = parseInt(cleanNumber[i], 10);
+  // Loop through digits from right to left
+  for (let i = cleaned.length - 1; i >= 0; i--) {
+    let digit = parseInt(cleaned.charAt(i), 10);
 
     if (isEven) {
       digit *= 2;
@@ -203,139 +366,80 @@ export function validateCreditCard(cardNumber: string): boolean {
 }
 
 /**
- * Validates date format (YYYY-MM-DD)
- * @param dateString Date string
- * @returns True if valid
+ * Validates a date and optionally checks if it falls within a range
+ *
+ * @param date - The date to validate (string or Date object)
+ * @param minDate - Optional minimum date
+ * @param maxDate - Optional maximum date
+ * @returns True if the date is valid and within range, false otherwise
+ *
+ * @example
+ * validateDate('2024-01-01'); // true
+ * validateDate('invalid'); // false
  */
-export function validateDateFormat(dateString: string): boolean {
-  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-  if (!dateRegex.test(dateString)) {
+export function validateDate(
+  date: string | Date,
+  minDate?: Date,
+  maxDate?: Date
+): boolean {
+  let dateObj: Date;
+
+  if (date instanceof Date) {
+    dateObj = date;
+  } else if (typeof date === 'string') {
+    if (date.trim() === '') {
+      return false;
+    }
+    dateObj = new Date(date);
+  } else {
     return false;
   }
 
-  const date = new Date(dateString);
-  return date instanceof Date && !isNaN(date.getTime());
+  // Check if date is valid
+  if (isNaN(dateObj.getTime())) {
+    return false;
+  }
+
+  // Check minimum date
+  if (minDate && dateObj < minDate) {
+    return false;
+  }
+
+  // Check maximum date
+  if (maxDate && dateObj > maxDate) {
+    return false;
+  }
+
+  return true;
 }
 
 /**
- * Validates that date is in the future
- * @param dateString Date string (YYYY-MM-DD)
- * @returns True if date is in future
- */
-export function validateFutureDate(dateString: string): boolean {
-  const date = new Date(dateString);
-  const now = new Date();
-  return date > now;
-}
-
-/**
- * Validates that date is in the past
- * @param dateString Date string (YYYY-MM-DD)
- * @returns True if date is in past
- */
-export function validatePastDate(dateString: string): boolean {
-  const date = new Date(dateString);
-  const now = new Date();
-  return date < now;
-}
-
-/**
- * Validates username format
- * Username must be 3-20 characters, alphanumeric and underscore only
- * @param username Username
- * @returns True if valid
- */
-export function validateUsername(username: string): boolean {
-  const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
-  return usernameRegex.test(username);
-}
-
-/**
- * Validates slug format (lowercase alphanumeric and hyphens)
- * @param slug Slug
- * @returns True if valid
- */
-export function validateSlug(slug: string): boolean {
-  const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-  return slugRegex.test(slug);
-}
-
-/**
- * Validates that string contains uppercase letter
- * @param value String value
- * @returns True if contains uppercase
- */
-export function hasUppercase(value: string): boolean {
-  return /[A-Z]/.test(value);
-}
-
-/**
- * Validates that string contains lowercase letter
- * @param value String value
- * @returns True if contains lowercase
- */
-export function hasLowercase(value: string): boolean {
-  return /[a-z]/.test(value);
-}
-
-/**
- * Validates that string contains number
- * @param value String value
- * @returns True if contains number
- */
-export function hasNumber(value: string): boolean {
-  return /[0-9]/.test(value);
-}
-
-/**
- * Validates that string contains special character
- * @param value String value
- * @returns True if contains special character
- */
-export function hasSpecialChar(value: string): boolean {
-  return /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value);
-}
-
-/**
- * Validates that two values match (for password confirmation, etc.)
- * @param value1 First value
- * @param value2 Second value
- * @returns True if values match
- */
-export function validateMatch(value1: any, value2: any): boolean {
-  return value1 === value2;
-}
-
-/**
- * Create a custom validator
- * @param predicate Function that returns true if valid
- * @param errorMessage Error message if invalid
- * @returns Validation function
+ * Creates a custom validator from an array of validation rules
+ *
+ * @param rules - Array of validation rules to apply
+ * @returns Validator function that returns validation result
+ *
+ * @example
+ * const validator = createValidator([
+ *   { name: 'required', validate: (v) => v !== '', message: 'Required' }
+ * ]);
+ * const result = validator('test'); // { valid: true, errors: [] }
  */
 export function createValidator(
-  predicate: (value: any) => boolean,
-  errorMessage: string
-): (value: any) => string | null {
-  return (value: any) => {
-    return predicate(value) ? null : errorMessage;
-  };
-}
+  rules: ValidationRule[]
+): (value: unknown) => ValidationResult {
+  return (value: unknown): ValidationResult => {
+    const errors: string[] = [];
 
-/**
- * Chain multiple validators
- * @param value Value to validate
- * @param validators Array of validator functions
- * @returns First error message or null
- */
-export function validateWith(
-  value: any,
-  validators: ((value: any) => string | null)[]
-): string | null {
-  for (const validator of validators) {
-    const error = validator(value);
-    if (error) {
-      return error;
+    for (const rule of rules) {
+      if (!rule.validate(value)) {
+        errors.push(rule.message);
+      }
     }
-  }
-  return null;
+
+    return {
+      valid: errors.length === 0,
+      errors,
+    };
+  };
 }

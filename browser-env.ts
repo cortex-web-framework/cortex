@@ -6,7 +6,7 @@
 // Mock DOM environment
 (global as any).document = {
   createElement: (tagName: string): HTMLElement => {
-    const element = {
+    const element: any = {
       tagName: tagName.toUpperCase(),
       attributes: new Map<string, string>(),
       textContent: '',
@@ -18,7 +18,7 @@
         }
         (element as any).eventListeners.set(event, callback);
       },
-      removeEventListener: (event: string, callback: (event: any) => void) => {
+      removeEventListener: (event: string, _callback: (event: any) => void) => {
         if ((element as any).eventListeners) {
           (element as any).eventListeners.delete(event);
         }
@@ -46,13 +46,23 @@
       getAttributeNames: (): string[] => {
         return Array.from((element as any).attributes.keys());
       }
-    } as HTMLElement;
-    
-    return element;
+    };
+
+    return element as unknown as HTMLElement;
   },
-  querySelector: (selector: string): HTMLElement | null => null,
-  querySelectorAll: (selector: string): NodeListOf<HTMLElement> => {
+  querySelector: (_selector: string): HTMLElement | null => null,
+  querySelectorAll: (_selector: string): NodeListOf<HTMLElement> => {
     return [] as any;
+  },
+  createTreeWalker: (_root: Node, _whatToShow: number, _filter: NodeFilter | null): TreeWalker => {
+    // Basic mock for TreeWalker
+    return {
+      currentNode: _root,
+      nextNode: () => null,
+      previousNode: () => null,
+      // Add other TreeWalker properties/methods if needed by lit-html
+      // For now, this is a minimal mock to prevent errors
+    } as TreeWalker;
   }
 };
 
@@ -71,6 +81,10 @@
     get: (name: string): any => {
       return (global as any).customElementsRegistry?.get(name);
     }
+  },
+  location: {
+    href: 'http://localhost/', // Provide a default href
+    searchParams: new URLSearchParams(), // Mock URLSearchParams
   }
 };
 
@@ -88,7 +102,7 @@
     this.eventListeners.set(event, callback);
   }
 
-  removeEventListener(event: string, callback: (event: any) => void): void {
+  removeEventListener(event: string, _callback: (event: any) => void): void {
     this.eventListeners.delete(event);
   }
 
@@ -121,12 +135,12 @@
     return Array.from(this.attributes.keys());
   }
 
-  attachShadow(options: { mode: string }): ShadowRoot {
+  attachShadow(_options: { mode: string }): ShadowRoot {
     this.shadowRoot = {
       innerHTML: '',
-      querySelector: (selector: string) => {
+      querySelector: (_selector: string) => {
         // Mock querySelector to return elements based on innerHTML content
-        if (selector === '.accordion' && this.shadowRoot?.innerHTML.includes('class="accordion"')) {
+        if (_selector === '.accordion' && this.shadowRoot?.innerHTML.includes('class="accordion"')) {
           return {
             getAttribute: (name: string) => {
               if (name === 'role') return 'region';
@@ -137,7 +151,7 @@
         }
         return null;
       },
-      querySelectorAll: (selector: string) => [] as any
+      querySelectorAll: (_selector: string) => [] as any
     } as ShadowRoot;
     return this.shadowRoot;
   }
@@ -164,14 +178,84 @@
   }
 };
 
+(global as any).Node = class Node {
+  public nodeType: number = 1; // ELEMENT_NODE
+  public parentNode: Node | null = null;
+  public childNodes: Node[] = [];
+
+  appendChild(node: Node): Node {
+    this.childNodes.push(node);
+    node.parentNode = this;
+    return node;
+  }
+
+  insertBefore(newNode: Node, referenceNode: Node | null): Node {
+    const index = referenceNode ? this.childNodes.indexOf(referenceNode) : -1;
+    if (index > -1) {
+      this.childNodes.splice(index, 0, newNode);
+    } else {
+      this.childNodes.push(newNode);
+    }
+    newNode.parentNode = this;
+    return newNode;
+  }
+
+  removeChild(node: Node): Node {
+    const index = this.childNodes.indexOf(node);
+    if (index > -1) {
+      this.childNodes.splice(index, 1);
+      node.parentNode = null;
+    }
+    return node;
+  }
+
+  remove(): void {
+    if (this.parentNode) {
+      this.parentNode.removeChild(this);
+    }
+  }
+};
+
+(global as any).DocumentFragment = class DocumentFragment extends (global as any).Node {
+  constructor() {
+    super();
+    this.nodeType = 11; // DOCUMENT_FRAGMENT_NODE
+  }
+};
+
+(global as any).CSSStyleSheet = class CSSStyleSheet {
+  public cssRules: any[] = [];
+  public adoptedStyleSheets: any[] = [];
+
+  replaceSync(cssText: string): void {
+    // Mock implementation
+    this.cssRules = [{ cssText }];
+  }
+
+  replace(cssText: string): Promise<void> {
+    // Mock implementation
+    this.cssRules = [{ cssText }];
+    return Promise.resolve();
+  }
+};
+
+// Ensure Document.prototype is correctly mocked
+if (!(global as any).Document) {
+  (global as any).Document = class Document {};
+}
+if (!(global as any).Document.prototype) {
+  (global as any).Document.prototype = {};
+}
+(global as any).Document.prototype.adoptedStyleSheets = [];
+
 (global as any).ShadowRoot = class ShadowRoot {
   public innerHTML: string = '';
-  
-  querySelector(selector: string): HTMLElement | null {
+
+  querySelector(_selector: string): HTMLElement | null {
     return null;
   }
-  
-  querySelectorAll(selector: string): NodeListOf<HTMLElement> {
+
+  querySelectorAll(_selector: string): NodeListOf<HTMLElement> {
     return [] as any;
   }
 };
