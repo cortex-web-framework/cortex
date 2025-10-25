@@ -1,0 +1,22 @@
+[package]
+name = "cortex-browser-env"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "cortex-browser-env"
+path = "src/main.rs"
+
+[lib]
+name = "cortex_browser_env"
+path = "src/lib.rs"
+
+[dependencies]
+png = "0.18.0"
+raqote = "0.8"
+rquickjs = { version = "0.5", features = ["full"] }
+
+[dev-dependencies]
+tempfile = "3.23.0"
