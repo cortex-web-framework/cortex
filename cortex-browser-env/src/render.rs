@@ -39,7 +39,6 @@ fn render_node(
     styles: &[ComputedStyle],
 ) {
     let node = &document.nodes[node_idx];
-    let options = DrawOptions::new();
 
     if let Some(ref layout) = node.layout {
         // Render background
@@ -57,7 +56,8 @@ fn render_node(
         // Render text content
         if let Some(ref data) = node.data {
             if let NodeData::Text(text) = data {
-                render_text(dt, layout, text);
+                // Check parent element tag for styling
+                render_text_with_styling(dt, layout, text, node_idx, document);
             } else if let NodeData::Element(elem) = data {
                 // Render element attributes as text (label, placeholder, value, etc.)
                 render_element_text(dt, layout, elem);
@@ -120,41 +120,107 @@ fn render_border(dt: &mut DrawTarget, layout: &Layout, color: &str) {
     dt.fill_rect(x, y, border_width, h, &source, &options);
 }
 
+/// Render text with styling based on parent element
+fn render_text_with_styling(
+    dt: &mut DrawTarget,
+    layout: &Layout,
+    text: &str,
+    node_idx: usize,
+    document: &Document,
+) {
+    // Determine parent element type for styling
+    let mut parent_tag = "";
+    for (_i, node) in document.nodes.iter().enumerate() {
+        if node.children.contains(&node_idx) {
+            if let Some(NodeData::Element(elem)) = &node.data {
+                parent_tag = &elem.tag_name;
+            }
+            break;
+        }
+    }
+
+    // Apply styling based on parent tag
+    match parent_tag {
+        "h1" => render_heading_text(dt, layout, text, 1.8),  // 80% larger
+        "h2" => render_heading_text(dt, layout, text, 1.6),  // 60% larger
+        "h3" => render_heading_text(dt, layout, text, 1.4),  // 40% larger
+        _ => render_text(dt, layout, text),                  // Normal text
+    }
+}
+
+/// Render heading text with larger font size
+fn render_heading_text(dt: &mut DrawTarget, layout: &Layout, text: &str, scale: f32) {
+    if text.is_empty() || layout.width <= 0.0 || layout.height <= 0.0 {
+        return;
+    }
+
+    let char_width = 14.0 * scale;
+    let char_height = 22.0 * scale;
+    let line_height = char_height + 8.0;
+
+    let text_source = Source::Solid(SolidSource::from_unpremultiplied_argb(255, 40, 40, 40)); // Dark gray for headings
+    let text_options = DrawOptions::new();
+
+    let mut x = layout.x + 8.0;
+    let mut y = layout.y + 8.0;
+
+    for ch in text.chars() {
+        if ch == '\n' {
+            x = layout.x + 8.0;
+            y += line_height;
+            continue;
+        }
+
+        if x + char_width > layout.x + layout.width - 4.0 {
+            x = layout.x + 8.0;
+            y += line_height;
+        }
+
+        if y + char_height > layout.y + layout.height - 2.0 {
+            break;
+        }
+
+        draw_simple_char(dt, ch, x, y, char_width, char_height, &text_source, &text_options);
+
+        x += char_width;
+    }
+}
+
 /// Render text content as visible readable characters
 fn render_text(dt: &mut DrawTarget, layout: &Layout, text: &str) {
     if text.is_empty() || layout.width <= 0.0 || layout.height <= 0.0 {
         return;
     }
 
-    let char_width = 10.0;
-    let char_height = 16.0;
-    let line_height = char_height + 4.0;
+    let char_width = 14.0;  // MUCH LARGER for better readability
+    let char_height = 22.0;  // MUCH LARGER for better readability
+    let line_height = char_height + 6.0;
 
     let text_source = Source::Solid(SolidSource::from_unpremultiplied_argb(255, 0, 0, 0)); // Black text
-    let options = DrawOptions::new();
+    let text_options = DrawOptions::new();
 
-    let mut x = layout.x + 4.0;
-    let mut y = layout.y + 4.0;
+    let mut x = layout.x + 6.0;
+    let mut y = layout.y + 6.0;
 
-    // Simple bitmap-style text rendering
+    // Simple bitmap-style text rendering with MUCH LARGER CHARACTERS
     for ch in text.chars() {
         if ch == '\n' {
-            x = layout.x + 4.0;
+            x = layout.x + 6.0;
             y += line_height;
             continue;
         }
 
-        if x + char_width > layout.x + layout.width {
-            x = layout.x + 4.0;
+        if x + char_width > layout.x + layout.width - 4.0 {
+            x = layout.x + 6.0;
             y += line_height;
         }
 
-        if y + char_height > layout.y + layout.height {
+        if y + char_height > layout.y + layout.height - 2.0 {
             break;
         }
 
         // Draw simple character outlines (boxes with internal structure)
-        draw_simple_char(dt, ch, x, y, char_width, char_height, &text_source, &options);
+        draw_simple_char(dt, ch, x, y, char_width, char_height, &text_source, &text_options);
 
         x += char_width;
     }
@@ -171,8 +237,8 @@ fn draw_simple_char(
     source: &Source,
     options: &DrawOptions,
 ) {
-    let px = width / 8.0; // Pixel size
-    let py = height / 12.0;
+    let px = width / 12.0;  // LARGER GRID - 12x18 pixels instead of 8x12
+    let py = height / 18.0;
 
     // Helper macro to draw a pixel at grid position
     macro_rules! draw_px {
@@ -373,12 +439,49 @@ fn render_element_text(dt: &mut DrawTarget, layout: &Layout, elem: &ElementData)
         return;
     }
 
-    let char_width = 10.0;
-    let char_height = 16.0;
-    let line_height = char_height + 4.0;
+    // Draw input field border for ui-* custom elements
+    if elem.tag_name.contains("-") {
+        let is_disabled = elem.attributes.contains_key("disabled");
 
-    let text_source = Source::Solid(SolidSource::from_unpremultiplied_argb(255, 0, 0, 0)); // Black text
-    let options = DrawOptions::new();
+        let border_color = if is_disabled {
+            Source::Solid(SolidSource::from_unpremultiplied_argb(255, 180, 180, 180)) // Lighter gray for disabled
+        } else {
+            Source::Solid(SolidSource::from_unpremultiplied_argb(255, 100, 100, 100)) // Gray border
+        };
+
+        let bg_color = if is_disabled {
+            Source::Solid(SolidSource::from_unpremultiplied_argb(255, 230, 230, 230)) // Darker gray for disabled
+        } else {
+            Source::Solid(SolidSource::from_unpremultiplied_argb(255, 245, 245, 245)) // Very light gray for enabled
+        };
+
+        let options = DrawOptions::new();
+
+        // Draw border
+        let border_width = 2.0;
+        dt.fill_rect(layout.x, layout.y, layout.width, border_width, &border_color, &options);
+        dt.fill_rect(layout.x, layout.y + layout.height - border_width, layout.width, border_width, &border_color, &options);
+        dt.fill_rect(layout.x, layout.y, border_width, layout.height, &border_color, &options);
+        dt.fill_rect(layout.x + layout.width - border_width, layout.y, border_width, layout.height, &border_color, &options);
+
+        // Draw background
+        dt.fill_rect(layout.x + border_width, layout.y + border_width,
+                    layout.width - border_width * 2.0,
+                    layout.height - border_width * 2.0,
+                    &bg_color, &options);
+    }
+
+    let char_width = 14.0;  // MUCH LARGER
+    let char_height = 22.0;  // MUCH LARGER
+    let line_height = char_height + 6.0;
+
+    let is_disabled_text = elem.attributes.contains_key("disabled");
+    let text_source = if is_disabled_text {
+        Source::Solid(SolidSource::from_unpremultiplied_argb(255, 150, 150, 150)) // Light gray for disabled text
+    } else {
+        Source::Solid(SolidSource::from_unpremultiplied_argb(255, 0, 0, 0)) // Black text
+    };
+    let text_options = DrawOptions::new();
 
     // Prioritize rendering these attributes in order
     let text_attrs = vec!["label", "placeholder", "value", "text"];
@@ -400,27 +503,27 @@ fn render_element_text(dt: &mut DrawTarget, layout: &Layout, elem: &ElementData)
         return;
     }
 
-    let mut x = layout.x + 4.0;
-    let mut y = layout.y + 4.0;
+    let mut x = layout.x + 8.0;
+    let mut y = layout.y + 6.0;
 
-    // Draw text using simple character rendering
+    // Draw text using simple character rendering with LARGER chars
     for ch in rendered_text.chars() {
         if ch == '\n' {
-            x = layout.x + 4.0;
+            x = layout.x + 8.0;
             y += line_height;
             continue;
         }
 
-        if x + char_width > layout.x + layout.width {
-            x = layout.x + 4.0;
+        if x + char_width > layout.x + layout.width - 4.0 {
+            x = layout.x + 8.0;
             y += line_height;
         }
 
-        if y + char_height > layout.y + layout.height {
+        if y + char_height > layout.y + layout.height - 2.0 {
             break;
         }
 
-        draw_simple_char(dt, ch, x, y, char_width, char_height, &text_source, &options);
+        draw_simple_char(dt, ch, x, y, char_width, char_height, &text_source, &text_options);
 
         x += char_width;
     }
