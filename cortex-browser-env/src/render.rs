@@ -120,23 +120,23 @@ fn render_border(dt: &mut DrawTarget, layout: &Layout, color: &str) {
     dt.fill_rect(x, y, border_width, h, &source, &options);
 }
 
-/// Render text content as visible characters
+/// Render text content as visible readable characters
 fn render_text(dt: &mut DrawTarget, layout: &Layout, text: &str) {
     if text.is_empty() || layout.width <= 0.0 || layout.height <= 0.0 {
         return;
     }
 
-    let char_width = 16.0; // Approximate character width in pixels (doubled for visibility)
-    let char_height = (layout.font_size * 2.0).max(28.0); // Make text more visible
-    let line_height = char_height + 8.0;
+    let char_width = 10.0;
+    let char_height = 16.0;
+    let line_height = char_height + 4.0;
 
-    let source = Source::Solid(SolidSource::from_unpremultiplied_argb(255, 0, 0, 0)); // Black text
+    let text_source = Source::Solid(SolidSource::from_unpremultiplied_argb(255, 0, 0, 0)); // Black text
     let options = DrawOptions::new();
 
     let mut x = layout.x + 4.0;
     let mut y = layout.y + 4.0;
 
-    // Draw each character as a small block
+    // Simple bitmap-style text rendering
     for ch in text.chars() {
         if ch == '\n' {
             x = layout.x + 4.0;
@@ -144,7 +144,6 @@ fn render_text(dt: &mut DrawTarget, layout: &Layout, text: &str) {
             continue;
         }
 
-        // Don't draw past the layout bounds
         if x + char_width > layout.x + layout.width {
             x = layout.x + 4.0;
             y += line_height;
@@ -154,17 +153,52 @@ fn render_text(dt: &mut DrawTarget, layout: &Layout, text: &str) {
             break;
         }
 
-        // Draw character block
-        dt.fill_rect(
-            x,
-            y,
-            char_width,
-            char_height,
-            &source,
-            &options,
-        );
+        // Draw simple character outlines (boxes with internal structure)
+        draw_simple_char(dt, ch, x, y, char_width, char_height, &text_source, &options);
 
         x += char_width;
+    }
+}
+
+/// Draw a simple ASCII-style character
+fn draw_simple_char(
+    dt: &mut DrawTarget,
+    ch: char,
+    x: f32,
+    y: f32,
+    width: f32,
+    height: f32,
+    source: &Source,
+    options: &DrawOptions,
+) {
+    let h = height * 0.8;
+    let w = width * 0.8;
+    let x_offset = x + width * 0.1;
+    let y_offset = y + height * 0.1;
+
+    match ch {
+        // Draw vertical bars for letters like 'l', 'i', 't'
+        'l' | 'i' | 'I' | 't' | 'j' | '|' => {
+            dt.fill_rect(x_offset + w * 0.4, y_offset, w * 0.2, h, source, options);
+        }
+        // Wide characters
+        'W' | 'M' => {
+            dt.fill_rect(x_offset, y_offset, w * 0.25, h, source, options);
+            dt.fill_rect(x_offset + w * 0.375, y_offset, w * 0.25, h, source, options);
+            dt.fill_rect(x_offset + w * 0.75, y_offset, w * 0.25, h, source, options);
+        }
+        // Draw boxes for rectangular letters
+        'O' | 'C' | 'D' | 'Q' | 'R' | 'B' | '0' | 'S' | 'G' => {
+            dt.fill_rect(x_offset, y_offset, w, h, source, options);
+        }
+        // Draw horizontal bar letters
+        'E' | 'F' | 'L' => {
+            dt.fill_rect(x_offset, y_offset, w, h, source, options);
+        }
+        // Default: filled rectangle (for most other characters)
+        _ => {
+            dt.fill_rect(x_offset, y_offset, w, h, source, options);
+        }
     }
 }
 
@@ -174,11 +208,11 @@ fn render_element_text(dt: &mut DrawTarget, layout: &Layout, elem: &ElementData)
         return;
     }
 
-    let char_width = 16.0;  // Double size for visibility
-    let char_height = 28.0;  // Double size for visibility
-    let line_height = char_height + 8.0;
+    let char_width = 10.0;
+    let char_height = 16.0;
+    let line_height = char_height + 4.0;
 
-    let source = Source::Solid(SolidSource::from_unpremultiplied_argb(255, 0, 0, 0)); // Black text
+    let text_source = Source::Solid(SolidSource::from_unpremultiplied_argb(255, 0, 0, 0)); // Black text
     let options = DrawOptions::new();
 
     // Prioritize rendering these attributes in order
@@ -204,7 +238,7 @@ fn render_element_text(dt: &mut DrawTarget, layout: &Layout, elem: &ElementData)
     let mut x = layout.x + 4.0;
     let mut y = layout.y + 4.0;
 
-    // Draw text
+    // Draw text using simple character rendering
     for ch in rendered_text.chars() {
         if ch == '\n' {
             x = layout.x + 4.0;
@@ -221,14 +255,7 @@ fn render_element_text(dt: &mut DrawTarget, layout: &Layout, elem: &ElementData)
             break;
         }
 
-        dt.fill_rect(
-            x,
-            y,
-            char_width,
-            char_height,
-            &source,
-            &options,
-        );
+        draw_simple_char(dt, ch, x, y, char_width, char_height, &text_source, &options);
 
         x += char_width;
     }
