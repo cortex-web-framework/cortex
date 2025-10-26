@@ -8,6 +8,7 @@
 
 import type { BaseMessage, ActorRef } from './actorTypes.js';
 import { EventBus } from './eventBus.js';
+import { Logger } from './logger.js';
 
 /**
  * Type-safe actor reference that can only send messages of type TMessage
@@ -140,9 +141,11 @@ export abstract class TypeSafeActor<TState, TMessage extends BaseMessage>
 export class TypeSafeActorSystem {
   private actors: Map<string, TypeSafeActor<any, any>> = new Map();
   private static readonly MAX_RESTARTS = 3;
+  private logger: Logger;
 
   constructor(_eventBus?: EventBus) {
     // EventBus reserved for future integration
+    this.logger = Logger.getInstance();
   }
 
   /**
@@ -191,9 +194,9 @@ export class TypeSafeActorSystem {
     if (actor) {
       actor.postStop();
       this.actors.delete(id);
-      console.log(`Actor '${id}' stopped`);
+      this.logger.info(`Actor '${id}' stopped`);
     } else {
-      console.warn(`Attempted to stop non-existent actor '${id}'`);
+      this.logger.warn(`Attempted to stop non-existent actor '${id}'`);
     }
   }
 
@@ -201,16 +204,16 @@ export class TypeSafeActorSystem {
    * Handle actor failure with supervision strategy
    */
   public handleActorFailure(actor: TypeSafeActor<any, any>, error: any): void {
-    console.error(`Actor '${actor.getId()}' failed:`, error);
+    this.logger.error(`Actor '${actor.getId()}' failed`, error as Error);
     (actor as any).restartCount++;
 
     if ((actor as any).restartCount > TypeSafeActorSystem.MAX_RESTARTS) {
-      console.error(
+      this.logger.error(
         `Actor '${actor.getId()}' exceeded max restarts. Stopping actor.`
       );
       this.stopActor(actor.getId());
     } else {
-      console.warn(
+      this.logger.warn(
         `Restarting actor '${actor.getId()}' (restart count: ${
           (actor as any).restartCount
         })`
@@ -255,7 +258,7 @@ export class TypeSafeActorSystem {
     for (const actor of actors) {
       this.stopActor(actor.getId());
     }
-    console.log('Actor system shut down');
+    this.logger.info('Actor system shut down');
   }
 }
 
