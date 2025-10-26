@@ -1,4 +1,4 @@
-import { Actor, ActorSystem } from '../core/actorSystem.js';
+import { Actor, ActorSystem, ActorMessage } from '../core/actorSystem.js';
 import { EventBus } from '../core/eventBus.js';
 
 interface PingEvent {
@@ -11,7 +11,7 @@ export class PingNeuron extends Actor {
     super(id, system);
   }
 
-  async receive(message: any): Promise<void> {
+  async receive(message: ActorMessage): Promise<void> {
     if (message.type === 'start') {
       console.log(`${this.id} received start message, publishing ping.`);
       this.eventBus.publish<PingEvent>('ping', { sender: this.id, message: 'Ping!' });

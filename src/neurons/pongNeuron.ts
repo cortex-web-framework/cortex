@@ -1,4 +1,4 @@
-import { Actor, ActorSystem } from '../core/actorSystem.js';
+import { Actor, ActorSystem, ActorMessage } from '../core/actorSystem.js';
 import { EventBus } from '../core/eventBus.js';
 
 interface PingEvent {
@@ -14,14 +14,14 @@ export class PongNeuron extends Actor {
     this.eventBus.subscribe<PingEvent>('ping', this.handlePing.bind(this));
   }
 
-  handlePing(payload: PingEvent) {
+  handlePing(payload: PingEvent): void {
     if (payload.message === 'Ping!') {
       console.log(`${this.id} received ping from ${payload.sender}.`);
       this.pongReceived = true;
     }
   }
 
-  async receive(_message: any): Promise<void> {
+  async receive(_message: ActorMessage): Promise<void> {
     // PongNeuron primarily reacts to EventBus messages, not direct actor messages
   }
 
