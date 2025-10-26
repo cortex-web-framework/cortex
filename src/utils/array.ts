@@ -129,11 +129,15 @@ export function groupBy<T, K extends string | number | symbol>(
  */
 export function sortBy<T>(
   arr: T[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   key: ((item: T) => any) | keyof T,
   order: 'asc' | 'desc' = 'asc'
 ): T[] {
   const sorted = [...arr];
-  const getValue = typeof key === 'function' ? key : (item: T) => (item as any)[key];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const getValue: (item: T) => any = typeof key === 'function'
+    ? key as (item: T) => any
+    : (item: T) => item[key];
 
   sorted.sort((a, b) => {
     const aVal = getValue(a);

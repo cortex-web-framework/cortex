@@ -683,7 +683,15 @@ export function getComputedStyle(element: Element, prop?: string): any {
  */
 export function setStyles(element: HTMLElement, styles: Record<string, string>): void {
   Object.entries(styles).forEach(([property, value]) => {
-    element.style[property as any] = value;
+    // Use setProperty method for safe CSS property assignment
+    if (property.startsWith('--')) {
+      // Custom CSS properties
+      element.style.setProperty(property, value);
+    } else {
+      // Standard CSS properties - convert camelCase to kebab-case
+      const cssProperty = property.replace(/([A-Z])/g, '-$1').toLowerCase();
+      element.style.setProperty(cssProperty, value);
+    }
   });
 }
 
