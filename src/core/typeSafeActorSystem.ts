@@ -11,6 +11,21 @@ import { EventBus } from './eventBus.js';
 import { Logger } from './logger.js';
 
 /**
+ * Metadata for type-safe actors using WeakMap for memory safety
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface TypeSafeActorMetadata<TState> {
+  _ActorClass: any;
+  _InitialState: TState;
+  restartCount: number;
+}
+
+/**
+ * WeakMap to store metadata for type-safe actors
+ */
+const actorMetadata = new WeakMap<TypeSafeActor<any, any>, TypeSafeActorMetadata<any>>();
+
+/**
  * Type-safe actor reference that can only send messages of type TMessage
  */
 export class TypedActorRef<TMessage extends BaseMessage> implements ActorRef<TMessage> {
@@ -103,7 +118,7 @@ export abstract class TypeSafeActor<TState, TMessage extends BaseMessage>
           if (message) {
             try {
               this.receive(message);
-            } catch (error: any) {
+            } catch (error: unknown) {
               this.system.handleActorFailure(this, error);
             }
           }
@@ -167,10 +182,12 @@ export class TypeSafeActorSystem {
     const actor = new ActorClass(id, initialState, this);
     this.actors.set(id, actor);
 
-    // Store metadata for restart
-    (actor as any)._ActorClass = ActorClass;
-    (actor as any)._InitialState = initialState;
-    (actor as any).restartCount = 0;
+    // Store metadata for restart using WeakMap
+    actorMetadata.set(actor, {
+      _ActorClass: ActorClass,
+      _InitialState: initialState,
+      restartCount: 0,
+    });
 
     actor.preStart();
 
@@ -203,36 +220,46 @@ export class TypeSafeActorSystem {
   /**
    * Handle actor failure with supervision strategy
    */
-  public handleActorFailure(actor: TypeSafeActor<any, any>, error: any): void {
-    this.logger.error(`Actor '${actor.getId()}' failed`, error as Error);
-    (actor as any).restartCount++;
+  public handleActorFailure(actor: TypeSafeActor<any, any>, error: unknown): void {
+    this.logger.error(`Actor '${actor.getId()}' failed`, error instanceof Error ? error : new Error(String(error)));
 
-    if ((actor as any).restartCount > TypeSafeActorSystem.MAX_RESTARTS) {
+    const metadata = actorMetadata.get(actor);
+    if (!metadata) {
+      this.logger.error(`Actor '${actor.getId()}' has no metadata. Cannot restart.`);
+      this.stopActor(actor.getId());
+      return;
+    }
+
+    metadata.restartCount++;
+
+    if (metadata.restartCount > TypeSafeActorSystem.MAX_RESTARTS) {
       this.logger.error(
         `Actor '${actor.getId()}' exceeded max restarts. Stopping actor.`
       );
       this.stopActor(actor.getId());
     } else {
       this.logger.warn(
-        `Restarting actor '${actor.getId()}' (restart count: ${
-          (actor as any).restartCount
-        })`
+        `Restarting actor '${actor.getId()}' (restart count: ${metadata.restartCount})`
       );
-      actor.preRestart(error);
 
-      const ActorClass = (actor as any)._ActorClass;
-      const initialState = (actor as any)._InitialState;
+      const errorObj = error instanceof Error ? error : new Error(String(error));
+      actor.preRestart(errorObj);
+
+      const ActorClass = metadata._ActorClass;
+      const initialState = metadata._InitialState;
       const actorId = actor.getId();
 
       this.stopActor(actorId);
 
       const newActor = new ActorClass(actorId, initialState, this);
       this.actors.set(actorId, newActor);
-      (newActor as any)._ActorClass = ActorClass;
-      (newActor as any)._InitialState = initialState;
-      (newActor as any).restartCount = (actor as any).restartCount;
+      actorMetadata.set(newActor, {
+        _ActorClass: ActorClass,
+        _InitialState: initialState,
+        restartCount: metadata.restartCount,
+      });
 
-      newActor.postRestart(error);
+      newActor.postRestart(errorObj);
     }
   }
 
