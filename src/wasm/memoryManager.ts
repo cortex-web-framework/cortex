@@ -3,6 +3,8 @@
  * Provides safe memory allocation, deallocation, and data transfer between JS and WASM
  */
 
+import { Logger } from '../core/logger.js';
+
 /**
  * Memory allocation information
  */
@@ -52,11 +54,13 @@ export class WasmMemoryManager {
   private nextPtr: number = 0;
   private config: Required<MemoryManagerConfig>;
   private gcTimer: NodeJS.Timeout | null = null;
+  private logger: Logger;
 
   constructor(instance: WebAssembly.Instance, config: MemoryManagerConfig = {}) {
+    this.logger = Logger.getInstance();
     this.memory = instance.exports["memory"] as WebAssembly.Memory;
     this.config = { ...DEFAULT_MEMORY_CONFIG, ...config };
-    
+
     this.initializeMemory();
     this.startGarbageCollection();
   }
@@ -342,7 +346,7 @@ export class WasmMemoryManager {
     try {
       const currentPages = this["memory"]!.buffer.byteLength / (64 * 1024);
       const newPages = Math.min(currentPages + pages, this.config.maximumPages);
-      
+
       if (newPages <= currentPages) {
         return false;
       }
@@ -350,7 +354,7 @@ export class WasmMemoryManager {
       (this["memory"] as any).grow(newPages - currentPages);
       return true;
     } catch (error) {
-      console["error"]('Failed to grow memory:', error);
+      this.logger.error('Failed to grow memory:', error as Error);
       return false;
     }
   }
@@ -383,7 +387,7 @@ export class WasmMemoryManager {
 
       toRemove.forEach(ptr => this.deallocate(ptr));
 
-      console.log(`Garbage collection: removed ${toRemove.length} allocations`);
+      this.logger.info(`Garbage collection: removed ${toRemove.length} allocations`);
     }
   }
 

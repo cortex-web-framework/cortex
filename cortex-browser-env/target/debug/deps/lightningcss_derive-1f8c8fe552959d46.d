@@ -1,0 +1,8 @@
+/home/matthias/projects/cortex/cortex-browser-env/target/debug/deps/lightningcss_derive-1f8c8fe552959d46.d: /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lightningcss-derive-1.0.0-alpha.43/src/lib.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lightningcss-derive-1.0.0-alpha.43/src/parse.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lightningcss-derive-1.0.0-alpha.43/src/to_css.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lightningcss-derive-1.0.0-alpha.43/src/visit.rs
+
+/home/matthias/projects/cortex/cortex-browser-env/target/debug/deps/liblightningcss_derive-1f8c8fe552959d46.so: /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lightningcss-derive-1.0.0-alpha.43/src/lib.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lightningcss-derive-1.0.0-alpha.43/src/parse.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lightningcss-derive-1.0.0-alpha.43/src/to_css.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lightningcss-derive-1.0.0-alpha.43/src/visit.rs
+
+/home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lightningcss-derive-1.0.0-alpha.43/src/lib.rs:
+/home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lightningcss-derive-1.0.0-alpha.43/src/parse.rs:
+/home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lightningcss-derive-1.0.0-alpha.43/src/to_css.rs:
+/home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lightningcss-derive-1.0.0-alpha.43/src/visit.rs:

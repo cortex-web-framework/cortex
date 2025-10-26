@@ -1,0 +1,13 @@
+/home/matthias/projects/cortex/cortex-browser-env/target/debug/deps/rquickjs_sys-8081eae1d4a1a55a.d: /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rquickjs-sys-0.5.1/src/lib.rs /home/matthias/projects/cortex/cortex-browser-env/target/debug/build/rquickjs-sys-949166e3a61d0abc/out/bindings.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rquickjs-sys-0.5.1/src/bindings/x86_64-unknown-linux-gnu.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rquickjs-sys-0.5.1/src/inlines/ptr_64.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rquickjs-sys-0.5.1/src/inlines/common.rs
+
+/home/matthias/projects/cortex/cortex-browser-env/target/debug/deps/librquickjs_sys-8081eae1d4a1a55a.rlib: /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rquickjs-sys-0.5.1/src/lib.rs /home/matthias/projects/cortex/cortex-browser-env/target/debug/build/rquickjs-sys-949166e3a61d0abc/out/bindings.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rquickjs-sys-0.5.1/src/bindings/x86_64-unknown-linux-gnu.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rquickjs-sys-0.5.1/src/inlines/ptr_64.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rquickjs-sys-0.5.1/src/inlines/common.rs
+
+/home/matthias/projects/cortex/cortex-browser-env/target/debug/deps/librquickjs_sys-8081eae1d4a1a55a.rmeta: /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rquickjs-sys-0.5.1/src/lib.rs /home/matthias/projects/cortex/cortex-browser-env/target/debug/build/rquickjs-sys-949166e3a61d0abc/out/bindings.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rquickjs-sys-0.5.1/src/bindings/x86_64-unknown-linux-gnu.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rquickjs-sys-0.5.1/src/inlines/ptr_64.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rquickjs-sys-0.5.1/src/inlines/common.rs
+
+/home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rquickjs-sys-0.5.1/src/lib.rs:
+/home/matthias/projects/cortex/cortex-browser-env/target/debug/build/rquickjs-sys-949166e3a61d0abc/out/bindings.rs:
+/home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rquickjs-sys-0.5.1/src/bindings/x86_64-unknown-linux-gnu.rs:
+/home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rquickjs-sys-0.5.1/src/inlines/ptr_64.rs:
+/home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rquickjs-sys-0.5.1/src/inlines/common.rs:
+
+# env-dep:OUT_DIR=/home/matthias/projects/cortex/cortex-browser-env/target/debug/build/rquickjs-sys-949166e3a61d0abc/out

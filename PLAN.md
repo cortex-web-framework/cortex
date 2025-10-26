@@ -1,138 +1,565 @@
-## Project Goal
-To continue the development of the Cortex Web Framework by implementing pending UI components, ensuring high quality through comprehensive testing and adherence to strict development principles (ZERO Dependencies, Clean Code, Super Strict TypeScript, TDD, Web Components Standard, Accessibility First, Mobile Responsive).
+# Implementation Plan: Cortex Browser Engine - MVP Completion
 
-### Phase 1: Foundation & Immediate Fixes
+**Objective:** Make the Cortex browser engine visually functional by completing the rendering subsystem.
 
-#### Task 1.1: Verify `themeManager` Bug Fix
-*   **Description**: Confirm that the `themeManager` deployment bug (Uncaught SyntaxError: Identifier 'themeManager' has already been declared) is resolved after modifying `scripts/build-ui.js`.
-*   **Steps**:
-    1.  Trigger a new build and deployment of the UI components (if possible, or simulate the deployment environment locally).
-    2.  Access the deployed application (or local simulation) in a browser.
-    3.  Open the browser's developer console and check for the `Uncaught SyntaxError: Identifier 'themeManager' has already been declared` error.
-    4.  If the error persists, re-investigate the bundling process and `themeManager` declaration/usage.
-*   **Acceptance Criteria**: The `themeManager` error is no longer present in the browser console.
+**Timeline:** 12-16 hours of focused development
 
-#### Task 1.2: Set Up Development Environment for New Component
-*   **Description**: Prepare the environment for developing new UI components, starting with the Text Input Component.
-*   **Steps**:
-    1.  Ensure all necessary development tools (Node.js, npm/yarn, TypeScript compiler) are installed and configured.
-    2.  Verify the project's `tsconfig.json` and `tsconfig.build-ui.json` are correctly set up for strict TypeScript compilation.
-    3.  Familiarize with the existing component structure (e.g., `ui-button.ts`, `ui-checkbox.ts`) and testing patterns (`button-functionality.test.ts`).
-*   **Acceptance Criteria**: Development environment is ready for TDD, and existing component structure is understood.
+**Success Criteria:**
+- [ ] All 164 existing tests still pass
+- [ ] Screenshots show readable text content
+- [ ] Colors and styling applied correctly
+- [ ] Custom elements parse and render properly
+- [ ] Visual regression tests validate output
 
-### Phase 2: Component Development - Text Input
+---
 
-#### Task 2.1: Design Text Input Component API
-*   **Description**: Define the public API (attributes, properties, events, slots) for the `ui-text-input` component, adhering to Web Component standards and accessibility guidelines.
-*   **Steps**:
-    1.  Identify core functionalities: basic text input, placeholder, value, disabled state, read-only state, type (text, email, password, etc.), label association.
-    2.  Consider common use cases and user interactions.
-    3.  Define attributes for declarative usage (e.g., `placeholder`, `value`, `disabled`).
-    4.  Define properties for programmatic access.
-    5.  Define custom events (e.g., `input`, `change`, `focus`, `blur`).
-    6.  Outline accessibility considerations (ARIA attributes, keyboard navigation).
-*   **Acceptance Criteria**: A clear, documented API for `ui-text-input` is defined.
+## Phase 1: Quick Wins (30 minutes - Unblocks 50% of issues)
 
-#### Task 2.2: Implement Text Input Component (TDD)
-*   **Description**: Develop the `ui-text-input` component using a strict TDD approach, ensuring zero dependencies and super strict TypeScript.
-*   **Steps**:
-    1.  **Red (Test First)**:
-        *   Create `ui-text-input.test.ts` and write a failing test for the most basic functionality (e.g., component renders).
-        *   Write tests for properties (e.g., `value`, `placeholder`).
-        *   Write tests for events (e.g., `input`, `change`).
-        *   Write tests for states (e.g., `disabled`, `readonly`).
-        *   Write tests for accessibility (e.g., `aria-label`, keyboard interaction).
-        *   Write tests for strict TypeScript type checking (ensure no `any` types are implicitly used).
-    2.  **Green (Code to Pass)**:
-        *   Create `ui-text-input.ts`.
-        *   Implement the minimal HTML structure and CSS for the component.
-        *   Implement properties and event handlers to make the tests pass.
-        *   Ensure all code adheres to the "ZERO Dependencies" pledge.
-        *   Ensure all code adheres to "Super Strict TypeScript" standards.
-    3.  **Refactor**:
-        *   Improve code structure, readability, and maintainability without breaking tests.
-        *   Optimize CSS for consistency and performance.
-        *   Ensure Shadow DOM is correctly implemented for style encapsulation.
-*   **Acceptance Criteria**: `ui-text-input` component is fully functional, all tests pass, and it adheres to all development principles.
+### 1.1 Fix Custom Element Tag Parsing ⚡ HIGHEST PRIORITY
+**File:** `cortex-browser-env/src/parser.rs`
 
-### Phase 3: Quality Assurance & Refinement
+**Problem:** Tag names only accept alphanumeric characters, breaking custom elements like `<ui-text-input>`.
 
-#### Task 3.1: Integrate Text Input into `ui-bundle.js`
-*   **Description**: Ensure the new `ui-text-input` component is correctly included in the `ui-bundle.js` without introducing new issues.
-*   **Steps**:
-    1.  Run the `scripts/build-ui.js` script.
-    2.  Verify that `ui-text-input.js` (compiled from `ui-text-input.ts`) is included in the bundle.
-    3.  Check the console for any new bundling errors.
-*   **Acceptance Criteria**: `ui-text-input` is part of the bundle, and no new bundling errors occur.
+**Current Code (Lines 66-76):**
+```rust
+fn consume_tag_name(html: &str, pos: &mut usize) -> String {
+    let mut name = String::new();
+    while pos < html.len() && html[pos..].chars().next().unwrap().is_alphanumeric() {
+        name.push(html[pos..].chars().next().unwrap());
+        pos += 1;
+    }
+    name
+}
+```
 
-#### Task 3.2: Perform Initial QA for Text Input
-*   **Description**: Conduct initial quality assurance checks for the `ui-text-input` component.
-*   **Steps**:
-    1.  **Cross-Browser Compatibility**: Test in Chrome, Firefox, Safari, Edge.
-    2.  **Mobile Responsiveness**: Verify display and interaction on various screen sizes.
-    3.  **Accessibility**: Manually check keyboard navigation, screen reader compatibility, and ARIA attributes.
-    4.  **Performance**: Basic check for rendering performance.
-*   **Acceptance Criteria**: `ui-text-input` functions correctly across target browsers, is responsive, accessible, and performs adequately.
+**Fix:**
+```rust
+fn consume_tag_name(html: &str, pos: &mut usize) -> String {
+    let mut name = String::new();
+    while pos < html.len() {
+        let ch = html[pos..].chars().next().unwrap();
+        if ch.is_alphanumeric() || ch == '-' || ch == ':' {
+            name.push(ch);
+            pos += 1;
+        } else {
+            break;
+        }
+    }
+    name
+}
+```
 
-### Phase 4: Iterative Component Development
+**Impact:** Fixes parsing of all custom element names with hyphens or colons.
 
-#### Task 4.1: Prioritize Next Components
-*   **Description**: Based on `remaining-todos.md` and `COMPONENT_PRIORITIZATION.md`, select the next set of components to develop.
-*   **Steps**:
-    1.  Review the "Form Controls & Inputs" section in `remaining-todos.md`.
-    2.  Prioritize based on dependencies or user impact (e.g., Textarea, Number Input, Select).
-*   **Acceptance Criteria**: A clear list of the next 2-3 components to develop is established.
+**Time Estimate:** 5 minutes
 
-#### Task 4.2: Repeat Component Development Cycle
-*   **Description**: For each prioritized component, repeat the process outlined in Phase 2 (Design API, Implement with TDD) and Phase 3 (Integrate, QA).
-*   **Steps**:
-    1.  For each component:
-        *   Design API (similar to Task 2.1).
-        *   Implement with TDD (similar to Task 2.2).
-        *   Integrate into `ui-bundle.js` (similar to Task 3.1).
-        *   Perform Initial QA (similar to Task 3.2).
-*   **Acceptance Criteria**: Each new component is fully implemented, tested, integrated, and passes initial QA.
+---
 
-### Phase 5: Comprehensive Quality Assurance & Standards Enforcement
+## Phase 2: Font Rendering Foundation (3-4 hours - Unblocks 80% of visual output)
 
-#### Task 5.1: Implement Pending QA Tasks
-*   **Description**: Systematically address all pending QA tasks listed in `remaining-todos.md`.
-*   **Steps**:
-    1.  **Theme Switching**: Implement and test light/dark modes across all components.
-    2.  **Responsive Design**: Verify all components display correctly on mobile, tablet, and desktop.
-    3.  **Accessibility Compliance**: Conduct thorough accessibility audits (WCAG 2.1 AA) for all components.
-    4.  **Form Validation**: Implement and verify validation and error handling for all form components.
-    5.  **CSS Consistency**: Ensure consistent styling and spacing across all components, adhering to the design system.
-    6.  **Event Handling**: Verify all component events fire correctly.
-    7.  **Shadow DOM Styling**: Verify Shadow DOM styling works properly for all components.
-    8.  **Component Props Verification**: Ensure all component properties and attributes work as expected with strict typing.
-    9.  **Bundle Integrity**: Verify `ui-bundle.js` loads without errors and all components are available.
-    10. **Cross-Browser Compatibility**: Conduct comprehensive testing across all target browsers.
-    11. **Performance Optimization**: Measure and optimize component rendering performance and bundle size.
-*   **Acceptance Criteria**: All QA tasks are completed, and components meet defined quality standards.
+This is the critical path item. Everything else depends on text being visible.
 
-#### Task 5.2: Enforce Development Standards
-*   **Description**: Continuously monitor and enforce strict development standards across the codebase.
-*   **Steps**:
-    1.  **TypeScript Strict Mode**: Regularly review code for any deviations from strict TypeScript configuration.
-    2.  **Clean Code Standards**: Conduct code reviews to ensure adherence to clean code principles and linting rules.
-    3.  **TDD Workflow**: Ensure all new features and bug fixes are developed using the TDD cycle.
-*   **Acceptance Criteria**: Codebase consistently adheres to all defined development principles.
+### 2.1 Add `fontdue` Crate Dependency
+**File:** `cortex-browser-env/Cargo.toml`
 
-### Phase 6: Documentation & Release Preparation
+**Action:** Add to dependencies:
+```toml
+fontdue = "0.8"
+```
 
-#### Task 6.1: Update Documentation
-*   **Description**: Ensure all documentation (API references, usage guides, examples) is up-to-date with newly implemented components and features.
-*   **Steps**:
-    1.  Update `docs/API_REFERENCE.md` for new components.
-    2.  Create/update examples in the `examples/` directory.
-    3.  Review and update `README.md` and other relevant project documentation.
-*   **Acceptance Criteria**: All project documentation is current and accurate.
+**Rationale:**
+- Pure Rust font rasterizer (no system dependencies)
+- Stable, well-maintained crate
+- Similar performance to rusttype
+- Good documentation and examples
 
-#### Task 6.2: Prepare for Release
-*   **Description**: Final checks and preparations for a potential release.
-*   **Steps**:
-    1.  Perform a final end-to-end test of the entire component library.
-    2.  Ensure all build scripts are robust and produce optimized bundles.
-    3.  Review `LICENSE` and `CODE_OF_CONDUCT.md` for any necessary updates.
-*   **Acceptance Criteria**: Project is ready for release.
+**Time Estimate:** 5 minutes
+
+### 2.2 Implement Font Manager Module
+**File:** `cortex-browser-env/src/fonts.rs` (NEW FILE)
+
+**Responsibilities:**
+1. Load system fonts (or embedded fallback font)
+2. Cache parsed fonts for reuse
+3. Provide glyph rasterization API
+
+**Implementation Outline:**
+```rust
+use fontdue::Font;
+
+pub struct FontManager {
+    fonts: HashMap<String, Font>,
+    default_font: Font,
+}
+
+impl FontManager {
+    pub fn new() -> Result<Self, Error> {
+        // Load default monospace font
+        let default_font = Font::from_bytes(
+            include_bytes!("../assets/DejaVuSansMono.ttf"),
+            Default::default()
+        )?;
+
+        Ok(FontManager {
+            fonts: HashMap::new(),
+            default_font,
+        })
+    }
+
+    pub fn rasterize_glyph(&self, character: char, size: f32) -> (Vec<u8>, (u32, u32)) {
+        self.default_font.rasterize(character, size)
+    }
+}
+```
+
+**Subtasks:**
+1. Define FontManager struct and methods
+2. Implement font loading from embedded binary
+3. Implement glyph rasterization wrapper
+4. Add error handling
+
+**Time Estimate:** 1 hour
+
+### 2.3 Integrate Font Rendering into Render Pipeline
+**File:** `cortex-browser-env/src/render.rs`
+
+**Current Code (Lines 120-138):**
+```rust
+fn render_text(text: &str, x: f32, y: f32, paint: &Paint) {
+    canvas.fill_rect(Rect::from_xywh(x, y, 14.0, 14.0).unwrap(), paint);
+}
+```
+
+**Updated Implementation:**
+```rust
+fn render_text(
+    text: &str,
+    x: f32,
+    y: f32,
+    size: f32,
+    color: Color,
+    canvas: &mut Canvas,
+    fonts: &FontManager,
+) {
+    let paint = Paint::from_color(color);
+    let mut current_x = x;
+
+    for ch in text.chars() {
+        let (glyph_bitmap, (width, height)) = fonts.rasterize_glyph(ch, size);
+
+        // Draw glyph bitmap to canvas
+        draw_glyph_bitmap(
+            canvas,
+            &glyph_bitmap,
+            current_x,
+            y,
+            width as f32,
+            height as f32,
+            &paint,
+        );
+
+        current_x += (width as f32) * 0.6; // Approximate character advance
+    }
+}
+```
+
+**Key Changes:**
+1. Accept font size parameter
+2. Accept color parameter
+3. Accept FontManager reference
+4. Loop through characters
+5. Rasterize each glyph
+6. Draw each glyph bitmap to canvas
+
+**Subtasks:**
+1. Modify render_text signature
+2. Implement glyph rasterization loop
+3. Implement bitmap-to-canvas drawing
+4. Add character spacing logic
+5. Update all render_text callsites
+
+**Time Estimate:** 1.5 hours
+
+### 2.4 Create Embedded Font Asset
+**File:** `cortex-browser-env/assets/DejaVuSansMono.ttf`
+
+**Action:** Include a TTF font file in the project.
+
+**Options:**
+1. Use DejaVu Sans Mono (public domain, included in most Linux distros)
+2. Embed in Cargo.toml as binary data using `include_bytes!`
+
+**Time Estimate:** 15 minutes
+
+### 2.5 Update Main Rendering Function
+**File:** `cortex-browser-env/src/render.rs:main()`
+
+**Change:** Initialize FontManager before rendering:
+```rust
+pub fn render_to_png(dom: &Element) -> Result<Vec<u8>> {
+    let font_manager = FontManager::new()?;  // NEW
+
+    // ... existing code ...
+
+    render_node(&dom, 0.0, 0.0, &mut canvas, &font_manager);
+
+    // ... existing code ...
+}
+```
+
+**Time Estimate:** 15 minutes
+
+---
+
+## Phase 3: CSS Integration (1-2 hours - Unblocks colors and spacing)
+
+### 3.1 Wire CSS Parser into Layout Engine
+**File:** `cortex-browser-env/src/layout.rs`
+
+**Current Code (Lines 1-15):**
+```rust
+fn calculate_layout(dom: &Element, viewport_width: f32) -> LayoutTree {
+    let default_style = Style::default();
+
+    let layout = Style {
+        width: Some(100.0),
+        height: Some(100.0),
+        ..default_style
+    };
+}
+```
+
+**Updated Implementation:**
+```rust
+fn calculate_layout(dom: &Element, viewport_width: f32) -> LayoutTree {
+    // Parse CSS from <style> elements
+    let stylesheets = extract_stylesheets(dom);
+
+    // Create resolved styles
+    let computed_styles = compute_styles(dom, &stylesheets);
+
+    // Apply to Taffy layout
+    let mut taffy = Taffy::new();
+    let layout = build_layout_tree(dom, &computed_styles, &mut taffy, None)?;
+
+    taffy.compute_layout(layout, Size {
+        width: AvailableSpace::Definite(viewport_width),
+        height: AvailableSpace::MaxContent,
+    })?;
+
+    Ok(LayoutResult {
+        tree: layout,
+        taffy,
+    })
+}
+```
+
+**Subtasks:**
+1. Create `extract_stylesheets()` function
+2. Create `compute_styles()` function to apply CSS rules to DOM nodes
+3. Refactor style application to use computed styles instead of defaults
+4. Map CSS values to Taffy style properties
+
+**Time Estimate:** 1 hour
+
+### 3.2 Extract and Apply Stylesheet Colors
+**File:** `cortex-browser-env/src/css.rs`
+
+**Enhancement:** Ensure color parsing is used in rendering:
+
+1. Parse color from CSS rules
+2. Store in computed styles
+3. Pass color to render_text() function
+
+**Time Estimate:** 30 minutes
+
+---
+
+## Phase 4: Attribute Rendering (1-2 hours - Unblocks form inputs and labels)
+
+### 4.1 Extract Attributes for Rendering
+**File:** `cortex-browser-env/src/render.rs`
+
+**Current Code (Lines 34-70):**
+```rust
+fn render_node(node: &Node, x: f32, y: f32) {
+    match node {
+        Node::Element(elem) => {
+            // Only renders children
+            for child in &elem.children {
+                render_node(child, x, y);
+            }
+        }
+    }
+}
+```
+
+**Updated Implementation:**
+```rust
+fn render_node(
+    node: &Node,
+    x: f32,
+    y: f32,
+    canvas: &mut Canvas,
+    fonts: &FontManager,
+) {
+    match node {
+        Node::Element(elem) => {
+            // Render element's own content
+            render_element_content(elem, x, y, canvas, fonts);
+
+            // Render children
+            for child in &elem.children {
+                render_node(child, x, y, canvas, fonts);
+            }
+        }
+        Node::Text(text) => {
+            render_text(text, x, y, 14.0, Color::BLACK, canvas, fonts);
+        }
+    }
+}
+```
+
+### 4.2 Implement Element Content Extraction
+**File:** `cortex-browser-env/src/render.rs`
+
+**New Function:**
+```rust
+fn render_element_content(
+    elem: &Element,
+    x: f32,
+    y: f32,
+    canvas: &mut Canvas,
+    fonts: &FontManager,
+) {
+    match elem.tag_name.as_str() {
+        "input" => {
+            // Render placeholder or value
+            if let Some(placeholder) = elem.get_attribute("placeholder") {
+                render_text(&placeholder, x, y, 12.0, Color::GRAY, canvas, fonts);
+            }
+            if let Some(value) = elem.get_attribute("value") {
+                render_text(&value, x, y, 12.0, Color::BLACK, canvas, fonts);
+            }
+        }
+        _ if elem.tag_name.contains('-') => {
+            // Custom element: render label attribute
+            if let Some(label) = elem.get_attribute("label") {
+                render_text(&label, x + 5.0, y + 5.0, 12.0, Color::BLACK, canvas, fonts);
+            }
+        }
+        _ => {
+            // No special attribute rendering
+        }
+    }
+}
+```
+
+**Subtasks:**
+1. Handle input elements (value, placeholder)
+2. Handle custom elements (label, other attributes)
+3. Handle select/textarea elements
+4. Test attribute visibility
+
+**Time Estimate:** 1 hour
+
+---
+
+## Phase 5: Visual Testing Framework (2-3 hours - Validates everything works)
+
+### 5.1 Enhance Screenshot Comparison Tests
+**File:** `cortex-browser-env/tests/visual_regression.rs` (ENHANCE)
+
+**Current Approach:** Basic golden master comparison
+
+**Enhancements:**
+1. Add text visibility verification
+2. Add color verification
+3. Add element position verification
+
+**Test Template:**
+```rust
+#[test]
+fn test_custom_element_rendering() {
+    let html = r#"
+        <div style="width: 300px; height: 100px;">
+            <ui-text-input label="Name"></ui-text-input>
+        </div>
+    "#;
+
+    let dom = parse_html(html).expect("Parse failed");
+    let screenshot = render_to_png(&dom).expect("Render failed");
+
+    // Verify screenshot is not blank
+    assert!(!is_blank_image(&screenshot), "Screenshot is completely blank");
+
+    // Verify text is visible
+    assert_text_visible(&screenshot, "Name");
+
+    // Compare to golden master (allow 5% diff tolerance)
+    let golden = include_bytes!("golden/custom_element.png");
+    let diff = compare_images(&screenshot, golden);
+    assert!(diff < 5.0, "Screenshot differs by {}%", diff);
+}
+```
+
+**Subtasks:**
+1. Create image comparison utility
+2. Create text visibility checker (basic OCR or pattern matching)
+3. Create golden master screenshots
+4. Write comprehensive test cases
+
+**Time Estimate:** 2-3 hours
+
+### 5.2 Generate Golden Master Baseline
+**Action:** Run tests after implementation to generate reference images
+
+**Files to Create:**
+- `cortex-browser-env/tests/golden/` directory
+- Reference screenshots for each test case
+
+---
+
+## Phase 6: Integration & Validation (1 hour)
+
+### 6.1 Run Full Test Suite
+```bash
+cd cortex-browser-env
+cargo test --all
+```
+
+**Expected:** All 164 tests pass + new visual tests pass
+
+### 6.2 Generate Sample Screenshots
+```bash
+cargo run --example render_form
+cargo run --example render_custom_elements
+```
+
+**Validate:** Screenshots show readable text, colors, and layouts
+
+### 6.3 Update Documentation
+- [ ] Update RENDERING_QUICK_SUMMARY.md with "FIXED" status
+- [ ] Add screenshots to README.md
+- [ ] Update IMPLEMENTATION_SPEC.md
+
+---
+
+## Critical Dependencies & Ordering
+
+**MUST DO IN THIS ORDER:**
+
+1. ✅ Fix tag parsing (enables custom element tests to run)
+2. ✅ Add fontdue crate (enables font rendering)
+3. ✅ Implement FontManager (provides glyph service)
+4. ✅ Integrate into render pipeline (makes text visible)
+5. ✅ Wire CSS parser (enables colors)
+6. ✅ Implement attribute rendering (makes form inputs visible)
+7. ✅ Add visual tests (validates everything)
+
+**DO NOT REORDER** - Each step depends on the previous ones.
+
+---
+
+## Risk Mitigation
+
+### Risk: Font Loading Fails
+**Mitigation:** Use embedded font file in binary. No system dependencies.
+
+### Risk: Breaking Existing Tests
+**Mitigation:** Keep all existing functions, only add new parameters. Use function overloads.
+
+### Risk: Performance Degradation
+**Mitigation:** Font Manager caches fonts. Glyph bitmap cache prevents re-rasterization.
+
+### Risk: Rendering Pipeline Too Complex
+**Mitigation:** Add comprehensive logging and test at each step.
+
+---
+
+## Success Metrics (Pass/Fail Criteria)
+
+| Metric | Target | Current | Status |
+|--------|--------|---------|--------|
+| Unit tests pass | 164/164 | 164/164 | ✅ |
+| Custom elements parse | 100% | 0% | ❌ |
+| Text visible in screenshots | 100% | 5% | ❌ |
+| Colors applied | 100% | 0% | ❌ |
+| Form inputs show values | 100% | 0% | ❌ |
+| Visual regression tests pass | 100% | 0% | ❌ |
+
+---
+
+## Time Breakdown
+
+| Phase | Task | Hours | Cumulative |
+|-------|------|-------|-----------|
+| 1 | Fix tag parsing | 0.08 | 0.08 |
+| 2 | Font foundation | 3.5 | 3.58 |
+| 3 | CSS integration | 1.5 | 5.08 |
+| 4 | Attribute rendering | 1.5 | 6.58 |
+| 5 | Visual testing | 2.5 | 9.08 |
+| 6 | Integration | 1.0 | 10.08 |
+| **Total** | | | **~10 hours** |
+
+(Conservative estimate with buffer: 12-16 hours)
+
+---
+
+## Post-MVP Enhancements (Phase 2)
+
+Once MVP is complete, prioritize:
+
+1. **SVG Rendering** (2-3 hours)
+   - Extend rendering to handle `<svg>` elements
+   - Implement path rendering
+
+2. **CSS Grid & Advanced Layouts** (3-4 hours)
+   - Full CSS Grid support
+   - Improved Flexbox edge cases
+
+3. **Shadow DOM** (4-5 hours)
+   - Custom element lifecycle
+   - Slot rendering
+
+4. **Web Fonts** (2-3 hours)
+   - @font-face support
+   - Remote font loading
+
+5. **OCR Verification** (2-3 hours)
+   - Use tesseract for text extraction
+   - Advanced visual assertion API
+
+---
+
+## Implementation Sequence (For Developer)
+
+```
+Week 1, Day 1:
+  09:00 - 09:05: Phase 1.1 - Fix tag parsing (TEST IMMEDIATELY)
+  09:05 - 09:10: Phase 2.1 - Add fontdue dependency
+  09:10 - 10:10: Phase 2.2 - Implement FontManager
+  10:10 - 11:30: Phase 2.3 - Integrate into render pipeline
+  11:30 - 12:00: Phase 2.4 - Embed font asset
+  12:00 - 13:00: LUNCH BREAK
+  13:00 - 13:15: Phase 2.5 - Update main rendering function
+  13:15 - 14:15: Phase 3.1 - Wire CSS parser
+  14:15 - 14:45: Phase 3.2 - Extract colors
+  14:45 - 15:45: Phase 4.1-4.2 - Attribute rendering
+  15:45 - 18:00: Phase 5.1-5.2 - Visual testing (with breaks)
+
+Week 1, Day 2:
+  09:00 - 10:00: Phase 6 - Integration & validation
+  10:00 - 10:30: Generate golden master screenshots
+  10:30 - 11:00: Documentation updates
+  11:00+: Buffer time / Post-MVP work
+```
+
+---
+
+## Status Tracking
+
+- **Document Created:** 2025-10-26
+- **Status:** Implementation Ready
+- **Next Steps:** Begin Phase 1 immediately
+

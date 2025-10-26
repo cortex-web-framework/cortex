@@ -1,0 +1,116 @@
+cargo:rerun-if-changed=build.rs
+cargo:rerun-if-env-changed=CARGO_FEATURE_EXPORTS
+cargo:rerun-if-env-changed=CARGO_FEATURE_BINDGEN
+cargo:rerun-if-env-changed=CARGO_FEATURE_UPDATE_BINDINGS
+cargo:rerun-if-env-changed=CARGO_FEATURE_DUMP_BYTECODE
+cargo:rerun-if-env-changed=CARGO_FEATURE_DUMP_GC
+cargo:rerun-if-env-changed=CARGO_FEATURE_DUMP_GC_FREE
+cargo:rerun-if-env-changed=CARGO_FEATURE_DUMP_FREE
+cargo:rerun-if-env-changed=CARGO_FEATURE_DUMP_LEAKS
+cargo:rerun-if-env-changed=CARGO_FEATURE_DUMP_MEM
+cargo:rerun-if-env-changed=CARGO_FEATURE_DUMP_OBJECTS
+cargo:rerun-if-env-changed=CARGO_FEATURE_DUMP_ATOMS
+cargo:rerun-if-env-changed=CARGO_FEATURE_DUMP_SHAPES
+cargo:rerun-if-env-changed=CARGO_FEATURE_DUMP_MODULE_RESOLVE
+cargo:rerun-if-env-changed=CARGO_FEATURE_DUMP_PROMISE
+cargo:rerun-if-env-changed=CARGO_FEATURE_DUMP_READ_OBJECT
+Applying patch patches/error_column_number.patch
+patching file cutils.c
+patching file cutils.h
+patching file quickjs-atom.h
+patching file quickjs-opcode.h
+patching file quickjs.c
+Hunk #87 succeeded at 38131 (offset -27 lines).
+Hunk #88 succeeded at 38227 (offset -27 lines).
+patching file quickjs.h
+patching file tests/test_line_column.js
+patching file quickjs.c
+patching file quickjs.c
+Applying patch patches/get_function_proto.patch
+patching file quickjs.c
+Hunk #1 succeeded at 6346 (offset 24 lines).
+patching file quickjs.h
+Hunk #1 succeeded at 786 (offset 1 line).
+Applying patch patches/check_stack_overflow.patch
+patching file quickjs.c
+Hunk #1 succeeded at 1597 (offset 7 lines).
+Applying patch patches/infinity_handling.patch
+patching file quickjs.c
+Hunk #1 succeeded at 10341 (offset 102 lines).
+Hunk #2 succeeded at 42053 (offset 317 lines).
+Hunk #3 succeeded at 48160 (offset 317 lines).
+Applying patch patches/atomic_new_class_id.patch
+patching file quickjs.c
+Hunk #1 succeeded at 3378 (offset 7 lines).
+Applying patch patches/dynamic_import_sync.patch
+patching file quickjs.c
+Hunk #1 succeeded at 1199 (offset 7 lines).
+Hunk #2 succeeded at 28419 (offset 207 lines).
+Hunk #3 succeeded at 28434 (offset 207 lines).
+Hunk #4 succeeded at 28442 (offset 207 lines).
+Hunk #5 succeeded at 28564 (offset 207 lines).
+Hunk #6 succeeded at 33894 (offset 310 lines).
+Hunk #7 succeeded at 33904 (offset 310 lines).
+patching file quickjs.h
+Hunk #1 succeeded at 868 (offset 2 lines).
+Hunk #2 succeeded at 1044 (offset 2 lines).
+OUT_DIR = Some(/home/matthias/projects/cortex/cortex-browser-env/target/debug/build/rquickjs-sys-949166e3a61d0abc/out)
+OPT_LEVEL = Some(0)
+TARGET = Some(x86_64-unknown-linux-gnu)
+CARGO_ENCODED_RUSTFLAGS = Some()
+HOST = Some(x86_64-unknown-linux-gnu)
+cargo:rerun-if-env-changed=CC_x86_64-unknown-linux-gnu
+CC_x86_64-unknown-linux-gnu = None
+cargo:rerun-if-env-changed=CC_x86_64_unknown_linux_gnu
+CC_x86_64_unknown_linux_gnu = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CC_ENABLE_DEBUG_OUTPUT
+RUSTC_WRAPPER = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+DEBUG = Some(false)
+CARGO_CFG_TARGET_FEATURE = Some(fxsr,sse,sse2)
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64_unknown_linux_gnu
+CFLAGS_x86_64_unknown_linux_gnu = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64-unknown-linux-gnu
+CFLAGS_x86_64-unknown-linux-gnu = None
+OUT_DIR = Some(/home/matthias/projects/cortex/cortex-browser-env/target/debug/build/rquickjs-sys-949166e3a61d0abc/out)
+cargo:rerun-if-env-changed=CC_ENABLE_DEBUG_OUTPUT
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+TARGET = Some(x86_64-unknown-linux-gnu)
+CARGO_CFG_TARGET_FEATURE = Some(fxsr,sse,sse2)
+HOST = Some(x86_64-unknown-linux-gnu)
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64_unknown_linux_gnu
+CFLAGS_x86_64_unknown_linux_gnu = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64-unknown-linux-gnu
+CFLAGS_x86_64-unknown-linux-gnu = None
+cargo:rerun-if-env-changed=AR_x86_64-unknown-linux-gnu
+AR_x86_64-unknown-linux-gnu = None
+cargo:rerun-if-env-changed=AR_x86_64_unknown_linux_gnu
+AR_x86_64_unknown_linux_gnu = None
+cargo:rerun-if-env-changed=HOST_AR
+HOST_AR = None
+cargo:rerun-if-env-changed=AR
+AR = None
+cargo:rerun-if-env-changed=ARFLAGS
+ARFLAGS = None
+cargo:rerun-if-env-changed=HOST_ARFLAGS
+HOST_ARFLAGS = None
+cargo:rerun-if-env-changed=ARFLAGS_x86_64_unknown_linux_gnu
+ARFLAGS_x86_64_unknown_linux_gnu = None
+cargo:rerun-if-env-changed=ARFLAGS_x86_64-unknown-linux-gnu
+ARFLAGS_x86_64-unknown-linux-gnu = None
+cargo:rustc-link-lib=static=quickjs
+cargo:rustc-link-search=native=/home/matthias/projects/cortex/cortex-browser-env/target/debug/build/rquickjs-sys-949166e3a61d0abc/out

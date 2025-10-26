@@ -76,9 +76,35 @@ fn calculate_layout_recursive(
     document.nodes[node_idx].layout = Some(layout);
 
     // Recursively layout children
-    let children = document.nodes[node_idx].children.clone();
-    for child_idx in children {
-        calculate_layout_recursive(document, child_idx, styles, content_width, content_height);
+    if style.display == Display::Flex {
+        layout_flex_children(document, node_idx, styles, content_width, content_height);
+    } else {
+        let children = document.nodes[node_idx].children.clone();
+        for child_idx in children {
+            calculate_layout_recursive(document, child_idx, styles, content_width, content_height);
+        }
+    }
+}
+
+fn layout_flex_children(
+    document: &mut Document,
+    node_idx: usize,
+    styles: &mut [ComputedStyle],
+    parent_width: f32,
+    parent_height: f32,
+) {
+    let node = &document.nodes[node_idx].clone();
+    let mut current_x = 0.0;
+
+    for &child_idx in &node.children {
+        // First, calculate the child's own layout
+        calculate_layout_recursive(document, child_idx, styles, parent_width, parent_height);
+
+        // Now, adjust its position based on flex layout
+        if let Some(child_layout) = document.nodes[child_idx].layout.as_mut() {
+            child_layout.x = current_x;
+            current_x += child_layout.width;
+        }
     }
 }
 
@@ -523,14 +549,44 @@ mod tests {
     }
 
     #[test]
-    fn test_layout_empty_document() {
-        // Given: An empty document
-        let mut doc = Document::new();
-
-        // When: We calculate layout
-        calculate_layout(&mut doc, 1024.0, 768.0);
-
-        // Then: Should not panic (graceful handling)
-        assert_eq!(doc.nodes.len(), 1); // Only document node
+        fn test_layout_empty_document() {
+            // Given: An empty document
+            let mut doc = Document::new();
+    
+            // When: We calculate layout
+            calculate_layout(&mut doc, 1024.0, 768.0);
+    
+            // Then: Should not panic (graceful handling)
+            assert_eq!(doc.nodes.len(), 1); // Only document node
+        }
+    
+        #[test]
+        fn test_layout_flex_row() {
+            // Given: A flex container with two children
+            let mut doc = Document::new();
+            let container_idx = doc.create_element("div");
+            let child1_idx = doc.create_element("div");
+            let child2_idx = doc.create_element("div");
+            doc.append_child(doc.root, container_idx);
+            doc.append_child(container_idx, child1_idx);
+            doc.append_child(container_idx, child2_idx);
+    
+            let mut styles = vec![ComputedStyle::default(); doc.nodes.len()];
+            styles[container_idx].display = Display::Flex;
+            styles[child1_idx].width = Some(CSSValue::Pixels(100.0));
+            styles[child1_idx].height = Some(CSSValue::Pixels(100.0));
+            styles[child2_idx].width = Some(CSSValue::Pixels(100.0));
+            styles[child2_idx].height = Some(CSSValue::Pixels(100.0));
+    
+            // When: We calculate layout
+            calculate_layout_recursive(&mut doc, container_idx, &mut styles, 1024.0, 768.0);
+    
+            // Then: The second child should be positioned to the right of the first child
+            let child1_layout = doc.nodes[child1_idx].layout.as_ref().unwrap();
+            let child2_layout = doc.nodes[child2_idx].layout.as_ref().unwrap();
+    
+            assert_eq!(child1_layout.x, 0.0);
+            assert_eq!(child2_layout.x, 100.0); // This will fail with the current block layout
+        }
     }
-}
+    

@@ -190,3 +190,24 @@ fn consume_until(chars: &mut std::iter::Peekable<std::str::Chars>, target: char)
         chars.next();
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use maplit::hashmap;
+
+    #[test]
+    fn test_parse_simple_css() {
+        let css = "h1 { color: red; font-size: 16px; }";
+        let stylesheet = parse_css(css);
+
+        assert_eq!(stylesheet.rules.len(), 1);
+        let rule = &stylesheet.rules[0];
+
+        assert_eq!(rule.selectors, vec!["h1"]);
+        assert_eq!(rule.declarations, hashmap!{
+            "color".to_string() => "red".to_string(),
+            "font-size".to_string() => "16px".to_string(),
+        });
+    }
+}

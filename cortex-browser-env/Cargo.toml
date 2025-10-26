@@ -17,6 +17,11 @@ path = "src/lib.rs"
 png = "0.18.0"
 raqote = "0.8"
 rquickjs = { version = "0.5", features = ["full"] }
+html5ever = "0.26.0"
+tendril = "0.4.3"
+fontdue = "0.8"
 
 [dev-dependencies]
 tempfile = "3.23.0"
+maplit = "1.0.2"
+mockito = "0.31.0"

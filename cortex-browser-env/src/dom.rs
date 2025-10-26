@@ -1,4 +1,5 @@
-#![allow(dead_code)]
+use rquickjs::Function;
+use std::collections::HashMap;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum NodeType {
@@ -13,27 +14,28 @@ pub enum NodeData {
     Text(String),
 }
 
-#[derive(Debug, PartialEq, Clone)] // Removed Eq
+#[derive(Debug, PartialEq, Clone)]
 pub struct Node {
     pub node_type: NodeType,
-    pub parent: Option<usize>, // Index into a Vec<Node> for parent
-    pub children: Vec<usize>,  // Indices into a Vec<Node> for children
+    pub parent: Option<usize>,
+    pub children: Vec<usize>,
     pub data: Option<NodeData>,
     pub shadow_root: Option<ShadowRoot>,
-    pub event_listeners: std::collections::HashMap<String, Vec<usize>>, // Map event type to list of listener indices
+    pub event_listeners: std::collections::HashMap<String, Vec<usize>>,
+    pub js_event_listeners: std::collections::HashMap<String, Function<'static>>,
     pub layout: Option<Layout>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct ElementData {
     pub tag_name: String,
-    pub attributes: std::collections::HashMap<String, String>,
+    pub attributes: HashMap<String, String>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct ShadowRoot {
     pub mode: ShadowRootMode,
-    pub children: Vec<usize>, // Indices into the Document's nodes for children of the shadow root
+    pub children: Vec<usize>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -42,7 +44,7 @@ pub enum ShadowRootMode {
     Closed,
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Default)]
 pub struct Layout {
     pub x: f32,
     pub y: f32,
@@ -82,7 +84,7 @@ impl Default for Display {
 #[derive(Debug)]
 pub struct Document {
     pub nodes: Vec<Node>,
-    pub root: usize, // Index of the root element
+    pub root: usize,
 }
 
 impl Document {
@@ -93,7 +95,8 @@ impl Document {
             children: Vec::new(),
             data: None,
             shadow_root: None,
-            event_listeners: std::collections::HashMap::new(),
+            event_listeners: HashMap::new(),
+            js_event_listeners: HashMap::new(),
             layout: None,
         };
         let mut nodes = Vec::new();
@@ -108,7 +111,7 @@ impl Document {
     pub fn create_element(&mut self, tag_name: &str) -> usize {
         let element_data = ElementData {
             tag_name: tag_name.to_string(),
-            attributes: std::collections::HashMap::new(),
+            attributes: HashMap::new(),
         };
         let node = Node {
             node_type: NodeType::Element,
@@ -116,7 +119,8 @@ impl Document {
             children: Vec::new(),
             data: Some(NodeData::Element(element_data)),
             shadow_root: None,
-            event_listeners: std::collections::HashMap::new(),
+            event_listeners: HashMap::new(),
+            js_event_listeners: HashMap::new(),
             layout: None,
         };
         let idx = self.nodes.len();
@@ -131,7 +135,8 @@ impl Document {
             children: Vec::new(),
             data: Some(NodeData::Text(text_content.to_string())),
             shadow_root: None,
-            event_listeners: std::collections::HashMap::new(),
+            event_listeners: HashMap::new(),
+            js_event_listeners: HashMap::new(),
             layout: None,
         };
         let idx = self.nodes.len();
@@ -140,9 +145,7 @@ impl Document {
     }
 
     pub fn append_child(&mut self, parent_idx: usize, child_idx: usize) {
-        // Update parent's children
         self.nodes[parent_idx].children.push(child_idx);
-        // Update child's parent
         self.nodes[child_idx].parent = Some(parent_idx);
     }
 
@@ -182,17 +185,16 @@ impl Document {
                     children: Vec::new(),
                 };
                 node.shadow_root = Some(shadow_root);
-                // Return the index of the host node, as the shadow root is part of it
                 Ok(host_idx)
             } else {
                 Err("Cannot attach shadow root to a non-element node.")
             }
-        } else {
+        }
+        else {
             Err("Host node not found.")
         }
     }
 
-    // Event System
     pub fn add_event_listener(&mut self, node_idx: usize, event_type: &str, listener_idx: usize) {
         if let Some(node) = self.nodes.get_mut(node_idx) {
             node.event_listeners.entry(event_type.to_string()).or_insert_with(Vec::new).push(listener_idx);
@@ -204,8 +206,6 @@ impl Document {
         while let Some(idx) = current_idx {
             if let Some(node) = self.nodes.get(idx) {
                 if let Some(listeners) = node.event_listeners.get(event_type) {
-                    // In a real browser, this would execute the JS listener callback
-                    // For now, we just print that an event was dispatched
                     println!("Event '{}' dispatched on node index {}", event_type, idx);
                 }
                 current_idx = node.parent;

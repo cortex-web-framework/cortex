@@ -1,4 +1,5 @@
 import { WasmMemoryManager, createMemoryManager } from './memoryManager.js';
+import { Logger } from '../core/logger.js';
 
 // WebAssembly type declarations for Node.js
 
@@ -72,6 +73,7 @@ export function executeWasmFunction<T>(
   functionName: string,
   args: any[] = []
 ): T {
+  const logger = Logger.getInstance();
   const wasmFunction = instance.exports[functionName] as Function;
   if (!wasmFunction) {
     throw new Error(`WASM function '${functionName}' not found`);
@@ -79,21 +81,21 @@ export function executeWasmFunction<T>(
 
   // Convert JS arguments to WASM pointers
   const wasmArgs = args.map(arg => jsToWasm(arg, memoryManager));
-  
+
   try {
     // Execute WASM function
     const result = wasmFunction(...wasmArgs);
-    
+
     // Clean up allocated memory for arguments
     wasmArgs.forEach(ptr => {
       try {
         memoryManager.deallocate(ptr);
       } catch (error) {
         // Ignore deallocation errors for now
-        console.warn('Failed to deallocate argument memory:', error);
+        logger.warn('Failed to deallocate argument memory:', { error });
       }
     });
-    
+
     return result as T;
   } catch (error) {
     // Clean up allocated memory on error

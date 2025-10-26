@@ -1,0 +1,1 @@
+(Cow<'_, lightningcss::properties::Property<'_>>, bool)

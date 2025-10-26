@@ -583,17 +583,98 @@ fn parse_color_to_argb(color: &str) -> u32 {
     }
 }
 
-// ============================================================================
+// ============================================================================ 
 // TESTS (RED PHASE - TDD)
-// ============================================================================
+// ============================================================================ 
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fs;
+    use std::path::Path;
 
-    // ========================================================================
+    // ======================================================================== 
+    // GOLDEN MASTER TEST
+    // ======================================================================== 
+
+    #[test]
+    fn test_golden_master_simple_box() {
+        let golden_master_path = "tests/golden_masters/simple_box.png";
+        let temp_dir = tempfile::tempdir().unwrap();
+        let output_path = temp_dir.path().join("simple_box.png");
+
+        // Given: A document with a simple styled box
+        let mut doc = Document::new();
+        let elem_idx = doc.create_element("div");
+        doc.append_child(doc.root, elem_idx);
+        doc.nodes[elem_idx].layout = Some(Layout {
+            x: 10.0, y: 10.0, width: 100.0, height: 50.0,
+            ..Default::default()
+        });
+        let mut styles = vec![ComputedStyle::default(); doc.nodes.len()];
+        styles[elem_idx].background_color = Some("red".to_string());
+
+        // When: We render it
+        let mut dt = DrawTarget::new(200, 100);
+        render_node(&mut dt, &doc, doc.root, &styles);
+        dt.write_png(output_path.to_str().unwrap()).unwrap();
+
+        // Then: The output should match the golden master
+        let (master_data, output_data) = load_or_create_golden_master(golden_master_path, &output_path);
+        assert_eq!(master_data, output_data, "Rendered output does not match the golden master.");
+    }
+
+    #[test]
+    fn test_golden_master_flexbox() {
+        let golden_master_path = "tests/golden_masters/flexbox.png";
+        let temp_dir = tempfile::tempdir().unwrap();
+        let output_path = temp_dir.path().join("flexbox.png");
+
+        // Given: A document with a flexbox layout
+        let mut doc = Document::new();
+        let container_idx = doc.create_element("div");
+        let child1_idx = doc.create_element("div");
+        let child2_idx = doc.create_element("div");
+        doc.append_child(doc.root, container_idx);
+        doc.append_child(container_idx, child1_idx);
+        doc.append_child(container_idx, child2_idx);
+
+        let mut styles = vec![ComputedStyle::default(); doc.nodes.len()];
+        styles[container_idx].display = super::super::dom::Display::Flex;
+        styles[child1_idx].width = Some(super::super::css::CSSValue::Pixels(50.0));
+        styles[child1_idx].height = Some(super::super::css::CSSValue::Pixels(50.0));
+        styles[child1_idx].background_color = Some("blue".to_string());
+        styles[child2_idx].width = Some(super::super::css::CSSValue::Pixels(50.0));
+        styles[child2_idx].height = Some(super::super::css::CSSValue::Pixels(50.0));
+        styles[child2_idx].background_color = Some("green".to_string());
+
+        // When: We calculate layout and render it
+        super::super::layout::calculate_layout(&mut doc, 200.0, 100.0);
+        let mut dt = DrawTarget::new(200, 100);
+        render_node(&mut dt, &doc, doc.root, &styles);
+        dt.write_png(output_path.to_str().unwrap()).unwrap();
+
+        // Then: The output should match the golden master
+        let (master_data, output_data) = load_or_create_golden_master(golden_master_path, &output_path);
+        assert_eq!(master_data, output_data, "Rendered flexbox output does not match the golden master.");
+    }
+
+    fn load_or_create_golden_master(master_path: &str, current_output_path: &Path) -> (Vec<u8>, Vec<u8>) {
+        let output_data = fs::read(current_output_path).unwrap();
+        if let Ok(master_data) = fs::read(master_path) {
+            (master_data, output_data)
+        } else {
+            // Golden master doesn't exist, create it.
+            fs::create_dir_all(Path::new(master_path).parent().unwrap()).unwrap();
+            fs::write(master_path, &output_data).unwrap();
+            (output_data.clone(), output_data)
+        }
+    }
+
+
+    // ======================================================================== 
     // BASIC RENDERING TESTS
-    // ========================================================================
+    // ======================================================================== 
 
     #[test]
     fn test_render_creates_draw_target() {
@@ -647,9 +728,9 @@ mod tests {
         assert_eq!(dt.height(), 2160);
     }
 
-    // ========================================================================
+    // ======================================================================== 
     // COLOR PARSING TESTS
-    // ========================================================================
+    // ======================================================================== 
 
     #[test]
     fn test_parse_color_named_black() {
@@ -745,9 +826,9 @@ mod tests {
         assert_eq!(argb, 0xff000000);
     }
 
-    // ========================================================================
+    // ======================================================================== 
     // BACKGROUND RENDERING TESTS
-    // ========================================================================
+    // ======================================================================== 
 
     #[test]
     fn test_render_background_with_element() {
@@ -786,9 +867,9 @@ mod tests {
         assert_eq!(dt.width(), 200);
     }
 
-    // ========================================================================
+    // ======================================================================== 
     // BORDER RENDERING TESTS
-    // ========================================================================
+    // ======================================================================== 
 
     #[test]
     fn test_render_border_exists() {
@@ -852,9 +933,9 @@ mod tests {
         assert_eq!(dt.width(), 200);
     }
 
-    // ========================================================================
+    // ======================================================================== 
     // TEXT RENDERING TESTS
-    // ========================================================================
+    // ======================================================================== 
 
     #[test]
     fn test_render_text_with_layout() {

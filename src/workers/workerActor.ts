@@ -1,4 +1,5 @@
 import { Actor, ActorSystem } from '../core/actorSystem.js';
+import { Logger } from '../core/logger.js';
 
 // Worker types are available globally in Node.js
 
@@ -47,9 +48,11 @@ const workerUrl = URL.createObjectURL(workerBlob);
 export class WorkerActor extends Actor {
   private worker: Worker | undefined;
   public onWasmResult: ((result: unknown) => void) | null = null;
+  private logger: Logger;
 
   constructor(id: string, system: ActorSystem, wasmModuleUrl?: string) {
     super(id, system);
+    this.logger = Logger.getInstance();
     this.worker = new Worker(workerUrl, { type: 'module' });
     this.worker.postMessage({ type: 'init', actorId: this.id, system: 'TODO: Pass a proxy for ActorSystem', wasmModuleUrl });
 
@@ -59,12 +62,12 @@ export class WorkerActor extends Actor {
           this.onWasmResult(e.data.result);
         }
       } else {
-        console.log(`Message from worker for ${this.id}:`, e.data);
+        this.logger.debug(`Message from worker for ${this.id}:`, { data: e.data });
       }
     };
 
     this.worker.onerror = (error) => {
-      console["error"](`Worker error for ${this.id}:`, error);
+      this.logger.error(`Worker error for ${this.id}:`, (error as unknown) as Error);
       // Potentially handle failure via actor system
       // this.system.handleFailure(this, error);
     };

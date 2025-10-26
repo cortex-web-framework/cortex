@@ -66,8 +66,9 @@ pub fn parse_html(html: &str) -> Document {
 fn consume_tag_name(chars: &mut Peekable<Chars>) -> String {
     let mut name = String::new();
     while let Some(&c) = chars.peek() {
-        // Allow alphanumeric, hyphens, and underscores for custom elements (e.g., ui-text-input)
-        if c.is_alphanumeric() || c == '-' || c == '_' {
+        // Allow alphanumeric, hyphens, underscores, and colons for custom elements
+        // Examples: ui-text-input, my:component, custom-element_v2
+        if c.is_alphanumeric() || c == '-' || c == '_' || c == ':' {
             name.push(chars.next().unwrap());
         } else {
             break;
@@ -144,5 +145,65 @@ fn consume_until(chars: &mut Peekable<Chars>, target: char) {
             break;
         }
         chars.next();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::dom::{NodeData, NodeType};
+
+    #[test]
+    fn test_parse_simple_html() {
+        let html = "<html><body><h1>Hello</h1></body></html>";
+        let document = parse_html(html);
+
+        // Document root is node 0
+        let root_node = document.get_node(document.root).unwrap();
+        assert_eq!(root_node.children.len(), 1);
+
+        // Get <html> element (should be the first and only child of the document)
+        let html_node_idx = root_node.children[0];
+        let html_node = document.get_node(html_node_idx).unwrap();
+        if let Some(NodeData::Element(data)) = &html_node.data {
+            assert_eq!(data.tag_name, "html");
+        } else {
+            panic!("HTML node should be an element");
+        }
+        assert_eq!(html_node.children.len(), 1);
+        assert_eq!(html_node.parent, Some(document.root));
+
+        // Get <body> element
+        let body_node_idx = html_node.children[0];
+        let body_node = document.get_node(body_node_idx).unwrap();
+        if let Some(NodeData::Element(data)) = &body_node.data {
+            assert_eq!(data.tag_name, "body");
+        } else {
+            panic!("Body node should be an element");
+        }
+        assert_eq!(body_node.children.len(), 1);
+        assert_eq!(body_node.parent, Some(html_node_idx));
+
+        // Get <h1> element
+        let h1_node_idx = body_node.children[0];
+        let h1_node = document.get_node(h1_node_idx).unwrap();
+        if let Some(NodeData::Element(data)) = &h1_node.data {
+            assert_eq!(data.tag_name, "h1");
+        } else {
+            panic!("H1 node should be an element");
+        }
+        assert_eq!(h1_node.children.len(), 1);
+        assert_eq!(h1_node.parent, Some(body_node_idx));
+
+        // Get text node
+        let text_node_idx = h1_node.children[0];
+        let text_node = document.get_node(text_node_idx).unwrap();
+        if let Some(NodeData::Text(text)) = &text_node.data {
+            assert_eq!(text, "Hello");
+        } else {
+            panic!("Text node should contain text");
+        }
+        assert_eq!(text_node.children.len(), 0);
+        assert_eq!(text_node.parent, Some(h1_node_idx));
     }
 }

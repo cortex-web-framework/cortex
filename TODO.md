@@ -1,96 +1,47 @@
-## TODO: Cortex Web Framework Development
+# TODO: Headless Rust-Browser-Testtool
 
-### Phase 1: Foundation & Immediate Fixes
+Dies ist die detaillierte Aufgabenliste, die aus dem `PLAN.md` abgeleitet wurde. Jede Aufgabe ist mit relevanten Kategorien gekennzeichnet.
 
-*   [test] Verify `themeManager` Bug Fix - **COMPLETED (Local Build Verified)**
-    *   Trigger new UI component build and deployment (or local simulation).
-    *   Access deployed application/local simulation in browser.
-    *   Check browser console for `Uncaught SyntaxError: Identifier 'themeManager' has already been declared`.
-    *   If error persists, re-investigate bundling and `themeManager` declaration/usage.
-*   [setup] Set Up Development Environment for New Component (Text Input) - **COMPLETED**
-    *   Ensure Node.js, npm/yarn, TypeScript compiler are installed and configured.
-    *   Verify `tsconfig.json` and `tsconfig.build-ui.json` are set for strict TypeScript.
-    *   Familiarize with existing component structure and testing patterns.
+### Meilenstein 1: Statischer Content-Parser
 
-### Phase 2: Component Development - Text Input
+- [ ] `[parser][test]` Test-Infrastruktur für den HTML-Parser aufsetzen und einen fehlschlagenden Test für die DOM-Struktur-Prüfung schreiben.
+- [ ] `[parser]` HTML-Parser mit `html5ever` implementieren, um eine DOM-Tree-Datenstruktur zu erzeugen.
+- [ ] `[parser][test]` Test-Infrastruktur für die CSS-Engine aufsetzen und einen fehlschlagenden Test für die Regel-Interpretation schreiben.
+- [ ] `[parser]` CSS-Engine mit `stylo` implementieren, um ein CSSOM zu erzeugen.
+- [ ] `[parser][test]` Einen fehlschlagenden Integrationstest schreiben, der einen "Styled Tree" aus einem DOM-Tree und einem CSSOM erzeugt.
+- [ ] `[parser]` Logik implementieren, um die CSS-Kaskade und Selektoren auf den DOM-Tree anzuwenden und den "Styled Tree" zu erstellen.
 
-*   [design] Design Text Input Component API - **COMPLETED**
-    *   Identify core functionalities: basic text input, placeholder, value, disabled, read-only, type, label association.
-    *   Consider common use cases and user interactions.
-    *   Define attributes for declarative usage.
-    *   Define properties for programmatic access.
-    *   Define custom events (`input`, `change`, `focus`, `blur`).
-    *   Outline accessibility considerations (ARIA, keyboard navigation).
-*   [frontend] [test] Implement Text Input Component (TDD) - **BLOCKED (Persistent Test Environment Issue)**
-    *   **Red (Test First)**:
-        *   Create `ui-text-input.test.ts`.
-        *   Write failing test for component renders.
-        *   Write tests for properties (`value`, `placeholder`).
-        *   Write tests for events (`input`, `change`).
-        *   Write tests for states (`disabled`, `readonly`).
-        *   Write tests for accessibility (`aria-label`, keyboard interaction).
-        *   Write tests for strict TypeScript type checking (no `any`).
-    *   **Green (Code to Pass)**:
-        *   Create `ui-text-input.ts`.
-        *   Implement minimal HTML structure and CSS.
-        *   Implement properties and event handlers to pass tests.
-        *   Adhere to "ZERO Dependencies" pledge.
-        *   Adhere to "Super Strict TypeScript" standards.
-    *   **Refactor**:
-        *   Improve code structure, readability, and maintainability.
-        *   Optimize CSS for consistency and performance.
-        *   Ensure Shadow DOM is correctly implemented.
+### Meilenstein 2: Layout-Kalkulator
 
-### Phase 3: Quality Assurance & Refinement
+- [ ] `[layout][test]` Einen fehlschlagenden TDD-Test für die Layout-Engine schreiben, der korrekte Bounding Boxes für ein einfaches Block-Layout prüft.
+- [ ] `[layout]` Das `taffy`-Crate in das Projekt integrieren.
+- [ ] `[layout]` Logik implementieren, um den "Styled Tree" in einen `taffy`-Layout-Tree umzuwandeln.
+- [ ] `[layout]` Die Layout-Berechnung mit `taffy` aufrufen und den resultierenden Layout-Tree speichern.
+- [ ] `[layout][test]` Weitere fehlschlagende TDD-Tests für komplexe Layouts (Flexbox, Grid) hinzufügen.
+- [ ] `[layout]` Die Logik erweitern, um Flexbox- und Grid-Eigenschaften korrekt an `taffy` zu übergeben.
 
-*   [build] Integrate Text Input into `ui-bundle.js` - **COMPLETED**
-    *   Run `scripts/build-ui.js`.
-    *   Verify `ui-text-input.js` is included in the bundle.
-    *   Check console for new bundling errors.
-*   [test] Perform Initial QA for Text Input - **BLOCKED (Persistent Test Environment Issue)**
-    *   **Cross-Browser Compatibility**: Test in Chrome, Firefox, Safari, Edge.
-    *   **Mobile Responsiveness**: Verify display and interaction on various screen sizes.
-    *   **Accessibility**: Manually check keyboard navigation, screen reader, ARIA.
-    *   **Performance**: Basic check for rendering performance.
+### Meilenstein 3: Headless Pixel-Renderer
 
-### Phase 4: Iterative Component Development
+- [ ] `[rendering][test]` Einen fehlschlagenden "Golden Master"-Test schreiben, der einen gerenderten Layout-Tree mit einem Master-PNG vergleicht.
+- [ ] `[rendering]` CPU-basierte Rendering-Engine mit `tiny-skia` implementieren, um Layout-Boxen zu zeichnen.
+- [ ] `[rendering]` Das `fontdue`-Crate integrieren, um Textinhalte zu rendern.
+- [ ] `[rendering]` Das `image`-Crate verwenden, um den Pixel-Buffer als PNG-Datei zu kodieren und zu speichern.
+- [ ] `[rendering][test]` Weitere "Golden Master"-Tests für komplexere visuelle Szenarien hinzufügen.
 
-*   [management] Prioritize Next Components (Parallelizable)
-    *   Review "Form Controls & Inputs" in `remaining-todos.md`.
-    *   Prioritize based on dependencies or user impact (e.g., Textarea, Number Input, Select).
-*   [frontend] [test] Repeat Component Development Cycle (Parallelizable) - **BLOCKED (Persistent Test Environment Issue)**
-    *   For each prioritized component:
-        *   Design API.
-        *   Implement with TDD.
-        *   Integrate into `ui-bundle.js`.
-        *   Perform Initial QA.
+### Meilenstein 4: JavaScript-Runtime-Integration
 
-### Phase 5: Comprehensive Quality Assurance & Standards Enforcement
+- [ ] `[javascript][test]` Einen fehlschlagenden TDD-Test für die DOM-Manipulation aus einem `<script>`-Tag heraus schreiben.
+- [ ] `[javascript]` Das `deno_core`-Crate integrieren und eine `JsRuntime`-Instanz initialisieren.
+- [ ] `[javascript][dom]` Rust-zu-JS-Bindings ("Ops") für die DOM-Manipulation implementieren (z.B. `getElementById`).
+-_ `[javascript]` Den `deno_core`-Event-Loop in den Haupt-Event-Loop des Browsers integrieren.
+- [ ] `[javascript][test]` Einen fehlschlagenden TDD-Test für die DOM-Event-Behandlung (z.B. `onclick`) schreiben.
+- [ ] `[javascript][dom]` Die Event-Dispatching-Logik vom DOM zur JS-Runtime implementieren.
 
-*   [test] Implement Pending QA Tasks (Parallelizable) - **BLOCKED (Persistent Test Environment Issue)**
-    *   **Theme Switching**: Implement and test light/dark modes.
-    *   **Responsive Design**: Verify all components on various screen sizes.
-    *   **Accessibility Compliance**: Conduct thorough WCAG 2.1 AA audits.
-    *   **Form Validation**: Implement and verify validation for form components.
-    *   **CSS Consistency**: Ensure consistent styling.
-    *   **Event Handling**: Verify all component events.
-    *   **Shadow DOM Styling**: Verify Shadow DOM works.
-    *   **Component Props Verification**: Ensure properties/attributes work with strict typing.
-    *   **Bundle Integrity**: Verify `ui-bundle.js` loads correctly.
-    *   **Cross-Browser Compatibility**: Comprehensive testing across browsers.
-    *   **Performance Optimization**: Measure and optimize component rendering/bundle size.
-*   [standards] Enforce Development Standards (Ongoing/Parallelizable)
-    *   **TypeScript Strict Mode**: Regularly review code for any deviations from strict TypeScript configuration.
-    *   **Clean Code Standards**: Conduct code reviews for clean code and linting.
-    *   **TDD Workflow**: Ensure TDD cycle for new features/bug fixes.
+### Meilenstein 5: Interaktivität & Logische Verifizierung
 
-### Phase 6: Documentation & Release Preparation
-
-*   [docs] Update Documentation (Parallelizable)
-    *   Update `docs/API_REFERENCE.md` for new components.
-    *   Create/update examples in `examples/`.
-    *   Review and update `README.md` and other relevant docs.
-*   [release] Prepare for Release
-    *   Perform final end-to-end test of component library.
-    *   Ensure robust build scripts and optimized bundles.
-    *   Review `LICENSE` and `CODE_OF_CONDUCT.md`.
+- [ ] `[network][test]` Einen fehlschlagenden TDD-Test für die `Fetch` API schreiben.
+- [ ] `[network]` Die `Fetch` API implementieren, indem `deno_core` mit der `reqwest`-Netzwerkschicht verbunden wird.
+- [ ] `[api]` Die öffentliche API des Test-Tools definieren und implementieren (z.B. `browser.load_url()`).
+- [ ] `[verification][test]` Einen vollständigen, fehlschlagenden End-to-End-TDD-Test für die logische Verifizierung (DOM -> Layout -> Screenshot -> OCR) schreiben.
+- [ ] `[verification]` Das logische Verifizierungssystem mit `tesseract` implementieren.
+- [ ] `[verification][test]` Einen fehlschlagenden TDD-Test für die visuelle Regression (Pixel-Diff) mit `image-compare` aufsetzen und implementieren.

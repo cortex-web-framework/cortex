@@ -1,0 +1,14 @@
+/home/matthias/projects/cortex/cortex-browser-env/target/debug/deps/serde-1f8dc261246f81be.d: /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/matthias/projects/cortex/cortex-browser-env/target/debug/build/serde-639e73c8ec6398ef/out/private.rs
+
+/home/matthias/projects/cortex/cortex-browser-env/target/debug/deps/libserde-1f8dc261246f81be.rlib: /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/matthias/projects/cortex/cortex-browser-env/target/debug/build/serde-639e73c8ec6398ef/out/private.rs
+
+/home/matthias/projects/cortex/cortex-browser-env/target/debug/deps/libserde-1f8dc261246f81be.rmeta: /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/matthias/projects/cortex/cortex-browser-env/target/debug/build/serde-639e73c8ec6398ef/out/private.rs
+
+/home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs:
+/home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs:
+/home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs:
+/home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs:
+/home/matthias/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs:
+/home/matthias/projects/cortex/cortex-browser-env/target/debug/build/serde-639e73c8ec6398ef/out/private.rs:
+
+# env-dep:OUT_DIR=/home/matthias/projects/cortex/cortex-browser-env/target/debug/build/serde-639e73c8ec6398ef/out
