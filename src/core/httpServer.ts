@@ -1,6 +1,6 @@
 import * as http from 'node:http';
 import { Socket } from 'node:net';
-import { RouteNotFound } from './errors.js';
+import { RouteNotFound, isError, getErrorMessage } from './errors.js';
 import type { MetricsCollector } from '../observability/metrics/collector.js';
 import type { HealthCheckRegistry } from '../observability/health/healthRegistry.js';
 
@@ -70,8 +70,9 @@ export class CortexHttpServer {
         } else {
           throw new RouteNotFound(req.method as HttpMethod, req.url ?? '/');
         }
-      } catch (error: any) {
-        console["error"](`HTTP Request Error for ${req.method} ${req.url}:`, error);
+      } catch (error: unknown) {
+        const errorMessage = isError(error) ? error.message : getErrorMessage(error);
+        console.error(`HTTP Request Error for ${req.method} ${req.url}: ${errorMessage}`);
         if (error instanceof RouteNotFound) {
           res.writeHead(404, { 'Content-Type': 'text/plain' });
           res.end('Not Found');
