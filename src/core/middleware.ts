@@ -1,9 +1,17 @@
 import * as http from 'node:http';
+import { Logger } from './logger.js';
+
+declare module 'node:http' {
+  interface IncomingMessage {
+    body?: unknown;
+  }
+}
 
 type NextFunction = () => void;
 
 export const jsonBodyParser: (options?: { limit?: string | number }) => (req: http.IncomingMessage, res: http.ServerResponse, next: NextFunction) => void = (options = {}) => {
   const limit = options.limit || '1mb'; // Default limit
+  const logger = Logger.getInstance();
 
   return (req, res, next) => {
     if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
@@ -21,17 +29,17 @@ export const jsonBodyParser: (options?: { limit?: string | number }) => (req: ht
 
       req.on('end', () => {
         try {
-          (req as any).body = JSON.parse(body);
+          req.body = JSON.parse(body);
           next();
         } catch (error) {
-          console["error"]('JSON Body Parser Error:', error);
+          logger.error('JSON Body Parser Error:', error instanceof Error ? error : new Error(String(error)));
           res.writeHead(400, { 'Content-Type': 'text/plain' });
           res.end('Bad Request: Invalid JSON');
         }
       });
 
-      req.on('error', (error) => {
-        console["error"]('Request stream error:', error);
+      req.on('error', (error: Error) => {
+        logger.error('Request stream error:', error);
         res.writeHead(500, { 'Content-Type': 'text/plain' });
         res.end('Internal Server Error');
       });
