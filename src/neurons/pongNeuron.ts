@@ -1,5 +1,6 @@
 import { Actor, ActorSystem, ActorMessage } from '../core/actorSystem.js';
 import { EventBus } from '../core/eventBus.js';
+import { Logger } from '../core/logger.js';
 
 interface PingEvent {
   sender: string;
@@ -8,15 +9,17 @@ interface PingEvent {
 
 export class PongNeuron extends Actor {
   private pongReceived: boolean = false;
+  private logger: Logger;
 
   constructor(id: string, system: ActorSystem, private eventBus: EventBus) {
     super(id, system);
+    this.logger = Logger.getInstance();
     this.eventBus.subscribe<PingEvent>('ping', this.handlePing.bind(this));
   }
 
   handlePing(payload: PingEvent): void {
     if (payload.message === 'Ping!') {
-      console.log(`${this.id} received ping from ${payload.sender}.`);
+      this.logger.info(`${this.id} received ping from ${payload.sender}.`);
       this.pongReceived = true;
     }
   }

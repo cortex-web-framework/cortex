@@ -1,5 +1,6 @@
 import { EventBus } from './eventBus.js';
 import { ActorNotFound, isError, getErrorMessage } from './errors.js';
+import { Logger } from './logger.js';
 
 /**
  * Base message type for Actor communication
@@ -75,9 +76,11 @@ export abstract class Actor {
 export class ActorSystem {
   private actors: Map<string, Actor> = new Map();
   private static readonly MAX_RESTARTS = 3;
+  private logger: Logger;
 
   constructor(_eventBus: EventBus) {
     // EventBus is passed for future extensibility
+    this.logger = Logger.getInstance();
   }
 
   public createActor<T extends Actor>(
@@ -120,11 +123,11 @@ export class ActorSystem {
 
   public handleFailure(actor: Actor, error: unknown): void {
     const errorMessage = isError(error) ? error.message : getErrorMessage(error);
-    console.error(`Actor '${actor.id}' failed: ${errorMessage}`);
+    this.logger.error(`Actor '${actor.id}' failed: ${errorMessage}`, isError(error) ? error : new Error(String(error)));
 
     const metadata = actorMetadata.get(actor);
     if (!metadata) {
-      console.error(`Actor '${actor.id}' has no metadata. Cannot restart.`);
+      this.logger.error(`Actor '${actor.id}' has no metadata. Cannot restart.`);
       this.stopActor(actor.id);
       return;
     }
@@ -132,10 +135,10 @@ export class ActorSystem {
     metadata.restartCount++;
 
     if (metadata.restartCount > ActorSystem.MAX_RESTARTS) {
-      console.error(`Actor '${actor.id}' exceeded max restarts. Stopping actor.`);
+      this.logger.error(`Actor '${actor.id}' exceeded max restarts. Stopping actor.`);
       this.stopActor(actor.id);
     } else {
-      console.warn(
+      this.logger.warn(
         `Restarting actor '${actor.id}' (restart count: ${metadata.restartCount}).`
       );
 
@@ -149,7 +152,7 @@ export class ActorSystem {
       const ActorArgs: any[] = metadata._ActorArgs;
 
       if (typeof ActorClass !== 'function') {
-        console.error(`Cannot restart actor '${actor.id}': ActorClass not found.`);
+        this.logger.error(`Cannot restart actor '${actor.id}': ActorClass not found.`);
         this.stopActor(actor.id);
         return;
       }
@@ -167,9 +170,9 @@ export class ActorSystem {
     if (actor) {
       actor.postStop();
       this.actors.delete(actorId);
-      console.log(`Actor '${actorId}' stopped.`);
+      this.logger.info(`Actor '${actorId}' stopped.`);
     } else {
-      console.warn(`Attempted to stop non-existent actor '${actorId}'.`);
+      this.logger.warn(`Attempted to stop non-existent actor '${actorId}'.`);
     }
   }
 }
