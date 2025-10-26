@@ -91,7 +91,7 @@ export function extractTestFunctionsFromFile(
           const nameArg = args[0].getText();
           const testName = nameArg
             .replace(/^["']|["']$/g, '')
-            .replace(/\\./g, (m) => m[1]);
+            .replace(/\\./g, (m: string) => m[1]);
 
           // Second argument is the test function
           const funcArg = args[1];

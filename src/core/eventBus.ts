@@ -26,13 +26,32 @@ class EventBus {
     this.subscriptions.get(topic)?.push(callback);
   }
 
+  public unsubscribe<T>(topic: string, callback: Callback<T>): boolean {
+    const callbacks = this.subscriptions.get(topic);
+    if (!callbacks) {
+      return false;
+    }
+
+    const index = callbacks.indexOf(callback);
+    if (index !== -1) {
+      callbacks.splice(index, 1);
+      // Clean up empty topic entries
+      if (callbacks.length === 0) {
+        this.subscriptions.delete(topic);
+      }
+      return true;
+    }
+
+    return false;
+  }
+
   public publish<T>(topic: string, message: T): void {
     if (this.subscriptions.has(topic)) {
       this.subscriptions.get(topic)?.forEach(callback => {
         try {
           callback(message);
         } catch (error: any) {
-          this.logger["error"](`Error in EventBus subscriber for topic '${topic}'`, error, { topic });
+          this.logger.error(`Error in EventBus subscriber for topic '${topic}'`, error, { topic });
           this.publish('error', new EventBusError(`Error in subscriber for topic '${topic}'`, error));
         }
       });

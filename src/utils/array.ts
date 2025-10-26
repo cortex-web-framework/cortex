@@ -103,10 +103,12 @@ export function groupBy<T, K extends string | number | symbol>(
   key: ((item: T) => K) | K
 ): Record<K, T[]> {
   const result = {} as Record<K, T[]>;
-  const getKey = typeof key === 'function' ? key : (item: T) => (item as any)[key];
+  const getKey: (item: T) => K = typeof key === 'function'
+    ? (key as (item: T) => K)
+    : (item: T) => ((item as unknown) as Record<string, K>)[key as unknown as string];
 
   for (const item of arr) {
-    const k = getKey(item);
+    const k: K = getKey(item);
     if (!result[k]) {
       result[k] = [];
     }
