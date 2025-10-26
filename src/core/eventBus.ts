@@ -50,9 +50,9 @@ class EventBus {
       this.subscriptions.get(topic)?.forEach(callback => {
         try {
           callback(message);
-        } catch (error: any) {
-          this.logger.error(`Error in EventBus subscriber for topic '${topic}'`, error, { topic });
-          this.publish('error', new EventBusError(`Error in subscriber for topic '${topic}'`, error));
+        } catch (error: unknown) {
+          this.logger.error(`Error in EventBus subscriber for topic '${topic}'`, error as Error, { topic });
+          this.publish('error', new EventBusError(`Error in subscriber for topic '${topic}'`, error as Error));
         }
       });
     }
