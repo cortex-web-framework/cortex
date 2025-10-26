@@ -1,5 +1,5 @@
 import type { ResiliencePolicy } from './types.js';
-import { TimeoutError } from './errors.js';
+import { ResilienceTimeoutError } from './errors.js';
 
 /**
  * Timeout executor for enforcing operation time limits
@@ -13,7 +13,7 @@ import { TimeoutError } from './errors.js';
  *     return await fetch('https://api.example.com/slow-endpoint');
  *   });
  * } catch (error) {
- *   if (error instanceof TimeoutError) {
+ *   if (error instanceof ResilienceTimeoutError) {
  *     console.log('Request took too long');
  *   }
  * }
@@ -32,7 +32,7 @@ export class TimeoutExecutor implements ResiliencePolicy {
    *
    * @param fn - Async function to execute
    * @returns Promise with function result or timeout error
-   * @throws TimeoutError if operation exceeds timeout
+   * @throws ResilienceTimeoutError if operation exceeds timeout
    */
   public async execute<T>(fn: () => Promise<T>): Promise<T> {
     return Promise.race([
@@ -42,7 +42,7 @@ export class TimeoutExecutor implements ResiliencePolicy {
           if (this.fallback) {
             reject(this.fallback());
           } else {
-            reject(new TimeoutError(`Operation timed out after ${this.timeoutMs}ms`));
+            reject(new ResilienceTimeoutError(`Operation timed out after ${this.timeoutMs}ms`));
           }
         }, this.timeoutMs);
 

@@ -23,6 +23,77 @@ export class EventBusError extends Error {
 }
 
 /**
+ * Timeout-related errors
+ */
+export class TimeoutError extends Error {
+  readonly timeoutMs: number;
+
+  constructor(message: string, timeoutMs: number) {
+    super(message);
+    this.name = 'TimeoutError';
+    this.timeoutMs = timeoutMs;
+  }
+}
+
+/**
+ * Validation-related errors
+ */
+export class ValidationError extends Error {
+  readonly field?: string;
+  readonly value?: unknown;
+
+  constructor(message: string, field?: string, value?: unknown) {
+    super(message);
+    this.name = 'ValidationError';
+    this.field = field;
+    this.value = value;
+  }
+}
+
+/**
+ * Configuration-related errors
+ */
+export class ConfigurationError extends Error {
+  readonly configKey?: string;
+
+  constructor(message: string, configKey?: string) {
+    super(message);
+    this.name = 'ConfigurationError';
+    this.configKey = configKey;
+  }
+}
+
+/**
+ * Memory-related errors (especially for WASM)
+ */
+export class MemoryError extends Error {
+  readonly requiredBytes?: number;
+  readonly availableBytes?: number;
+
+  constructor(message: string, requiredBytes?: number, availableBytes?: number) {
+    super(message);
+    this.name = 'MemoryError';
+    this.requiredBytes = requiredBytes;
+    this.availableBytes = availableBytes;
+  }
+}
+
+/**
+ * Network-related errors
+ */
+export class NetworkError extends Error {
+  readonly statusCode?: number;
+  readonly originalError?: Error;
+
+  constructor(message: string, statusCode?: number, originalError?: Error) {
+    super(message);
+    this.name = 'NetworkError';
+    this.statusCode = statusCode;
+    this.originalError = originalError;
+  }
+}
+
+/**
  * Type guard: Check if value is an ActorNotFound error
  */
 export function isActorNotFound(value: unknown): value is ActorNotFound {
@@ -41,6 +112,41 @@ export function isRouteNotFound(value: unknown): value is RouteNotFound {
  */
 export function isEventBusError(value: unknown): value is EventBusError {
   return value instanceof EventBusError;
+}
+
+/**
+ * Type guard: Check if value is a TimeoutError
+ */
+export function isTimeoutError(value: unknown): value is TimeoutError {
+  return value instanceof TimeoutError;
+}
+
+/**
+ * Type guard: Check if value is a ValidationError
+ */
+export function isValidationError(value: unknown): value is ValidationError {
+  return value instanceof ValidationError;
+}
+
+/**
+ * Type guard: Check if value is a ConfigurationError
+ */
+export function isConfigurationError(value: unknown): value is ConfigurationError {
+  return value instanceof ConfigurationError;
+}
+
+/**
+ * Type guard: Check if value is a MemoryError
+ */
+export function isMemoryError(value: unknown): value is MemoryError {
+  return value instanceof MemoryError;
+}
+
+/**
+ * Type guard: Check if value is a NetworkError
+ */
+export function isNetworkError(value: unknown): value is NetworkError {
+  return value instanceof NetworkError;
 }
 
 /**

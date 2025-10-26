@@ -26,10 +26,10 @@ export class BulkheadRejectError extends Error {
  * Error thrown when an operation exceeds its timeout
  * Indicates that an async operation took too long to complete
  */
-export class TimeoutError extends Error {
+export class ResilienceTimeoutError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'TimeoutError';
-    Object.setPrototypeOf(this, TimeoutError.prototype);
+    this.name = 'ResilienceTimeoutError';
+    Object.setPrototypeOf(this, ResilienceTimeoutError.prototype);
   }
 }
