@@ -48,7 +48,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: cortex-browser-env/target
-          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-build-target-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-build-target-${{ matrix.rust }}-
+            ${{ runner.os }}-cargo-build-target-
 
       - name: Check Rust formatting
         working-directory: cortex-browser-env
