@@ -1,0 +1,64 @@
+[
+  {
+    "id": "post-1",
+    "title": "Getting Started with Cortex",
+    "excerpt": "Learn the basics of building your first application with Cortex.",
+    "content": "Full article content about getting started...",
+    "author": "Team Cortex",
+    "category": "tutorial",
+    "tags": [
+      "beginner",
+      "tutorial",
+      "setup"
+    ],
+    "published": true,
+    "createdAt": "2024-10-27T00:00:00.000Z",
+    "updatedAt": "2024-10-27T00:00:00.000Z"
+  },
+  {
+    "id": "post-2",
+    "title": "Building Resilient Systems",
+    "excerpt": "Explore patterns for building fault-tolerant systems using Cortex.",
+    "content": "Full article about resilience patterns...",
+    "author": "Team Cortex",
+    "category": "guide",
+    "tags": [
+      "advanced",
+      "resilience",
+      "patterns"
+    ],
+    "published": true,
+    "createdAt": "2024-10-20T00:00:00.000Z",
+    "updatedAt": "2024-10-20T00:00:00.000Z"
+  },
+  {
+    "id": "post-3",
+    "title": "Cortex v1.0.0 Released",
+    "excerpt": "We are excited to announce the release of Cortex v1.0.0!",
+    "content": "Release notes and features...",
+    "author": "Team Cortex",
+    "category": "update",
+    "tags": [
+      "release",
+      "announcement"
+    ],
+    "published": true,
+    "createdAt": "2024-10-15T00:00:00.000Z",
+    "updatedAt": "2024-10-15T00:00:00.000Z"
+  },
+  {
+    "id": "post-4",
+    "title": "Actor Model Explained",
+    "excerpt": "A deep dive into the actor model and how it enables concurrent systems.",
+    "content": "Detailed explanation of the actor model...",
+    "author": "Contributors",
+    "category": "guide",
+    "tags": [
+      "architecture",
+      "concepts"
+    ],
+    "published": true,
+    "createdAt": "2024-10-10T00:00:00.000Z",
+    "updatedAt": "2024-10-10T00:00:00.000Z"
+  }
+]

@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 import config from './config.js'; // Import the config instance
-import { BlogServiceActor } from './blog/blogServiceActor.js'; // Import BlogServiceActor
+import { PersistentBlogServiceActor } from './blog/persistentBlogService.js'; // Import PersistentBlogServiceActor
 import { FeatureActor } from './features/featureActor.js'; // Import FeatureActor
 import { ExampleActor } from './examples/exampleActor.js'; // Import ExampleActor
 
@@ -17,8 +17,7 @@ const actorSystem = new ActorSystem(eventBus);
 const server = new CortexHttpServer(config.get('port', 3000) as number); // Get port from config, default to 3000
 
 // Initialize service actors
-const blogService = new BlogServiceActor();
-blogService.handle({ type: 'init-sample-data' }); // Initialize with sample data
+const blogService = new PersistentBlogServiceActor(); // Now persists to file system
 
 const featureActor = new FeatureActor();
 
