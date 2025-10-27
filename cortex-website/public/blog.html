@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog - Cortex Framework</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-color: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary-color: #ec4899;
+      --background: #0f172a;
+      --background-secondary: #1e293b;
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --border-color: #334155;
+      --accent: #00d9ff;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, var(--background) 0%, #1a0f2e 100%);
+      min-height: 100vh;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 0;
+      z-index: 100;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .nav-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary-color);
+    }
+
+    main {
+      padding: 4rem 2rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 3rem;
+      text-align: center;
+    }
+
+    .blog-controls {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    #searchInput {
+      flex: 1;
+      min-width: 200px;
+      padding: 0.75rem 1rem;
+      background: var(--background-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      color: var(--text-primary);
+    }
+
+    .filter-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 0.5rem 1rem;
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+      background: rgba(99, 102, 241, 0.1);
+    }
+
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 2rem;
+    }
+
+    .blog-card {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(236, 72, 153, 0.05));
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      padding: 2rem;
+      transition: all 0.3s;
+    }
+
+    .blog-card:hover {
+      border-color: var(--primary-color);
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
+    }
+
+    .blog-card h3 {
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+      font-size: 1.25rem;
+    }
+
+    .blog-meta {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      flex-wrap: wrap;
+    }
+
+    .blog-tag {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 0.25rem;
+      font-size: 0.8rem;
+      color: var(--primary-color);
+    }
+
+    .blog-excerpt {
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .read-more {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .read-more:hover {
+      color: var(--accent);
+    }
+
+    footer {
+      background: var(--background-secondary);
+      border-top: 1px solid var(--border-color);
+      padding: 3rem 2rem;
+      text-align: center;
+      color: var(--text-secondary);
+      margin-top: 4rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--primary-color);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent);
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .blog-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .blog-controls {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="container">
+      <div class="nav-content">
+        <a href="/" class="nav-logo">Cortex</a>
+        <ul class="nav-links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/architecture.html">Architecture</a></li>
+          <li><a href="/blog.html">Blog</a></li>
+          <li><a href="/examples.html">Examples</a></li>
+          <li><a href="/community.html">Community</a></li>
+          <li><a href="/about.html">About</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <h1>Blog & News</h1>
+
+    <div class="blog-controls">
+      <input type="text" id="searchInput" placeholder="Search articles...">
+      <div class="filter-buttons">
+        <button class="filter-btn active" data-category="all">All</button>
+        <button class="filter-btn" data-category="tutorial">Tutorials</button>
+        <button class="filter-btn" data-category="update">Updates</button>
+        <button class="filter-btn" data-category="guide">Guides</button>
+      </div>
+    </div>
+
+    <div class="blog-grid" id="blogGrid">
+      <div class="blog-card">
+        <h3>Getting Started with Cortex</h3>
+        <div class="blog-meta">
+          <span>October 27, 2024</span>
+          <span class="blog-tag">tutorial</span>
+        </div>
+        <p class="blog-excerpt">Learn the basics of building your first application with Cortex. We'll walk you through setup, creating actors, and handling events.</p>
+        <a href="#" class="read-more">Read More →</a>
+      </div>
+
+      <div class="blog-card">
+        <h3>Building Resilient Systems</h3>
+        <div class="blog-meta">
+          <span>October 20, 2024</span>
+          <span class="blog-tag">guide</span>
+        </div>
+        <p class="blog-excerpt">Explore patterns for building fault-tolerant systems using Cortex's resilience features including circuit breakers and retry logic.</p>
+        <a href="#" class="read-more">Read More →</a>
+      </div>
+
+      <div class="blog-card">
+        <h3>Cortex v1.0.0 Released</h3>
+        <div class="blog-meta">
+          <span>October 15, 2024</span>
+          <span class="blog-tag">update</span>
+        </div>
+        <p class="blog-excerpt">We're excited to announce the release of Cortex v1.0.0! This major release includes performance improvements and new features.</p>
+        <a href="#" class="read-more">Read More →</a>
+      </div>
+
+      <div class="blog-card">
+        <h3>Actor Model Explained</h3>
+        <div class="blog-meta">
+          <span>October 10, 2024</span>
+          <span class="blog-tag">guide</span>
+        </div>
+        <p class="blog-excerpt">A deep dive into the actor model and how it enables concurrent, distributed systems with message-passing architecture.</p>
+        <a href="#" class="read-more">Read More →</a>
+      </div>
+
+      <div class="blog-card">
+        <h3>Monitoring with Observability</h3>
+        <div class="blog-meta">
+          <span>October 5, 2024</span>
+          <span class="blog-tag">tutorial</span>
+        </div>
+        <p class="blog-excerpt">Learn how to use Cortex's built-in observability features to monitor, trace, and debug your distributed applications.</p>
+        <a href="#" class="read-more">Read More →</a>
+      </div>
+
+      <div class="blog-card">
+        <h3>Event-Driven Architecture Patterns</h3>
+        <div class="blog-meta">
+          <span>September 28, 2024</span>
+          <span class="blog-tag">guide</span>
+        </div>
+        <p class="blog-excerpt">Discover best practices for designing event-driven systems with Cortex's EventBus and how to decouple your application components.</p>
+        <a href="#" class="read-more">Read More →</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-links">
+        <a href="https://github.com/cortex-web-framework/cortex" target="_blank">GitHub</a>
+        <a href="/community.html">Community</a>
+        <a href="/about.html">About</a>
+        <a href="https://github.com/cortex-web-framework/cortex/issues" target="_blank">Issues</a>
+      </div>
+      <p>&copy; 2024 Cortex Framework. Licensed under MIT.</p>
+    </div>
+  </footer>
+
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const blogCards = document.querySelectorAll('.blog-card');
+    let currentCategory = 'all';
+
+    searchInput.addEventListener('input', filterBlog);
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        filterButtons.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentCategory = this.dataset.category;
+        filterBlog();
+      });
+    });
+
+    function filterBlog() {
+      const searchTerm = searchInput.value.toLowerCase();
+      blogCards.forEach(card => {
+        const title = card.querySelector('h3').textContent.toLowerCase();
+        const excerpt = card.querySelector('.blog-excerpt').textContent.toLowerCase();
+        const tag = card.querySelector('.blog-tag').textContent.toLowerCase();
+
+        const matchesSearch = title.includes(searchTerm) || excerpt.includes(searchTerm);
+        const matchesCategory = currentCategory === 'all' || tag === currentCategory;
+
+        card.style.display = matchesSearch && matchesCategory ? '' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>

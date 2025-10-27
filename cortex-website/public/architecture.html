@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Architecture - Cortex Framework</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-color: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary-color: #ec4899;
+      --background: #0f172a;
+      --background-secondary: #1e293b;
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --border-color: #334155;
+      --accent: #00d9ff;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, var(--background) 0%, #1a0f2e 100%);
+      min-height: 100vh;
+    }
+
+    /* Navigation */
+    nav {
+      position: sticky;
+      top: 0;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 0;
+      z-index: 100;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .nav-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary-color);
+    }
+
+    /* Main Content */
+    main {
+      padding: 4rem 2rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 3rem;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Architecture Diagram */
+    .architecture-container {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(236, 72, 153, 0.05));
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      padding: 3rem 2rem;
+      margin: 3rem 0;
+      overflow-x: auto;
+    }
+
+    .architecture-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      min-width: 600px;
+    }
+
+    .layer {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1));
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    .layer::before {
+      content: attr(data-label);
+      position: absolute;
+      top: -0.75rem;
+      left: 1rem;
+      background: var(--background);
+      padding: 0 0.5rem;
+      color: var(--primary-color);
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .layer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+    }
+
+    .component {
+      background: var(--background-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .component:hover {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .component h4 {
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .component p {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    /* Description Sections */
+    .description-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .description-card {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1));
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      padding: 2rem;
+      transition: all 0.3s;
+    }
+
+    .description-card:hover {
+      border-color: var(--primary-color);
+      transform: translateY(-5px);
+    }
+
+    .description-card h3 {
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+
+    .description-card p {
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--background-secondary);
+      border-top: 1px solid var(--border-color);
+      padding: 3rem 2rem;
+      text-align: center;
+      color: var(--text-secondary);
+      margin-top: 4rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--primary-color);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .nav-links {
+        gap: 1rem;
+        font-size: 0.9rem;
+      }
+
+      .layer-content {
+        grid-template-columns: 1fr;
+      }
+
+      .architecture-container {
+        padding: 1.5rem;
+        margin: 2rem 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav>
+    <div class="container">
+      <div class="nav-content">
+        <a href="/" class="nav-logo">Cortex</a>
+        <ul class="nav-links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/architecture.html">Architecture</a></li>
+          <li><a href="/blog.html">Blog</a></li>
+          <li><a href="/examples.html">Examples</a></li>
+          <li><a href="/community.html">Community</a></li>
+          <li><a href="/about.html">About</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container">
+    <h1>Architecture Overview</h1>
+    <p class="subtitle">Understand the layered architecture that powers the Cortex Framework</p>
+
+    <!-- Architecture Diagram -->
+    <div class="architecture-container">
+      <div class="architecture-diagram">
+        <!-- API Layer -->
+        <div class="layer" data-label="API & HTTP Server Layer">
+          <div class="layer-content">
+            <div class="component">
+              <h4>HTTP Server</h4>
+              <p>RESTful API endpoints and routing</p>
+            </div>
+            <div class="component">
+              <h4>WebSocket</h4>
+              <p>Real-time bidirectional communication</p>
+            </div>
+            <div class="component">
+              <h4>Middleware</h4>
+              <p>Request/response processing</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Core Features Layer -->
+        <div class="layer" data-label="Core Features Layer">
+          <div class="layer-content">
+            <div class="component">
+              <h4>Actor System</h4>
+              <p>Concurrent message-driven actors</p>
+            </div>
+            <div class="component">
+              <h4>Event Bus</h4>
+              <p>Pub/sub event distribution</p>
+            </div>
+            <div class="component">
+              <h4>Config</h4>
+              <p>Environment configuration</p>
+            </div>
+            <div class="component">
+              <h4>Logger</h4>
+              <p>Structured logging</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Observability Module -->
+        <div class="layer" data-label="Observability Module">
+          <div class="layer-content">
+            <div class="component">
+              <h4>Metrics</h4>
+              <p>Prometheus format metrics</p>
+            </div>
+            <div class="component">
+              <h4>Tracing</h4>
+              <p>Distributed request tracing</p>
+            </div>
+            <div class="component">
+              <h4>Health Checks</h4>
+              <p>System health monitoring</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resilience Module -->
+        <div class="layer" data-label="Resilience Module">
+          <div class="layer-content">
+            <div class="component">
+              <h4>Circuit Breaker</h4>
+              <p>Fault tolerance pattern</p>
+            </div>
+            <div class="component">
+              <h4>Rate Limiter</h4>
+              <p>Request rate control</p>
+            </div>
+            <div class="component">
+              <h4>Retry Logic</h4>
+              <p>Automatic retry mechanism</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Security Module -->
+        <div class="layer" data-label="Security Module">
+          <div class="layer-content">
+            <div class="component">
+              <h4>Authentication</h4>
+              <p>User identity verification</p>
+            </div>
+            <div class="component">
+              <h4>Authorization</h4>
+              <p>Access control & permissions</p>
+            </div>
+            <div class="component">
+              <h4>Data Protection</h4>
+              <p>Encryption & data security</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Core Runtime -->
+        <div class="layer" data-label="Core Runtime">
+          <div class="layer-content">
+            <div class="component">
+              <h4>Type System</h4>
+              <p>TypeScript type safety</p>
+            </div>
+            <div class="component">
+              <h4>Message Queue</h4>
+              <p>Actor message buffering</p>
+            </div>
+            <div class="component">
+              <h4>Scheduler</h4>
+              <p>Task scheduling & execution</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layer Descriptions -->
+    <h2 style="text-align: center; margin-top: 3rem; margin-bottom: 1rem;">Key Layers Explained</h2>
+    <div class="description-grid">
+      <div class="description-card">
+        <h3>API & HTTP Server</h3>
+        <p>The top layer that handles all incoming requests. Built on Node.js, it provides RESTful endpoints, WebSocket support, and middleware for request/response processing.</p>
+      </div>
+
+      <div class="description-card">
+        <h3>Core Features</h3>
+        <p>The heart of Cortex. Contains the Actor System for concurrent operations, Event Bus for event-driven architecture, configuration management, and structured logging.</p>
+      </div>
+
+      <div class="description-card">
+        <h3>Observability</h3>
+        <p>Tools for monitoring and understanding your system. Includes metrics collection (Prometheus format), distributed tracing, and health checks.</p>
+      </div>
+
+      <div class="description-card">
+        <h3>Resilience</h3>
+        <p>Patterns and tools for building fault-tolerant systems. Features circuit breakers, rate limiters, and automatic retry logic for handling failures gracefully.</p>
+      </div>
+
+      <div class="description-card">
+        <h3>Security</h3>
+        <p>Built-in security features including authentication, authorization, and data protection mechanisms to keep your applications and data secure.</p>
+      </div>
+
+      <div class="description-card">
+        <h3>Core Runtime</h3>
+        <p>The foundation layer providing type safety through TypeScript, message queuing for actor communication, and task scheduling mechanisms.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-links">
+        <a href="https://github.com/cortex-web-framework/cortex" target="_blank">GitHub</a>
+        <a href="/community.html">Community</a>
+        <a href="/about.html">About</a>
+        <a href="https://github.com/cortex-web-framework/cortex/issues" target="_blank">Issues</a>
+      </div>
+      <p>&copy; 2024 Cortex Framework. Licensed under MIT.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Add interactivity to components
+    document.querySelectorAll('.component').forEach(component => {
+      component.addEventListener('mouseenter', function() {
+        this.style.backgroundColor = 'rgba(99, 102, 241, 0.15)';
+      });
+      component.addEventListener('mouseleave', function() {
+        this.style.backgroundColor = 'var(--background-secondary)';
+      });
+    });
+  </script>
+</body>
+</html>
