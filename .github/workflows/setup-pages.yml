@@ -3,7 +3,6 @@ name: Setup GitHub Pages
 on:
   push:
     branches:
-      - main
       - develop
   workflow_dispatch:
 
