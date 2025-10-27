@@ -28,7 +28,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'new-website'
+          path: 'cortex-website/public'
 
   deploy:
     needs: build
