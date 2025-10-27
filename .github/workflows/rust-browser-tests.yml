@@ -32,6 +32,11 @@ jobs:
         with:
           toolchain: ${{ matrix.rust }}
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfontconfig1-dev pkg-config
+
       - name: Cache cargo registry
         uses: actions/cache@v3
         with:
@@ -121,7 +126,7 @@ jobs:
 
       - name: Upload test logs
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: typescript-test-logs
           path: test-output.log
@@ -313,7 +318,7 @@ jobs:
 
       - name: Upload screenshots
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: rust-browser-screenshots
           path: screenshots/
@@ -321,7 +326,7 @@ jobs:
 
       - name: Upload browser info
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: browser-build-info
           path: browser-info.md
@@ -391,7 +396,7 @@ jobs:
           cat QUALITY_REPORT.md
 
       - name: Upload quality report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: quality-report
           path: QUALITY_REPORT.md
@@ -419,7 +424,7 @@ jobs:
           cat ARTIFACTS.md
 
       - name: Upload artifact summary
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: artifacts-summary
           path: ARTIFACTS.md
