@@ -147,12 +147,15 @@ export function compression(config: CompressionConfig = {}): (req: Request, res:
     // Support both standard Node.js req.headers and Express-style req.get()
     const acceptEncoding = ((req as any).get?.('Accept-Encoding') || (req.headers?.['accept-encoding'] as string) || '') as string;
     const supportedEncodings = parseAcceptEncoding(acceptEncoding);
-    const selectedEncoding = selectEncoding(supportedEncodings);
+    const selectedEncodingOrNull = selectEncoding(supportedEncodings);
 
-    if (!selectedEncoding) {
+    if (!selectedEncodingOrNull) {
       next();
       return;
     }
+
+    // At this point, selectedEncoding is guaranteed to be a string, not null
+    const selectedEncoding: string = selectedEncodingOrNull;
 
     // Store original methods
     const originalWrite = res.write.bind(res);
@@ -167,11 +170,10 @@ export function compression(config: CompressionConfig = {}): (req: Request, res:
     // Initialize compression stream when we know we should compress
     function initializeCompression(): void {
       if (compressionInitialized) return;
-      if (!selectedEncoding) return;
       compressionInitialized = true;
 
-      // Create compression stream (selectedEncoding is now guaranteed to be a string)
-      compressionStream = createCompressionStream(selectedEncoding as string, finalConfig);
+      // Create compression stream (selectedEncoding is guaranteed to be a string)
+      compressionStream = createCompressionStream(selectedEncoding, finalConfig);
 
       // Pipe compressed chunks directly to original response
       compressionStream.on('data', (compressedChunk: Buffer) => {
