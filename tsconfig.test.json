@@ -1,22 +1,19 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "./dist/ui-test-compiled",
+    "outDir": "./dist-tests",
     "target": "es2020",
     "module": "es2022",
     "rootDirs": ["./src", "./tests"]
   },
   "include": [
-    "src/ui-test/**/*.ts",
-    "src/ui/**/*.ts",
-    "src/ui/**/*.test.ts",
-    "tests/ui/components/**/*.ts",
-    "tests/ui/components/**/*.test.ts"
+    "src/**/*.ts",
+    "tests/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "dist-test",
-    "dist/ui-test-compiled"
+    "dist-examples",
+    "dist-tests"
   ]
 }
