@@ -334,31 +334,109 @@
     </div>
   </footer>
 
+  <script src="/js/api-client.js"></script>
   <script>
     const searchInput = document.getElementById('searchInput');
     const filterButtons = document.querySelectorAll('.filter-btn');
-    const blogCards = document.querySelectorAll('.blog-card');
+    const blogGrid = document.getElementById('blogGrid');
     let currentCategory = 'all';
+    let allPosts = [];
 
-    searchInput.addEventListener('input', filterBlog);
-    filterButtons.forEach(btn => {
-      btn.addEventListener('click', function() {
-        filterButtons.forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        currentCategory = this.dataset.category;
-        filterBlog();
+    // Initialize
+    (async () => {
+      try {
+        // Load blog posts from API
+        await loadBlogPosts();
+
+        // Set up event listeners
+        searchInput.addEventListener('input', filterBlog);
+        filterButtons.forEach(btn => {
+          btn.addEventListener('click', function() {
+            filterButtons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentCategory = this.dataset.category;
+            filterBlog();
+          });
+        });
+      } catch (error) {
+        console.error('Failed to initialize blog:', error);
+        blogGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--text-secondary);">Failed to load blog posts. Please try again later.</div>';
+      }
+    })();
+
+    async function loadBlogPosts() {
+      try {
+        const response = await apiClient.getBlogPosts(100, 0);
+        if (response.success && Array.isArray(response.data)) {
+          allPosts = response.data;
+          renderBlogCards();
+        } else {
+          console.warn('No posts found, using placeholder');
+        }
+      } catch (error) {
+        console.error('Error loading posts:', error);
+      }
+    }
+
+    function renderBlogCards() {
+      blogGrid.innerHTML = '';
+      allPosts.forEach(post => {
+        const card = document.createElement('div');
+        card.className = 'blog-card';
+        card.dataset.category = post.category;
+
+        const date = new Date(post.createdAt);
+        const formattedDate = date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+
+        card.innerHTML = `
+          <h3>${post.title}</h3>
+          <div class="blog-meta">
+            <span>${formattedDate}</span>
+            <span class="blog-tag">${post.category}</span>
+          </div>
+          <p class="blog-excerpt">${post.excerpt}</p>
+          <a href="#" class="read-more">Read More →</a>
+        `;
+
+        blogGrid.appendChild(card);
       });
-    });
+    }
 
-    function filterBlog() {
+    async function filterBlog() {
       const searchTerm = searchInput.value.toLowerCase();
-      blogCards.forEach(card => {
+
+      try {
+        const response = await apiClient.searchBlogPosts(
+          searchTerm,
+          currentCategory === 'all' ? 'all' : currentCategory,
+          100,
+          0
+        );
+
+        if (response.success && Array.isArray(response.data)) {
+          allPosts = response.data;
+          renderBlogCards();
+        }
+      } catch (error) {
+        console.error('Search error:', error);
+        // Fallback to client-side filtering
+        filterBlogClientSide(searchTerm);
+      }
+    }
+
+    function filterBlogClientSide(searchTerm) {
+      const cards = document.querySelectorAll('.blog-card');
+      cards.forEach(card => {
         const title = card.querySelector('h3').textContent.toLowerCase();
         const excerpt = card.querySelector('.blog-excerpt').textContent.toLowerCase();
-        const tag = card.querySelector('.blog-tag').textContent.toLowerCase();
+        const category = card.dataset.category;
 
         const matchesSearch = title.includes(searchTerm) || excerpt.includes(searchTerm);
-        const matchesCategory = currentCategory === 'all' || tag === currentCategory;
+        const matchesCategory = currentCategory === 'all' || category === currentCategory;
 
         card.style.display = matchesSearch && matchesCategory ? '' : 'none';
       });

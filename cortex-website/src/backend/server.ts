@@ -9,14 +9,20 @@ const __dirname = path.dirname(__filename);
 
 import config from './config.js'; // Import the config instance
 import { BlogServiceActor } from './blog/blogServiceActor.js'; // Import BlogServiceActor
+import { FeatureActor } from './features/featureActor.js'; // Import FeatureActor
+import { ExampleActor } from './examples/exampleActor.js'; // Import ExampleActor
 
 const eventBus = EventBus.getInstance();
 const actorSystem = new ActorSystem(eventBus);
 const server = new CortexHttpServer(config.get('port', 3000) as number); // Get port from config, default to 3000
 
-// Initialize blog service actor
+// Initialize service actors
 const blogService = new BlogServiceActor();
 blogService.handle({ type: 'init-sample-data' }); // Initialize with sample data
+
+const featureActor = new FeatureActor();
+
+const exampleActor = new ExampleActor();
 
 // Middleware for static file serving
 server.use((req: http.IncomingMessage, res: http.ServerResponse, next: () => void) => {
@@ -115,6 +121,114 @@ server.get('/api/blog/featured', async (req: http.IncomingMessage, res: http.Ser
   } catch (error) {
     res.writeHead(500, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ success: false, error: 'Failed to fetch featured posts' }));
+  }
+});
+
+// Features API Endpoints
+server.get('/api/features', async (req: http.IncomingMessage, res: http.ServerResponse) => {
+  try {
+    const url = new URL(req.url || '', 'http://localhost');
+    const category = url.searchParams.get('category');
+
+    const response = await featureActor.handle({
+      type: 'get-features',
+      category: category || undefined,
+    });
+
+    res.writeHead(response.success ? 200 : 500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(response));
+  } catch (error) {
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: false, error: 'Failed to fetch features' }));
+  }
+});
+
+server.get('/api/features/categories', async (req: http.IncomingMessage, res: http.ServerResponse) => {
+  try {
+    const response = await featureActor.handle({
+      type: 'list-categories',
+    });
+
+    res.writeHead(response.success ? 200 : 500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(response));
+  } catch (error) {
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: false, error: 'Failed to fetch categories' }));
+  }
+});
+
+// Examples API Endpoints
+server.get('/api/examples', async (req: http.IncomingMessage, res: http.ServerResponse) => {
+  try {
+    const url = new URL(req.url || '', 'http://localhost');
+    const category = url.searchParams.get('category');
+
+    const response = await exampleActor.handle({
+      type: 'get-examples',
+      category: category as 'actor' | 'eventbus' | 'http' | 'resilience' | 'middleware' | undefined,
+    });
+
+    res.writeHead(response.success ? 200 : 500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(response));
+  } catch (error) {
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: false, error: 'Failed to fetch examples' }));
+  }
+});
+
+server.get('/api/examples/categories', async (req: http.IncomingMessage, res: http.ServerResponse) => {
+  try {
+    const response = await exampleActor.handle({
+      type: 'list-categories',
+    });
+
+    res.writeHead(response.success ? 200 : 500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(response));
+  } catch (error) {
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: false, error: 'Failed to fetch categories' }));
+  }
+});
+
+server.get('/api/examples/run', async (req: http.IncomingMessage, res: http.ServerResponse) => {
+  try {
+    const url = new URL(req.url || '', 'http://localhost');
+    const exampleId = url.searchParams.get('id');
+
+    if (!exampleId) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Missing example id' }));
+      return;
+    }
+
+    const response = await exampleActor.handle({
+      type: 'run-example',
+      id: exampleId,
+    });
+
+    res.writeHead(response.success ? 200 : 500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(response));
+  } catch (error) {
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: false, error: 'Failed to run example' }));
+  }
+});
+
+server.get('/api/examples/search', async (req: http.IncomingMessage, res: http.ServerResponse) => {
+  try {
+    const url = new URL(req.url || '', 'http://localhost');
+    const query = url.searchParams.get('q') || '';
+
+    const response = await exampleActor.handle({
+      type: 'search',
+      query,
+    });
+
+    res.writeHead(response.success ? 200 : 500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(response));
+  } catch (error) {
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: false, error: 'Failed to search examples' }));
   }
 });
 
