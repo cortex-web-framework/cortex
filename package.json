@@ -40,7 +40,7 @@
   ],
   "scripts": {
     "start": "ts-node src/index.ts",
-    "build": "tsc",
+    "build": "node scripts/bundle-declarations.cjs",
     "build:docs": "npm run build && node scripts/build-docs.js",
     "test:compile": "tsc --project tsconfig.test.json",
     "test:run": "node --test dist-tests/tests",

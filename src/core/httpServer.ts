@@ -181,11 +181,18 @@ export class CortexHttpServer {
         return resolve();
       }
 
+      // Remove all event listeners to prevent listener leaks
+      this.server.removeAllListeners();
+
       // Destroy all active connections
       for (const socket of this.connections) {
         socket.destroy();
       }
       this.connections.clear();
+
+      // Clear routes and middleware for complete cleanup
+      this.routes = [];
+      this.globalMiddleware = [];
 
       this.server.close((err: Error | undefined) => {
         if (err) {

@@ -1,64 +1,110 @@
-# Cortex Documentation Overhaul Plan
+# Project Plan: Cortex Website Implementation
 
-This plan outlines the steps to overhaul the Cortex documentation website based on the research in `RESEARCH.md`.
+This plan outlines the detailed steps for implementing the Cortex website based on the research conducted in `RESEARCH.md`. The goal is to build a modular, performant, and scalable website that showcases the capabilities of the Cortex framework.
 
-## Phase 1: Foundation and Content Strategy
+## 1. Project Setup and Initialization
 
-**Goal:** Define the core message and structure of the new documentation.
+**Objective:** Set up the basic project structure, integrate necessary tools, and ensure a smooth development environment.
 
-*   **Task 1: Define Cortex's Value Proposition.**
-    *   **Action:** Brainstorm and decide on a clear, concise, and compelling tagline for Cortex.
-    *   **Deliverable:** A single, approved tagline to be used on the new website.
-*   **Task 2: Outline the "Learn" Section Structure.**
-    *   **Action:** Create a detailed outline for the new tutorial-style "Learn" section. This should include a list of topics, the order in which they will be presented, and the key concepts to be covered in each topic.
-    *   **Deliverable:** A markdown document outlining the structure of the "Learn" section.
-*   **Task 3: Plan "Cortex for X Developers" Guides.**
-    *   **Action:** Identify the target frameworks for the "Cortex for X Developers" guides (e.g., React, Vue, Angular). Outline the content for each guide, focusing on the key differences and similarities between Cortex and the other framework.
-    *   **Deliverable:** A markdown document outlining the content for the "Cortex for X Developers" guides.
-*   **Task 4: Design the New Website.**
-    *   **Action:** Create a wireframe and a visual design for the new documentation website. The design should be modern, clean, and user-friendly.
-    *   **Deliverable:** A set of design mockups for the new website.
+*   **1.1. Initialize New Project:**
+    *   Create a new directory for the website (e.g., `cortex-website`).
+    *   Initialize a new Node.js project (`npm init -y`).
+    *   Build the local Cortex framework (run `npm run build` in the root Cortex project).
+*   Configure TypeScript `paths` in `cortex-website` to reference the local Cortex framework's `dist` folder.
+*   Install development dependencies: TypeScript, and a build tool (e.g., Webpack, Vite, or a simple `tsc` setup).
+*   **1.2. Configure TypeScript:**
+    *   Create `tsconfig.json` for the frontend and backend (if separate).
+    *   Ensure strict type checking is enabled.
+*   **1.4. Basic File Structure:**
+    *   Create `src/frontend` for all frontend assets (HTML, TypeScript, CSS).
+    *   Create `src/backend` for Cortex actors and server logic.
+    *   Create `src/shared` for interfaces, types, and utilities shared between frontend and backend.
+    *   Create `public` directory for static assets (images, compiled CSS, JS).
 
-## Phase 2: Content Creation
+## 2. Core Cortex Backend Implementation
 
-**Goal:** Write the content for the new documentation.
+**Objective:** Establish the foundational backend services using the Cortex framework.
 
-*   **Task 5: Write the "Learn" Section Content.**
-    *   **Action:** Write the content for the "Learn" section, following the outline created in Task 2. The content should be clear, concise, and include code examples.
-    *   **Deliverable:** A set of markdown files containing the content for the "Learn" section.
-*   **Task 6: Write the API Reference Content.**
-    *   **Action:** Write the content for the API reference section. This should be a separate section from the "Learn" section and should provide detailed information about every part of the Cortex API.
-    *   **Deliverable:** A set of markdown files containing the content for the API reference.
-*   **Task 7: Write the "Cortex for X Developers" Guides.**
-    *   **Action:** Write the content for the "Cortex for X Developers" guides, following the outline created in Task 3.
-    *   **Deliverable:** A set of markdown files containing the content for the guides.
+*   **2.1. Initialize Cortex Server:**
+    *   Create `src/backend/server.ts`.
+    *   Initialize `EventBus`, `ActorSystem`, and `CortexHttpServer`.
+    *   Configure the HTTP server to serve static files from the `public` directory.
+    *   Define basic routes (e.g., `/api/*`).
+*   **2.2. Implement Configuration Management:**
+    *   Utilize Cortex's `Config` module for environment-aware settings (e.g., API keys, database connections, external links).
+    *   Create `config.ts` in `src/backend`.
+*   **2.3. Implement Logging:**
+    *   Integrate Cortex's `Logger` for structured logging across backend services.
+    *   Configure log levels and output destinations.
 
-## Phase 3: Website Development
+## 3. Frontend Page Implementations
 
-**Goal:** Build the new documentation website.
+**Objective:** Develop each website page/section according to the provided design files, leveraging Cortex backend services where necessary.
 
-*   **Task 8: Develop the New Website.**
-    *   **Action:** Develop the new documentation website based on the design created in Task 4. The website should be built using a modern static site generator.
-    *   **Deliverable:** A functional static website.
-*   **Task 9: Implement the Interactive Playground.**
-    *   **Action:** Implement an interactive playground where users can experiment with Cortex in their browser.
-    *   **Deliverable:** A working interactive playground integrated into the new website.
+*   **3.1. Homepage (`/`):**
+    *   **3.1.1. HTML Structure:** Create `public/index.html` with the basic layout, hero section, and feature areas based on `cortex_home_page:_hero_&_features_1/code.html` and `cortex_home_page:_hero_&_features_2/code.html`.
+    *   **3.1.2. Styling:** Apply custom CSS classes to match the design.
+    *   **3.1.3. Dynamic Content (Optional):** If features are dynamic, create a `FeatureActor` in `src/backend` to serve feature data via a REST endpoint (e.g., `/api/features`). Frontend fetches and renders.
+*   **3.2. Architecture Visualization Page (`/architecture`):**
+    *   **3.2.1. HTML Structure:** Create `src/frontend/architecture.html` based on `cortex_architecture_visualization_1/code.html` and `cortex_architecture_visualization_2/code.html`.
+    *   **3.2.2. Styling:** Apply custom CSS, including animations and glassmorphic effects.
+    *   **3.2.3. Interactivity:** Implement JavaScript/TypeScript for hover effects and tooltips for each architectural component.
+    *   **3.2.4. Content Sourcing:** Ensure descriptions for each layer/module are consistent with the Cortex `README.md` and other documentation.
+*   **3.3. Blog / News Section (`/blog`):**
+    *   **3.3.1. HTML Structure:** Create `src/frontend/blog.html` based on `cortex_blog_/_news/code.html`.
+    *   **3.3.2. Styling:** Apply custom CSS for article cards, search bar, and category filters.
+    *   **3.3.3. Backend Actors:**
+        *   Create `PostActor` in `src/backend/blog/postActor.ts` to manage blog post data (CRUD operations).
+        *   Create `BlogServiceActor` in `src/backend/blog/blogServiceActor.ts` to handle fetching posts, search, and filtering logic.
+    *   **3.3.4. API Endpoints:** Define REST endpoints in `src/backend/server.ts` (e.g., `/api/blog/posts`, `/api/blog/search`) that dispatch messages to `BlogServiceActor`.
+    *   **3.3.5. Frontend Logic:** Implement JavaScript/TypeScript to fetch blog posts, handle search input, filter categories, and render the articles dynamically.
+*   **3.4. Code Examples Showcase (`/examples`):**
+    *   **3.4.1. HTML Structure:** Create `src/frontend/examples.html` based on `cortex_code_examples_showcase_1/code.html` and `cortex_code_examples_showcase_2/code.html`.
+    *   **3.4.2. Styling:** Apply custom CSS for code blocks, console output, and navigation tabs. Use a monospace font for code.
+    *   **3.4.3. Backend Actors (Interactive Examples):**
+        *   Create `CodeRunnerActor` in `src/backend/examples/codeRunnerActor.ts` that can execute code snippets (e.g., using a sandboxed environment or pre-compiled examples) and return output.
+        *   Define an API endpoint (e.g., `/api/examples/run`) to interact with `CodeRunnerActor`.
+    *   **3.4.4. Frontend Logic:** Implement JavaScript/TypeScript to display code, send code to the backend for execution (if interactive), and display the results.
+*   **3.5. Community & Contribution Page (`/community`):**
+    *   **3.5.1. HTML Structure:** Create `src/frontend/community.html` based on `cortex_community_&_contribution/code.html`.
+    *   **3.5.2. Styling:** Apply custom CSS for call-to-action cards and social links.
+    *   **3.5.3. Dynamic Links:** Use the `Config` module to manage external links (GitHub, Twitter, LinkedIn, etc.) and inject them into the frontend.
+*   **3.6. About Us / Team Page (`/about`):**
+    *   **3.6.1. HTML Structure:** Create `src/frontend/about.html` based on `cortex_about_us_/_team/code.html`.
+    *   **3.6.2. Styling:** Apply custom CSS for team member cards and hero section.
+    *   **3.6.3. Content Management:** Team member data (names, roles, bios, images) can be managed via a simple JSON file or a dedicated `TeamActor` if dynamic updates are required.
 
-## Phase 4: Community and Social Proof
+## 4. General Technical Considerations
 
-**Goal:** Add community and social proof elements to the website.
+*   **Routing:** Implement client-side routing for a Single Page Application (SPA) feel, or server-side routing for simpler pages. Cortex's `CortexHttpServer` can handle server-side routing.
+*   **Asset Management:** Configure the build process to handle JavaScript and CSS bundling, minification, and cache busting.
+*   **Error Handling:** Implement robust error handling on both frontend and backend.
+*   **Performance:** Optimize frontend assets (image compression, lazy loading) and backend queries.
+*   **Security:** Implement basic security measures (e.g., input validation, CORS policies) using Cortex's built-in security features.
 
-*   **Task 10: Create the Community Section.**
-    *   **Action:** Create a community section on the website that highlights community resources, contributors, and events.
-    *   **Deliverable:** A "Community" page on the new website.
-*   **Task 11: Gather and Add Social Proof.**
-    *   **Action:** Collect testimonials from users and identify companies that are using Cortex. Add these to the website.
-    *   **Deliverable:** A "Showcase" or "Testimonials" section on the new website.
+## 5. Testing Strategy
 
-## Phase 5: Launch
+**Objective:** Ensure the quality, reliability, and correctness of the implemented website.
 
-**Goal:** Deploy the new documentation website.
+*   **5.1. Unit Tests:**
+    *   Write unit tests for all Cortex actors and backend services (e.g., `PostActor`, `BlogServiceActor`).
+    *   Use a testing framework like Jest or Vitest.
+*   **5.2. Integration Tests:**
+    *   Test the interaction between frontend and backend APIs.
+    *   Verify that data flows correctly through the `EventBus` and `ActorSystem`.
+*   **5.3. End-to-End (E2E) Tests:**
+    *   Use a tool like Playwright or Cypress to simulate user interactions and verify the complete user flow for critical pages.
 
-*   **Task 12: Deploy the New Website.**
-    *   **Action:** Deploy the new documentation website to a hosting provider.
-    *   **Deliverable:** The new documentation website is live.
+## 6. Documentation
+
+**Objective:** Maintain clear and up-to-date documentation for the project.
+
+*   **6.1. README.md:** Update the project `README.md` with instructions on how to set up, run, and contribute to the website.
+*   **6.2. API Documentation:** Document all backend API endpoints.
+*   **6.3. Code Comments:** Add clear and concise comments to complex code sections.
+
+## 7. Future Enhancements (Out of Scope for Initial Implementation)
+
+*   **CMS Integration:** Integrate with a headless CMS for easier content management of blog posts, team members, etc.
+*   **Internationalization (i18n):** Support for multiple languages.
+*   **Advanced Analytics:** Integrate with analytics platforms.

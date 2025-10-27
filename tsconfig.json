@@ -17,7 +17,8 @@
     "noEmitOnError": false,
     "lib": ["dom", "es2020"],
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "declaration": true
   },
   "include": ["src/**/*", "src/ui/**/*"],
   "exclude": ["node_modules", "tests", "dist", "dist/ui"]

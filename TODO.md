@@ -1,377 +1,177 @@
-# Cortex v1.0.0+ TODO List
-
-**Last Updated:** October 27, 2025
-**Current Version:** v1.0.0 (RELEASED)
-**Next Target:** v1.1 (Month 1 post-release)
-
----
-
-## 🚀 IMMEDIATE TASKS (This Week)
-
-### 1. npm Publishing
-- [ ] Run `npm publish --access public`
-- [ ] Verify package appears on https://npmjs.com/package/cortex
-- [ ] Test local install: `npm install cortex` in temp directory
-- [ ] Verify package contents and exports
-- [ ] Announce on GitHub Discussions
-
-**Priority:** CRITICAL
-**Owner:** Matthias
-**Estimated Time:** 30 minutes
-
----
-
-### 2. GitHub Actions Test Failures
-- [ ] Investigate setup-pages workflow failures
-- [ ] Optimize test environment for CI
-- [ ] Fix Edge case tests timing out
-- [ ] Ensure all workflows pass consistently
-
-**Priority:** HIGH
-**Owner:** Matthias
-**Estimated Time:** 4 hours
-
----
-
-### 3. Website Social Links Configuration
-- [ ] Set up Discord community link
-- [ ] Configure Twitter handle
-- [ ] Add GitHub discussions link
-- [ ] Update community page with real links
-
-**Priority:** MEDIUM
-**Owner:** Matthias
-**Estimated Time:** 1 hour
-
----
-
-## 📋 v1.1 Tasks (Month 1)
-
-### 1. WebSocket Support Implementation
-- [ ] Design WebSocket architecture
-- [ ] Implement WebSocket server
-- [ ] Create Socket.io-like API
-- [ ] Add connection pooling
-- [ ] Write comprehensive tests
-- [ ] Document API
-
-**Priority:** HIGH
-**Owner:** TBD
-**Estimated Time:** 40 hours
-
-**Subtasks:**
-- [ ] Socket class with event handling
-- [ ] Connection lifecycle management
-- [ ] Broadcast functionality
-- [ ] Room/namespace support
-- [ ] Reconnection handling
-- [ ] Examples and tutorials
-
----
-
-### 2. Distributed Clustering
-- [ ] Design cluster architecture
-- [ ] Implement multi-node support
-- [ ] Add message passing between nodes
-- [ ] Create load balancing strategy
-- [ ] Add cluster management UI
-- [ ] Write cluster tests
-
-**Priority:** HIGH
-**Owner:** TBD
-**Estimated Time:** 60 hours
-
-**Subtasks:**
-- [ ] Node discovery mechanism
-- [ ] Message queue for inter-node communication
-- [ ] State synchronization
-- [ ] Failover handling
-- [ ] Performance monitoring
-- [ ] Documentation
-
----
-
-### 3. Advanced Rate Limiting
-- [ ] Implement per-user rate limits
-- [ ] Add sliding window algorithm
-- [ ] Create Redis backend support
-- [ ] Add rate limit metrics
-- [ ] Document configuration
-
-**Priority:** MEDIUM
-**Owner:** TBD
-**Estimated Time:** 20 hours
-
-**Subtasks:**
-- [ ] Token bucket algorithm
-- [ ] Sliding window counter
-- [ ] Redis integration
-- [ ] Rate limit headers
-- [ ] Custom strategies
-- [ ] Tests and examples
-
----
-
-### 4. Custom Test Runner Optimization
-- [ ] Improve test discovery
-- [ ] Add test filtering/selection
-- [ ] Implement parallel test execution
-- [ ] Add coverage reporting
-- [ ] Create UI component test helpers
-
-**Priority:** MEDIUM
-**Owner:** TBD
-**Estimated Time:** 25 hours
-
-**Subtasks:**
-- [ ] Test file globbing
-- [ ] Watch mode improvement
-- [ ] Coverage percentage tracking
-- [ ] Component render testing
-- [ ] DOM interaction testing
-- [ ] Report generation
-
----
-
-### 5. Website Playground Implementation
-- [ ] Set up code editor (CodeMirror or similar)
-- [ ] Implement code execution environment
-- [ ] Add example templates
-- [ ] Create real-time preview
-- [ ] Add error handling and display
-
-**Priority:** MEDIUM
-**Owner:** TBD
-**Estimated Time:** 15 hours
-
----
-
-## 📚 v1.2 Tasks (Month 2-3)
-
-### 1. Video Tutorial Series
-- [ ] Create getting started video
-- [ ] Record architecture overview
-- [ ] Film example walkthroughs
-- [ ] Produce best practices guide
-- [ ] Host on YouTube
-
-**Priority:** MEDIUM
-**Owner:** TBD
-**Estimated Time:** 40 hours
-
----
-
-### 2. Integrated Community Examples
-- [ ] Example 1: Blog/CMS application
-- [ ] Example 2: Real-time chat
-- [ ] Example 3: Dashboard application
-- [ ] Example 4: E-commerce site
-- [ ] Example 5: Analytics platform
-- [ ] Documentation for each example
-
-**Priority:** MEDIUM
-**Owner:** Community
-**Estimated Time:** 50 hours
-
----
-
-### 3. Performance Dashboard
-- [ ] Design dashboard UI
-- [ ] Real-time metrics display
-- [ ] Health check visualization
-- [ ] Distributed tracing viewer
-- [ ] Alert configuration
-
-**Priority:** LOW
-**Owner:** TBD
-**Estimated Time:** 30 hours
-
----
-
-## 🔐 v2.0 Tasks (Q1 2026)
-
-### 1. Enterprise Authentication
-- [ ] OAuth2 provider support
-- [ ] SAML integration
-- [ ] JWT token management
-- [ ] Multi-factor authentication
-- [ ] Session management
-
-**Priority:** HIGH
-**Owner:** TBD
-**Estimated Time:** 80 hours
-
----
-
-### 2. Database Integrations
-- [ ] TypeORM support
-- [ ] MongoDB driver
-- [ ] PostgreSQL adapters
-- [ ] GraphQL ORM
-- [ ] Query optimization
-
-**Priority:** HIGH
-**Owner:** TBD
-**Estimated Time:** 100 hours
-
----
-
-### 3. Kubernetes Integration
-- [ ] Helm charts
-- [ ] Kubernetes operator
-- [ ] Service mesh compatibility
-- [ ] Auto-scaling support
-- [ ] Configuration management
-
-**Priority:** MEDIUM
-**Owner:** TBD
-**Estimated Time:** 60 hours
-
----
-
-## 🐛 Bug Fixes & Technical Debt
-
-### High Priority
-- [ ] Fix GitHub Actions workflow intermittent failures
-- [ ] Optimize test execution time in CI
-- [ ] Improve error messages for better debugging
-- [ ] Add more comprehensive error handling
-
-### Medium Priority
-- [ ] Refactor compression module for clarity
-- [ ] Optimize memory usage in large applications
-- [ ] Add performance benchmarks
-- [ ] Improve documentation of edge cases
-
-### Low Priority
-- [ ] Clean up unused code
-- [ ] Consolidate similar modules
-- [ ] Improve TypeScript type definitions
-- [ ] Update dependencies
-
----
-
-## 📖 Documentation Tasks
-
-### Immediate
-- [ ] Update README.md with npm installation
-- [ ] Add troubleshooting guide
-- [ ] Create FAQ document
-- [ ] Update installation guide
-
-### Short-term
-- [ ] Create architecture deep-dive
-- [ ] Write performance tuning guide
-- [ ] Add security best practices
-- [ ] Create API migration guide
-
-### Medium-term
-- [ ] Create video transcripts
-- [ ] Add interactive tutorials
-- [ ] Build searchable docs
-- [ ] Create glossary of terms
-
----
-
-## 🎓 Community & Learning
-
-### Community Building
-- [ ] Set up GitHub Discussions
-- [ ] Create Discord community
-- [ ] Establish code of conduct
-- [ ] Create contribution guidelines
-- [ ] Set up sponsorship program
-
-### Developer Experience
-- [ ] Create starter template
-- [ ] Build project scaffolder
-- [ ] Write style guide
-- [ ] Create debugging tools
-- [ ] Build VS Code extension
-
----
-
-## 📊 Monitoring & Analytics
-
-### v1.1
-- [ ] Add npm download tracking
-- [ ] Monitor GitHub stars
-- [ ] Track community activity
-- [ ] Measure website traffic
-- [ ] Monitor build/test times
-
-### v1.2
-- [ ] Set up error tracking (Sentry)
-- [ ] Add analytics dashboard
-- [ ] Track feature usage
-- [ ] Monitor performance metrics
-- [ ] Create insights reports
-
----
-
-## 🎯 Success Metrics
-
-### v1.1 Goals
-- [ ] 100+ npm downloads per week
-- [ ] 50+ GitHub stars
-- [ ] 10+ community contributions
-- [ ] <5 minute test execution
-- [ ] 0 high-priority bugs
-
-### v1.2 Goals
-- [ ] 1,000+ npm downloads per week
-- [ ] 500+ GitHub stars
-- [ ] 50+ community contributions
-- [ ] Production usage in 5+ companies
-- [ ] 100% test coverage for core
-
-### v2.0 Goals
-- [ ] 10,000+ npm downloads per week
-- [ ] 5,000+ GitHub stars
-- [ ] 500+ contributors
-- [ ] Enterprise adoption
-- [ ] Industry recognition
-
----
-
-## 🔗 Dependencies & Blockers
-
-### Currently Blocking
-- [ ] npm token setup (blocking npm publish)
-- [ ] GitHub Actions environment optimization
-
-### Known Dependencies
-- Test suite completion → GitHub Actions improvements
-- Website features → Additional styling/scripting
-- Video content → Recording equipment/time
-
----
-
-## 📝 Notes
-
-- Tasks are organized by priority and timeline
-- Estimated times are rough and may vary
-- Community contributions welcome for all tasks
-- v1.1 should be released within 1 month of v1.0.0
-- Consider user feedback for reprioritization
-- Monitor performance metrics post-launch
-
----
-
-## ✅ Completed v1.0.0 Tasks
-
-- [x] Core framework development
-- [x] TypeScript strict mode
-- [x] Test suite (100+ tests)
-- [x] Documentation (70+ files)
-- [x] GitHub Pages deployment
-- [x] CI/CD automation
-- [x] npm package metadata
-- [x] GitHub release
-- [x] Website with routing
-- [x] Compression streaming fix
-
----
-
-**Last Review:** October 27, 2025
-**Next Review:** November 3, 2025 (post-npm-publish)
+# TODO: Cortex Website Implementation
+
+This document outlines the detailed work breakdown for implementing the Cortex website, based on the approved `PLAN.md`. Each task is categorized and, where applicable, marked for parallel execution.
+
+## 1. Project Setup and Initialization
+
+*   [ ] **1.1. Initialize New Project**
+    *   [ ] 1.1.1. Create `cortex-website` directory. [setup]
+    *   [ ] 1.1.2. Run `npm init -y` inside `cortex-website`. [setup]
+    *   [ ] 1.1.3. Build the local Cortex framework. [setup]
+*   [ ] 1.1.3.1. Configure `tsconfig.json` in `cortex-website` to map `cortex` imports to the local framework's `dist` folder. [setup]
+*   [ ] **1.1.4. Install dev dependencies: `npm install -D typescript`. [setup]**
+    *   [ ] 1.1.5. Choose and install a build tool (e.g., `npm install -D vite` or configure `tsc` for compilation). [setup]
+*   [ ] **1.2. Configure TypeScript**
+    *   [ ] 1.2.1. Create `tsconfig.json` in the root for project-wide settings. [setup]
+    *   [ ] 1.2.2. Create `tsconfig.frontend.json` in `src/frontend` for frontend-specific settings. [setup]
+    *   [ ] 1.2.3. Create `tsconfig.backend.json` in `src/backend` for backend-specific settings. [setup]
+    *   [ ] 1.2.4. Ensure `strict: true` and other strict type-checking options are enabled in all `tsconfig.json` files. [setup]
+*   [ ] **1.4. Basic File Structure**
+    *   [ ] 1.4.1. Create `src/frontend` directory. [setup]
+    *   [ ] 1.4.2. Create `src/backend` directory. [setup]
+    *   [ ] 1.4.3. Create `src/shared` directory for shared types/interfaces. [setup]
+    *   [ ] 1.4.4. Create `public` directory for static assets. [setup]
+
+## 2. Core Cortex Backend Implementation
+
+*   [ ] **2.1. Initialize Cortex Server**
+    *   [ ] 2.1.1. Create `src/backend/server.ts`. [backend]
+    *   [ ] 2.1.2. Initialize `EventBus`, `ActorSystem`, and `CortexHttpServer`. [backend]
+    *   [ ] 2.1.3. Configure `CortexHttpServer` to serve static files from `public` directory. [backend]
+    *   [ ] 2.1.4. Define a basic `/api` route for future API endpoints. [backend]
+    *   [ ] 2.1.5. **[Test]** Write unit tests for server initialization and static file serving. [test]
+*   [ ] **2.2. Implement Configuration Management**
+    *   [ ] 2.2.1. Create `src/backend/config.ts` using Cortex's `Config` module. [backend]
+    *   [ ] 2.2.2. Define configuration for external links (GitHub, Twitter, etc.). [backend]
+    *   [ ] 2.2.3. **[Test]** Write unit tests for configuration loading and environment-specific settings. [test]
+*   [ ] **2.3. Implement Logging**
+    *   [ ] 2.3.1. Integrate Cortex's `Logger` in `src/backend/server.ts`. [backend]
+    *   [ ] 2.3.2. Configure log levels and output. [backend]
+    *   [ ] 2.3.3. **[Test]** Write unit tests to verify logger functionality. [test]
+
+## 3. Frontend Page Implementations
+
+### 3.1. Homepage (`/`)
+
+*   [ ] **3.1.1. HTML Structure:**
+    *   [ ] 3.1.1.1. Create `public/index.html`. [frontend]
+    *   [ ] 3.1.1.2. Implement hero section and feature areas based on `cortex_home_page:_hero_&_features_1/code.html` and `cortex_home_page:_hero_&_features_2/code.html`. [frontend]
+*   [ ] **3.1.2. Styling:**
+    *   [ ] 3.1.2.1. Apply custom CSS classes to match the design. [frontend]
+*   [ ] **3.1.3. Dynamic Content (Optional):**
+    *   [ ] 3.1.3.1. **[Backend]** Create `src/backend/features/featureActor.ts` to serve feature data. [backend]
+    *   [ ] 3.1.3.2. **[Backend]** Define `/api/features` endpoint in `src/backend/server.ts`. [backend]
+    *   [ ] 3.1.3.3. **[Frontend]** Implement JavaScript/TypeScript to fetch and render dynamic features. [frontend]
+    *   [ ] 3.1.3.4. **[Test]** Write unit tests for `FeatureActor`. [test]
+    *   [ ] 3.1.3.5. **[Test]** Write integration tests for `/api/features` endpoint. [test]
+
+### 3.2. Architecture Visualization Page (`/architecture`)
+
+*   [ ] **3.2.1. HTML Structure:**
+    *   [ ] 3.2.1.1. Create `src/frontend/architecture.html`. [frontend]
+    *   [ ] 3.2.1.2. Implement layout based on `cortex_architecture_visualization_1/code.html` and `cortex_architecture_visualization_2/code.html`. [frontend]
+*   [ ] **3.2.2. Styling:**
+    *   [ ] 3.2.2.1. Apply custom CSS, including animations and glassmorphic effects. [frontend]
+*   [ ] **3.2.3. Interactivity:**
+    *   [ ] 3.2.3.1. Implement JavaScript/TypeScript for hover effects and tooltips for architectural components. [frontend]
+*   [ ] **3.2.4. Content Sourcing:**
+    *   [ ] 3.2.4.1. Ensure descriptions are consistent with Cortex `README.md` and other documentation. [documentation]
+
+### 3.3. Blog / News Section (`/blog`)
+
+*   [ ] **3.3.1. HTML Structure:**
+    *   [ ] 3.3.1.1. Create `src/frontend/blog.html` based on `cortex_blog_/_news/code.html`. [frontend]
+*   [ ] **3.3.2. Styling:**
+    *   [ ] 3.3.2.1. Apply custom CSS for article cards, search bar, and category filters. [frontend]
+*   [ ] **3.3.3. Backend Actors:**
+    *   [ ] 3.3.3.1. **[Backend]** Create `src/backend/blog/postActor.ts` for CRUD operations on blog posts. [backend]
+    *   [ ] 3.3.3.2. **[Backend]** Create `src/backend/blog/blogServiceActor.ts` for fetching, searching, and filtering posts. [backend]
+    *   [ ] 3.3.3.3. **[Test]** Write unit tests for `PostActor` and `BlogServiceActor`. [test]
+*   [ ] **3.3.4. API Endpoints:**
+    *   [ ] 3.3.4.1. **[Backend]** Define `/api/blog/posts` and `/api/blog/search` endpoints in `src/backend/server.ts`. [backend]
+    *   [ ] 3.3.4.2. **[Test]** Write integration tests for blog API endpoints. [test]
+*   [ ] **3.3.5. Frontend Logic:**
+    *   [ ] 3.3.5.1. Implement JavaScript/TypeScript to fetch blog posts. [frontend]
+    *   [ ] 3.3.5.2. Implement search input and category filtering logic. [frontend]
+    *   [ ] 3.3.5.3. Dynamically render blog articles. [frontend]
+
+### 3.4. Code Examples Showcase (`/examples`)
+
+*   [ ] **3.4.1. HTML Structure:**
+    *   [ ] 3.4.1.1. Create `src/frontend/examples.html` based on `cortex_code_examples_showcase_1/code.html` and `cortex_code_examples_showcase_2/code.html`. [frontend]
+*   [ ] **3.4.2. Styling:**
+    *   [ ] 3.4.2.1. Apply custom CSS for code blocks, console output, and navigation tabs. [frontend]
+    *   [ ] 3.4.2.2. Ensure monospace font for code. [frontend]
+*   [ ] **3.4.3. Backend Actors (Interactive Examples):**
+    *   [ ] 3.4.3.1. **[Backend]** Create `src/backend/examples/codeRunnerActor.ts` for executing code snippets. [backend]
+    *   [ ] 3.4.3.2. **[Backend]** Define `/api/examples/run` endpoint in `src/backend/server.ts`. [backend]
+    *   [ ] 3.4.3.3. **[Test]** Write unit tests for `CodeRunnerActor`. [test]
+    *   [ ] 3.4.3.4. **[Test]** Write integration tests for `/api/examples/run` endpoint. [test]
+*   [ ] **3.4.4. Frontend Logic:**
+    *   [ ] 3.4.4.1. Implement JavaScript/TypeScript to display code. [frontend]
+    *   [ ] 3.4.4.2. Implement logic to send code to backend for execution (if interactive). [frontend]
+    *   [ ] 3.4.4.3. Display execution results. [frontend]
+
+### 3.5. Community & Contribution Page (`/community`)
+
+*   [ ] **3.5.1. HTML Structure:**
+    *   [ ] 3.5.1.1. Create `src/frontend/community.html` based on `cortex_community_&_contribution/code.html`. [frontend]
+*   [ ] **3.5.2. Styling:**
+    *   [ ] 3.5.2.1. Apply custom CSS for call-to-action cards and social links. [frontend]
+*   [ ] **3.5.3. Dynamic Links:**
+    *   [ ] 3.5.3.1. Use `Config` module to manage external links (GitHub, Twitter, LinkedIn). [backend]
+    *   [ ] 3.5.3.2. Inject dynamic links into the frontend. [frontend]
+
+### 3.6. About Us / Team Page (`/about`)
+
+*   [ ] **3.6.1. HTML Structure:**
+    *   [ ] 3.6.1.1. Create `src/frontend/about.html` based on `cortex_about_us_/_team/code.html`. [frontend]
+*   [ ] **3.6.2. Styling:**
+    *   [ ] 3.6.2.1. Apply custom CSS for team member cards and hero section. [frontend]
+*   [ ] **3.6.3. Content Management:**
+    *   [ ] 3.6.3.1. Manage team member data (names, roles, bios, images) via a JSON file or a `TeamActor`. [backend]
+    *   [ ] 3.6.3.2. Implement frontend logic to render team members. [frontend]
+
+## 4. General Technical Considerations
+
+*   [ ] **4.1. Routing:**
+    *   [ ] 4.1.1. Implement server-side routing using `CortexHttpServer` for all pages. [backend]
+*   [ ] **4.2. Asset Management:**
+    *   [ ] 4.2.1. Configure build process for JavaScript and CSS bundling and minification. [setup]
+    *   [ ] 4.2.2. Implement cache busting for static assets. [setup]
+*   [ ] **4.3. Error Handling:**
+    *   [ ] 4.3.1. Implement robust error handling on both frontend and backend. [backend] [frontend]
+*   [ ] **4.4. Performance:**
+    *   [ ] 4.4.1. Optimize frontend assets (image compression, lazy loading). [frontend]
+    *   [ ] 4.4.2. Optimize backend queries and actor performance. [backend]
+*   [ ] **4.5. Security:**
+    *   [ ] 4.5.1. Implement input validation using Cortex's security features. [backend]
+    *   [ ] 4.5.2. Configure CORS policies in `CortexHttpServer`. [backend]
+
+## 5. Testing Strategy
+
+*   [ ] **5.1. Unit Tests:**
+    *   [ ] 5.1.1. Write unit tests for all Cortex actors and backend services. [test]
+    *   [ ] 5.1.2. Ensure 100% code coverage for critical backend logic. [test]
+*   [ ] **5.2. Integration Tests:**
+    *   [ ] 5.2.1. Test interaction between frontend and backend APIs. [test]
+    *   [ ] 5.2.2. Verify data flow through `EventBus` and `ActorSystem`. [test]
+*   [ ] **5.3. End-to-End (E2E) Tests:**
+    *   [ ] 5.3.1. Set up Playwright/Cypress for E2E testing. [test]
+    *   [ ] 5.3.2. Write E2E tests for critical user flows (e.g., navigating to pages, interacting with forms). [test]
+
+## 6. Documentation
+
+*   [ ] **6.1. README.md:**
+    *   [ ] 6.1.1. Update project `README.md` with setup, run, and contribution instructions. [documentation]
+*   [ ] **6.2. API Documentation:**
+    *   [ ] 6.2.1. Document all backend API endpoints (e.g., using OpenAPI/Swagger). [documentation]
+*   [ ] **6.3. Code Comments:**
+    *   [ ] 6.3.1. Add clear and concise comments to complex code sections. [documentation]
+
+## Parallelizable Tasks
+
+*   **[P1]** Frontend HTML Structure and initial Tailwind Styling (3.1.1, 3.1.2, 3.2.1, 3.2.2, 3.3.1, 3.3.2, 3.4.1, 3.4.2, 3.5.1, 3.5.2, 3.6.1, 3.6.2)
+*   **[P2]** Core Cortex Backend Implementation (2.1, 2.2, 2.3)
+*   **[P3]** Backend Actors for Blog (3.3.3)
+*   **[P4]** Backend Actors for Code Examples (3.4.3)
+*   **[P5]** Unit Tests for Core Backend (2.1.5, 2.2.3, 2.3.3)
+*   **[P6]** Unit Tests for Blog Actors (3.3.3.3)
+*   **[P7]** Unit Tests for Code Example Actors (3.4.3.3)
+
+## 7. Test Execution & Stability
+
+*   [ ] **7.1. Investigate and Fix Test Hanging Issue:**
+    *   [ ] 7.1.1. Analyze why `npm test` command is hanging, even with explicit server shutdown.
+    *   [ ] 7.1.2. Ensure all asynchronous operations are properly awaited and resources are released.
+    *   [ ] 7.1.3. Consider alternative test runners or configurations if necessary, while adhering to "ZERO DEPS" for the website project.
