@@ -55,7 +55,7 @@ describe('SalesAnalyticsDashboard', () => {
     test('should display total sales metric', () => {
       const metrics = component.shadowRoot.querySelectorAll('.metric-card');
       let foundSales = false;
-      metrics.forEach((card) => {
+      metrics.forEach((card: Element) => {
         if (card.textContent?.includes('Total Sales')) {
           foundSales = true;
         }
@@ -66,7 +66,7 @@ describe('SalesAnalyticsDashboard', () => {
     test('should display revenue metric', () => {
       const metrics = component.shadowRoot.querySelectorAll('.metric-card');
       let foundRevenue = false;
-      metrics.forEach((card) => {
+      metrics.forEach((card: Element) => {
         if (card.textContent?.includes('Revenue')) {
           foundRevenue = true;
         }
@@ -77,7 +77,7 @@ describe('SalesAnalyticsDashboard', () => {
     test('should display profit metric', () => {
       const metrics = component.shadowRoot.querySelectorAll('.metric-card');
       let foundProfit = false;
-      metrics.forEach((card) => {
+      metrics.forEach((card: Element) => {
         if (card.textContent?.includes('Profit')) {
           foundProfit = true;
         }
@@ -87,7 +87,7 @@ describe('SalesAnalyticsDashboard', () => {
 
     test('metric values should be numeric', () => {
       const values = component.shadowRoot.querySelectorAll('.metric-value');
-      values.forEach((value) => {
+      values.forEach((value: Element) => {
         const text = value.textContent || '';
         if (!text.match(/\d/)) {
           throw new Error('Metric value should contain numbers');
@@ -198,7 +198,7 @@ describe('SalesAnalyticsDashboard', () => {
       const rows = component.shadowRoot.querySelectorAll('tbody tr');
       let previousSales = Infinity;
 
-      rows.forEach((row) => {
+      rows.forEach((row: Element) => {
         const salesCell = row.querySelector('td:nth-child(2)');
         const salesText = salesCell?.textContent || '';
         const sales = parseInt(salesText.replace(/\D/g, ''));
@@ -228,7 +228,7 @@ describe('SalesAnalyticsDashboard', () => {
       const metrics = component.shadowRoot.querySelectorAll('.metric-value');
       if (metrics.length === 0) throw new Error('No metrics calculated');
 
-      metrics.forEach((metric) => {
+      metrics.forEach((metric: Element) => {
         const value = metric.textContent || '';
         if (value === '') {
           throw new Error('All metrics should have values');

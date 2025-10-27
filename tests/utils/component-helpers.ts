@@ -4,6 +4,9 @@
 
 import * as dom from './dom-helpers.js';
 
+// Global test container
+let testContainer: HTMLElement | null = null;
+
 /**
  * Renders a Web Component and waits for it to be ready
  * @param html HTML containing the component
@@ -399,4 +402,49 @@ export function getComponentA11y(element: Element): Record<string, any> {
     tabIndex: (element as any).tabIndex,
     disabled: element.hasAttribute('disabled'),
   };
+}
+
+/**
+ * Creates a test fixture for component testing
+ * @param html Optional HTML to render in the fixture
+ * @returns The container element for the test fixture
+ */
+export function createComponentFixture(html: string = ''): HTMLElement {
+  // Create a new container for this test
+  const container = document.createElement('div');
+  container.id = `test-fixture-${Date.now()}`;
+  document.body.appendChild(container);
+
+  // Render the component HTML if provided
+  if (html) {
+    container.innerHTML = html;
+  }
+
+  testContainer = container;
+  return container;
+}
+
+/**
+ * Cleans up a test fixture
+ * @param container The container element to clean up
+ */
+export function cleanupFixture(container?: HTMLElement): void {
+  const target = container || testContainer;
+
+  if (target && target.parentElement) {
+    // Remove all event listeners by cloning
+    target.querySelectorAll('*').forEach((el) => {
+      const clone = el.cloneNode(true);
+      if (el.parentElement) {
+        el.parentElement.replaceChild(clone, el);
+      }
+    });
+
+    // Remove the container
+    target.parentElement.removeChild(target);
+  }
+
+  if (container) {
+    testContainer = null;
+  }
 }

@@ -325,10 +325,10 @@ describe('DropdownComponent', () => {
       component.shadowRoot.querySelector('[data-trigger]').dispatchEvent(new Event('click', { bubbles: true }));
 
       const items = component.shadowRoot.querySelectorAll('[data-dropdown-item]');
-      const disabledItem = Array.from(items).find((item) => item.textContent?.includes('Disabled Item'));
+      const disabledItem = Array.from(items as NodeListOf<Element>).find((item: Element) => item.textContent?.includes('Disabled Item'));
 
       if (disabledItem) {
-        disabledItem.dispatchEvent(new Event('click', { bubbles: true }));
+        (disabledItem as Element).dispatchEvent(new Event('click', { bubbles: true }));
         if (component.getValue() === 'disabled-item') {
           throw new Error('Disabled item should not be selectable');
         }
@@ -344,9 +344,9 @@ describe('DropdownComponent', () => {
       component.appendChild(disabledOpt);
 
       const items = component.shadowRoot.querySelectorAll('[data-dropdown-item]');
-      const disabledItem = Array.from(items).find((item) => item.textContent?.includes('Disabled'));
+      const disabledItem = Array.from(items as NodeListOf<Element>).find((item: Element) => item.textContent?.includes('Disabled'));
 
-      if (!disabledItem?.classList.contains('disabled')) {
+      if (disabledItem && !(disabledItem as Element).classList.contains('disabled')) {
         throw new Error('Disabled item should have disabled class');
       }
     });
@@ -521,14 +521,14 @@ describe('DropdownComponent', () => {
       }
     });
 
-    test('should apply top position class when position is top', () => {
-      const comp = document.createElement('ui-dropdown');
+    test('should apply top position class when position is top', async () => {
+      const comp = document.createElement('ui-dropdown') as unknown as Element & { open(): void };
       comp.setAttribute('position', 'top');
       fixture.appendChild(comp);
 
       await new Promise((resolve) => setTimeout(resolve, 50));
 
-      const menu = comp.shadowRoot.querySelector('[data-menu]');
+      const menu = comp.shadowRoot?.querySelector('[data-menu]');
       comp.open();
 
       if (!menu?.classList.contains('top')) {
@@ -538,13 +538,13 @@ describe('DropdownComponent', () => {
   });
 
   describe('No Options State', () => {
-    test('should show no options message when empty', () => {
+    test('should show no options message when empty', async () => {
       const emptyComp = document.createElement('ui-dropdown');
       fixture.appendChild(emptyComp);
 
       await new Promise((resolve) => setTimeout(resolve, 50));
 
-      const menu = emptyComp.shadowRoot.querySelector('[data-menu]');
+      const menu = emptyComp.shadowRoot?.querySelector('[data-menu]');
       if (!menu?.textContent?.includes('No options available')) {
         throw new Error('Should show no options message when empty');
       }

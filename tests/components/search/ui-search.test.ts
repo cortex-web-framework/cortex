@@ -306,11 +306,11 @@ describe('SearchComponent', () => {
 
       return new Promise((resolve) => {
         setTimeout(() => {
-          const input = comp.shadowRoot.querySelector('input[type="text"]');
-          input.dispatchEvent(new Event('focus', { bubbles: true }));
+          const input = comp.shadowRoot?.querySelector('input[type="text"]');
+          input?.dispatchEvent(new Event('focus', { bubbles: true }));
 
           setTimeout(() => {
-            const suggestions = comp.shadowRoot.querySelectorAll('[data-suggestion-item]');
+            const suggestions = comp.shadowRoot?.querySelectorAll('[data-suggestion-item]') || [];
             if (suggestions.length !== 3) {
               throw new Error(`Expected 3 suggestions on focus, got ${suggestions.length}`);
             }

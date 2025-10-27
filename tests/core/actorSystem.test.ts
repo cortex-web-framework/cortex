@@ -31,12 +31,12 @@ test(`ActorSystem should dispatch a message to an actor's mailbox and it should 
   const eventBus = EventBus.getInstance();
   const system = new ActorSystem(eventBus);
   const actor = system.createActor(TestActor, 'testActor2'); // Re-added this line
-  system.dispatch('testActor2', 'Hello Mailbox!');
+  system.dispatch('testActor2', { type: 'message', data: 'Hello Mailbox!' });
 
   await new Promise(resolve => setTimeout(resolve, 100)); // Allow time for async processing
 
   assert.strictEqual(actor.receivedMessages.length, 1, 'Actor should have processed one message');
-  assert.strictEqual(actor.receivedMessages[0], 'Hello Mailbox!', 'Actor should have received the correct message');
+  assert.strictEqual(actor.receivedMessages[0].data, 'Hello Mailbox!', 'Actor should have received the correct message');
 });
 
 // Test for asynchronous message processing by an actor
@@ -44,11 +44,12 @@ test(`Actor should process messages from its mailbox asynchronously`, async () =
   const eventBus = EventBus.getInstance();
   const system = new ActorSystem(eventBus);
   const actor = system.createActor(TestActor, 'testActor3');
-  system.dispatch('testActor3', 'Async Message 1');
-  system.dispatch('testActor3', 'Async Message 2');
+  system.dispatch('testActor3', { type: 'message', data: 'Async Message 1' });
+  system.dispatch('testActor3', { type: 'message', data: 'Async Message 2' });
 
   await new Promise(resolve => setTimeout(resolve, 100)); // Allow time for async processing
 
   assert.strictEqual(actor.receivedMessages.length, 2, 'Actor should have processed two messages');
-  assert.deepStrictEqual(actor.receivedMessages, ['Async Message 1', 'Async Message 2'], 'Actor should have received messages in order');
+  assert.strictEqual(actor.receivedMessages[0].data, 'Async Message 1', 'Actor should have received first message');
+  assert.strictEqual(actor.receivedMessages[1].data, 'Async Message 2', 'Actor should have received second message');
 });
