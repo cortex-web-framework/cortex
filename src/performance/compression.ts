@@ -166,11 +166,12 @@ export function compression(config: CompressionConfig = {}): (req: Request, res:
 
     // Initialize compression stream when we know we should compress
     function initializeCompression(): void {
-      if (compressionInitialized || !selectedEncoding) return;
+      if (compressionInitialized) return;
+      if (!selectedEncoding) return;
       compressionInitialized = true;
 
-      // Create compression stream
-      compressionStream = createCompressionStream(selectedEncoding, finalConfig);
+      // Create compression stream (selectedEncoding is now guaranteed to be a string)
+      compressionStream = createCompressionStream(selectedEncoding as string, finalConfig);
 
       // Pipe compressed chunks directly to original response
       compressionStream.on('data', (compressedChunk: Buffer) => {
