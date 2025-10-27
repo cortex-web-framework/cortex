@@ -51,6 +51,9 @@
     "test:single": "npm run test:compile && node --test",
     "pretest": "npm run build"
   },
+  "dependencies": {
+    "reflect-metadata": "^0.2.1"
+  },
   "devDependencies": {
     "@open-wc/testing": "^4.0.0",
     "@types/node": "^24.8.1",

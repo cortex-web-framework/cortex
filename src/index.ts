@@ -6,6 +6,7 @@ export * from './core/config.js';
 export * from './core/httpServer.js';
 export * from './core/errors.js';
 export * from './core/middleware.js';
+export * from './core/container.js';
 
 // Neurons exports
 export * from './neurons/pingNeuron.js';
