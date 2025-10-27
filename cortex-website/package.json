@@ -4,12 +4,25 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "tsc && node dist/tests/test-server.js && node dist/tests/test-config.js && node dist/tests/test-post-actor.js && node dist/tests/test-blog-service.js && node dist/tests/test-feature-actor.js && node dist/tests/test-example-actor.js"
+    "build": "tsc",
+    "start": "node dist/backend/server.js",
+    "dev": "tsc --watch & node --watch dist/backend/server.js",
+    "test": "tsc && node dist/tests/test-server.js && node dist/tests/test-config.js && node dist/tests/test-post-actor.js && node dist/tests/test-blog-service.js && node dist/tests/test-feature-actor.js && node dist/tests/test-example-actor.js",
+    "clean": "rm -rf dist dist-tests data/*.json",
+    "docker:build": "docker build -t cortex-website .",
+    "docker:run": "docker run -p 3000:3000 cortex-website",
+    "docker:up": "docker-compose up",
+    "docker:down": "docker-compose down"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": ["cortex", "framework", "actor-model", "event-driven", "typescript"],
+  "author": "Cortex Framework Contributors",
+  "license": "MIT",
+  "description": "Production-ready showcase website for Cortex Framework, built with Cortex",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cortex-web-framework/cortex.git",
+    "directory": "cortex-website"
+  },
   "devDependencies": {
     "typescript": "^5.9.3"
   }
