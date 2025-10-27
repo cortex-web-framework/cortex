@@ -1,11 +1,22 @@
+# Test Plan
+
+1.  **Verify File Creation:** Verify that all the files created in the implementation phase exist and have the correct content.
+2.  **Manual Website Review:** Ask the user to open the `new-website/index.html` file in their browser and manually review the new website.
+
 ---
 
-**Timestamp:** 2025-10-25T18:50:00Z
+# Test Execution
 
-**Action:** Executed `cargo test` after implementing the `style_tree` function.
+## Step 1: Verify File Creation
 
-**Result:**
+**Result:** All files were created successfully and their content is correct.
 
-`test result: ok. 161 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.87s`
+**Status:** Passed
 
-**Summary:** All tests passed, including the new integration test for the styled tree. This concludes the testing for the first milestone.
+---
+
+## Step 2: Manual Website Review
+
+**Status:** Pending
+
+**Note:** The user cancelled the local web server, so the manual review could not be completed.

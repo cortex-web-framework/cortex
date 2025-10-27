@@ -1,8 +1,43 @@
 {
   "name": "cortex",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "A comprehensive, production-ready framework for building reactive, distributed, and event-driven systems using an Actor-model architecture with zero external dependencies for core components.",
+  "main": "dist/index.js",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cortex-web-framework/cortex.git"
+  },
+  "homepage": "https://cortex-web-framework.github.io/cortex/",
+  "bugs": {
+    "url": "https://github.com/cortex-web-framework/cortex/issues"
+  },
+  "author": "Cortex Framework Contributors",
+  "license": "MIT",
+  "keywords": [
+    "actor-model",
+    "distributed-systems",
+    "event-driven",
+    "typescript",
+    "reactive",
+    "zero-dependencies",
+    "framework",
+    "event-bus",
+    "circuit-breaker",
+    "resilience-patterns",
+    "observability",
+    "metrics",
+    "tracing",
+    "web3",
+    "webassembly",
+    "workers"
+  ],
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "start": "ts-node src/index.ts",
     "build": "tsc",
@@ -16,15 +51,14 @@
     "test:single": "npm run test:compile && node --test",
     "pretest": "npm run build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "devDependencies": {
     "@open-wc/testing": "^4.0.0",
     "@types/node": "^24.8.1",
     "ts-morph": "^27.0.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

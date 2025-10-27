@@ -1,10 +1,53 @@
 # Cortex Framework
 
-## Overview
+**The complete framework for building modern web applications with Actor-based architecture**
 
-The Cortex Framework is a comprehensive, production-ready framework for building reactive, distributed, and event-driven systems using an Actor-model architecture. It combines advanced web technologies with strict TypeScript enforcement and zero external dependencies for core components.
+> Zero external dependencies · Enterprise-grade patterns · Type-safe · Production-ready
 
-## Key Features
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+npm install cortex
+```
+
+**Requirements:** Node.js 18.0.0 or higher
+
+### Basic Example
+
+```typescript
+import { EventBus, ActorSystem, CortexHttpServer } from 'cortex';
+
+// Create core components
+const eventBus = EventBus.getInstance();
+const actorSystem = new ActorSystem(eventBus);
+const server = new CortexHttpServer(eventBus, undefined, 3000);
+
+// Create a simple actor
+class PingActor {
+  async receive(message: any) {
+    console.log('Ping actor received:', message);
+    return { response: 'pong' };
+  }
+}
+
+// Register and dispatch
+await actorSystem.createActor(PingActor, 'ping-actor');
+await actorSystem.dispatch('ping-actor', { type: 'ping' });
+
+// Start server
+await server.listen();
+```
+
+### 📚 Documentation
+
+- **[Full Documentation](https://cortex-web-framework.github.io/cortex/)** - Complete guide and API reference
+- **[Getting Started Guide](https://cortex-web-framework.github.io/cortex/#getting-started)** - Step-by-step tutorial
+- **[API Reference](https://cortex-web-framework.github.io/cortex/#api)** - Detailed API documentation
+- **[Examples](https://github.com/cortex-web-framework/cortex/tree/main/examples)** - Working code examples
+
+### 🎯 Key Features
 
 ### Core Architecture
 *   **Actor System:** Robust actor model for managing concurrent message-driven processes

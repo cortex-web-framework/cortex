@@ -161,10 +161,34 @@ export function compression(config: CompressionConfig = {}): (req: Request, res:
 
     let shouldCompress = false;
     let compressionStream: Transform | null = null;
+    let compressionInitialized = false;
     let contentLength = 0;
-    let chunks: Buffer[] = [];
 
-    // Override writeHead to check content type and length
+    // Initialize compression stream when we know we should compress
+    function initializeCompression(): void {
+      if (compressionInitialized || !selectedEncoding) return;
+      compressionInitialized = true;
+
+      // Create compression stream
+      compressionStream = createCompressionStream(selectedEncoding, finalConfig);
+
+      // Pipe compressed chunks directly to original response
+      compressionStream.on('data', (compressedChunk: Buffer) => {
+        originalWrite(compressedChunk);
+      });
+
+      compressionStream.on('end', () => {
+        originalEnd();
+      });
+
+      compressionStream.on('error', (error: Error) => {
+        console["error"]('Compression error:', error);
+        // Fallback: end without compression
+        originalEnd();
+      });
+    }
+
+    // Override writeHead to check content type and length, then initialize compression
     res.writeHead = function writeHeadImpl(statusCode: number, ...args: any[]): Response {
       // Extract headers from writeHead arguments
       // Signature: writeHead(statusCode, [statusMessage], [headers])
@@ -193,6 +217,9 @@ export function compression(config: CompressionConfig = {}): (req: Request, res:
         res.setHeader('Content-Encoding', selectedEncoding);
         res.removeHeader('Content-Length'); // Remove original content length
 
+        // Initialize compression stream NOW (not later)
+        initializeCompression();
+
         // Remove Content-Length from args if it was passed in writeHead call
         if (headersArgIndex >= 0 && headersArg['Content-Length']) {
           const newHeaders = { ...headersArg };
@@ -204,46 +231,28 @@ export function compression(config: CompressionConfig = {}): (req: Request, res:
       return originalWriteHead(statusCode, ...args);
     } as unknown as typeof res.writeHead;
 
-    // Override write to collect chunks
+    // Override write to stream through compression (no buffering)
     res.write = function writeImpl(chunk: any, ...args: any[]): boolean {
-      if (shouldCompress && chunk) {
-        chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-        return true;
+      if (compressionStream) {
+        // Write directly through compression stream (true streaming!)
+        return compressionStream.write(chunk);
       }
+      // No compression, use original write
       return originalWrite(chunk, ...args);
     } as unknown as typeof res.write;
 
-    // Override end to compress and send
+    // Override end to finalize compression
     res.end = function endImpl(chunkArg?: any, ...args: any[]): Response {
-      if (shouldCompress) {
+      if (compressionStream) {
+        // Write final chunk if provided
         if (chunkArg) {
-          chunks.push(Buffer.isBuffer(chunkArg) ? chunkArg : Buffer.from(chunkArg));
+          compressionStream.write(chunkArg);
         }
-
-        // Create compression stream using detected encoding
-        compressionStream = createCompressionStream(selectedEncoding, finalConfig);
-
-        // Set up compression stream
-        compressionStream.on('data', (compressedChunk: Buffer) => {
-          originalWrite(compressedChunk);
-        });
-
-        compressionStream.on('end', () => {
-          originalEnd();
-        });
-
-        compressionStream.on('error', (error: Error) => {
-          console["error"]('Compression error:', error);
-          // Fallback to uncompressed
-          chunks.forEach(chunk => originalWrite(chunk));
-          originalEnd();
-        });
-
-        // Compress all collected chunks
-        chunks.forEach(chunk => compressionStream!.write(chunk));
+        // End the compression stream
         compressionStream.end();
         return res;
       }
+      // No compression, use original end
       return originalEnd(chunkArg, ...args);
     } as unknown as typeof res.end;
 
