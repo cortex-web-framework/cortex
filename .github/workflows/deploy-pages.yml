@@ -25,19 +25,10 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build UI components
-        run: node scripts/build-ui.js
-
-      - name: Prepare for deployment
-        run: |
-          mkdir -p _site/dist/ui
-          cp -r examples/ui-component-test-app/* _site/
-          cp dist/ui/ui-bundle.js _site/dist/ui/ui-bundle.js
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './_site'
+          path: 'new-website'
 
   deploy:
     needs: build
