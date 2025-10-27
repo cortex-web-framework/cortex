@@ -8,6 +8,10 @@ export * from './core/errors.js';
 export * from './core/middleware.js';
 export * from './core/container.js';
 
+// Data/Database exports
+export * from './data/database.js';
+export * from './data/prisma.js';
+
 // Neurons exports
 export * from './neurons/pingNeuron.js';
 export * from './neurons/pongNeuron.js';
