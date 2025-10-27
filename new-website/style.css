@@ -22,6 +22,15 @@ header {
   font-weight: bold;
 }
 
+.logo a {
+  color: white;
+  text-decoration: none;
+}
+
+.logo a:hover {
+  opacity: 0.8;
+}
+
 nav ul {
   list-style: none;
   margin: 0;
