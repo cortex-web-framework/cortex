@@ -47,6 +47,94 @@ await server.listen();
 - **[API Reference](https://cortex-web-framework.github.io/cortex/#api)** - Detailed API documentation
 - **[Examples](https://github.com/cortex-web-framework/cortex/tree/main/examples)** - Working code examples
 
+## 🛠️ CLI - Command Line Interface
+
+The Cortex CLI provides powerful tools for scaffolding and managing your Cortex projects.
+
+### Installation
+
+```bash
+# Global installation (recommended)
+npm install -g cortex
+
+# Or use with npx
+npx cortex --version
+```
+
+### Create Your First Project
+
+```bash
+# Interactive mode
+cortex create my-app
+
+# Or with options
+cortex create my-app --typescript --testing vitest --port 8080
+
+# Batch mode (no prompts)
+cortex create my-app --yes --skip-git --skip-install
+```
+
+### Available Commands
+
+- **`cortex create [name]`** - Create new Cortex project with full scaffolding
+- **`cortex version`** - Show CLI and Node.js version information
+- **`cortex info`** - Display current project configuration and details
+- **`cortex serve`** - Start development server *(coming in v1.1)*
+- **`cortex build`** - Build project for production
+- **`cortex test`** - Run test suite with coverage options
+- **`cortex generate <type> <name>`** - Generate code scaffolding:
+  - `cortex generate actor MyActor` - Create new actor
+  - `cortex generate service MyService` - Create service
+  - `cortex generate route users` - Create API routes
+- **`cortex --help`** - Show all available commands
+- **`cortex <command> --help`** - Show help for specific command
+
+### CLI Options for `create` Command
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `name` | string | required | Project name (lowercase, alphanumeric, hyphens) |
+| `--typescript` | boolean | true | Enable TypeScript support |
+| `--testing` | string | vitest | Testing framework (vitest, jest, deno, none) |
+| `--port` | number | 3000 | Development server port |
+| `--https` | boolean | false | Enable HTTPS in development |
+| `--redis` | boolean | false | Include Redis integration |
+| `--postgres` | boolean | false | Include PostgreSQL integration |
+| `--websocket` | boolean | false | Enable WebSocket support |
+| `--auth` | boolean | false | Include authentication system |
+| `--deploy` | string | none | Deployment platform (vercel, aws, docker, kubernetes) |
+| `--yes` | boolean | false | Skip all interactive prompts |
+| `--skip-git` | boolean | false | Skip Git repository initialization |
+| `--skip-install` | boolean | false | Skip npm dependency installation |
+
+### CLI Examples
+
+```bash
+# Create minimal project
+cortex create my-app --skip-git --skip-install
+
+# Create TypeScript project with testing
+cortex create my-app --typescript --testing vitest
+
+# Create full-stack project with database
+cortex create my-app --redis --postgres --websocket --auth
+
+# Generate new components
+cortex generate actor UserActor
+cortex generate service EmailService
+cortex generate route api/users
+
+# Build and test
+cortex build
+cortex test
+cortex test --watch
+cortex test --coverage
+
+# Show project information
+cortex info
+cortex version
+```
+
 ### 🎯 Key Features
 
 ### Core Architecture
