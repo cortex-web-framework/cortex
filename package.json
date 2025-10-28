@@ -4,6 +4,19 @@
   "description": "A comprehensive, production-ready framework for building reactive, distributed, and event-driven systems using an Actor-model architecture with zero external dependencies for core components.",
   "main": "dist/index.js",
   "type": "module",
+  "bin": {
+    "cortex": "./dist/cli/bin.js"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./cli": {
+      "import": "./dist/cli/index.js",
+      "types": "./dist/cli/index.d.ts"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/cortex-web-framework/cortex.git"
@@ -49,7 +62,9 @@
     "test:debug": "node --inspect-brk --test dist-tests/tests",
     "test:coverage": "node --test --experimental-test-coverage dist-tests/tests",
     "test:single": "npm run test:compile && node --test",
-    "pretest": "npm run build"
+    "pretest": "npm run build",
+    "prepublishOnly": "npm run build && npm run test",
+    "prepare": "npm run build"
   },
   "dependencies": {
     "reflect-metadata": "^0.2.1"

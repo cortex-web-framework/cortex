@@ -115,15 +115,34 @@ export class CLIParser {
     try {
       // Remove node and script path
       const commandArgs = args.slice(2);
-      
+
       if (commandArgs.length === 0) {
         this.showHelp();
         return;
       }
 
-      const command = commandArgs[0]!;
+      const firstArg = commandArgs[0]!;
+
+      // Handle global flags
+      if (firstArg === '--help' || firstArg === '-h') {
+        this.showHelp();
+        return;
+      }
+
+      if (firstArg === '--version' || firstArg === '-v') {
+        this.output.write(`${this.config.version}\n`);
+        return;
+      }
+
+      const command = firstArg;
       const commandArgs_ = commandArgs.slice(1);
-      
+
+      // Check for command-specific help
+      if (commandArgs_.includes('--help') || commandArgs_.includes('-h')) {
+        this.showCommandHelp(command);
+        return;
+      }
+
       await this.executeCommand(command, commandArgs_);
     } catch (error) {
       if (error instanceof CLIError) {
@@ -236,21 +255,55 @@ export class CLIParser {
   private showHelp(): void {
     this.output.write(colors.bold(`${this.config.name} v${this.config.version}\n`));
     this.output.write(`${this.config.description}\n\n`);
-    
+
     this.output.write(colors.bold('Commands:\n'));
     this.config.commands.forEach(command => {
       this.output.write(`  ${colors.cyan(command.name.padEnd(20))} ${command.description}\n`);
     });
-    
+
     this.output.write('\n');
     this.output.write(colors.bold('Global Options:\n'));
     this.config.globalOptions.forEach(option => {
       const alias = option.alias ? `-${option.alias}, ` : '    ';
       this.output.write(`  ${alias}--${option.name.padEnd(20)} ${option.description}\n`);
     });
-    
+
     this.output.write('\n');
     this.output.write(`Use '${this.config.name} <command> --help' for more information about a command.\n`);
+  }
+
+  /**
+   * Show command-specific help
+   */
+  private showCommandHelp(commandName: string): void {
+    const command = this.findCommand(commandName);
+    if (!command) {
+      this.output.writeError(`Unknown command: ${commandName}\n`);
+      this.showHelp();
+      return;
+    }
+
+    this.output.write('\n');
+    this.output.write(colors.bold(`${this.config.name} ${command.name}\n`));
+    this.output.write(`${command.description}\n\n`);
+
+    if (command.options && command.options.length > 0) {
+      this.output.write(colors.bold('Options:\n'));
+      command.options.forEach(option => {
+        const alias = option.alias ? `-${option.alias}, ` : '    ';
+        const defaultVal = option.default !== undefined ? ` (default: ${option.default})` : '';
+        const required = option.required ? ' [required]' : '';
+        this.output.write(`  ${alias}--${option.name.padEnd(20)} ${option.description}${defaultVal}${required}\n`);
+      });
+      this.output.write('\n');
+    }
+
+    this.output.write(colors.bold('Usage:\n'));
+    this.output.write(`  ${this.config.name} ${command.name}`);
+    if (command.options && command.options.length > 0) {
+      this.output.write(' [options]');
+    }
+    this.output.write('\n\n');
   }
 }
 

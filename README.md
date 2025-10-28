@@ -88,6 +88,10 @@ await server.listen();
 *   **Project Generator:** Scaffold new Cortex projects with templates
 *   **Interactive Wizard:** Terminal-based configuration and setup
 *   **Command Framework:** Build custom CLI commands easily
+*   **Development Server:** Live reload and file watching
+*   **Build System:** Production-ready builds with TypeScript support
+*   **Test Runner:** Integrated testing with multiple framework support
+*   **Code Generators:** Scaffold actors, services, and routes
 
 ## Architecture
 
@@ -178,7 +182,185 @@ The server will listen on `http://localhost:3000`. You can then access the `/pin
 curl http://localhost:3000/ping
 ```
 
-### Example Usage
+## 🖥️ CLI Commands
+
+Cortex provides a comprehensive command-line interface for project management and development.
+
+### Installation
+
+Install Cortex globally to use the CLI:
+
+```bash
+npm install -g cortex
+```
+
+Or use npx to run without installation:
+
+```bash
+npx cortex --version
+```
+
+### Available Commands
+
+#### `cortex create <name> [options]`
+
+Create a new Cortex project with interactive setup or batch mode.
+
+**Options:**
+- `--typescript` - Enable TypeScript (default: true)
+- `--testing <framework>` - Testing framework: vitest, jest, none (default: vitest)
+- `--port <number>` - Development server port (default: 3000)
+- `--redis` - Include Redis integration
+- `--postgres` - Include PostgreSQL integration
+- `--websocket` - Enable WebSocket support
+- `--auth` - Include authentication system
+- `--deploy <platform>` - Deployment platform: vercel, aws, docker, kubernetes, none
+- `--yes` - Skip prompts and use defaults
+- `--skip-git` - Skip Git initialization
+- `--skip-install` - Skip npm install
+
+**Examples:**
+```bash
+# Interactive mode with prompts
+cortex create my-app
+
+# Batch mode with specific options
+cortex create my-app --typescript --testing vitest --redis --postgres
+
+# Quick start with defaults
+cortex create my-app --yes
+```
+
+#### `cortex serve [options]`
+
+Start a development server with hot reload and file watching.
+
+**Options:**
+- `-p, --port <number>` - Port to listen on (default: 3000)
+- `-h, --host <string>` - Host to bind to (default: localhost)
+- `-w, --watch` - Enable file watching (default: true)
+- `-o, --open` - Open browser automatically (default: false)
+
+**Examples:**
+```bash
+# Start dev server on default port
+cortex serve
+
+# Start on custom port with browser open
+cortex serve --port 8080 --open
+
+# Disable file watching
+cortex serve --watch false
+```
+
+#### `cortex build [options]`
+
+Build the project for production with optimizations.
+
+**Options:**
+- `-m, --minify` - Minify output (default: true)
+- `-s, --sourcemap` - Generate source maps (default: true)
+- `-c, --clean` - Clean output directory before build (default: true)
+- `-w, --watch` - Watch for changes and rebuild (default: false)
+
+**Examples:**
+```bash
+# Production build
+cortex build
+
+# Build with watch mode
+cortex build --watch
+
+# Build without minification
+cortex build --minify false
+```
+
+#### `cortex test [options]`
+
+Run the test suite with coverage and watch options.
+
+**Options:**
+- `-w, --watch` - Watch for changes and re-run tests (default: false)
+- `-c, --coverage` - Generate coverage report (default: false)
+- `-v, --verbose` - Verbose output (default: false)
+- `-f, --filter <pattern>` - Filter tests by pattern
+
+**Examples:**
+```bash
+# Run all tests
+cortex test
+
+# Run tests with coverage
+cortex test --coverage
+
+# Watch mode with verbose output
+cortex test --watch --verbose
+
+# Run specific tests
+cortex test --filter "ActorSystem"
+```
+
+#### `cortex generate <type> <name>`
+
+Generate new components with boilerplate code and tests.
+
+**Types:**
+- `actor` - Create a new actor with message handling
+- `service` - Create a new service class
+- `route` - Create API route handlers
+
+**Examples:**
+```bash
+# Generate an actor
+cortex generate actor UserActor
+
+# Generate a service
+cortex generate service EmailService
+
+# Generate API routes
+cortex generate route /api/users
+```
+
+#### `cortex info [options]`
+
+Display project information, dependencies, and configuration.
+
+**Options:**
+- `-d, --detailed` - Show detailed information (default: false)
+
+**Examples:**
+```bash
+# Show project info
+cortex info
+
+# Show detailed info with all dependencies
+cortex info --detailed
+```
+
+#### `cortex version`
+
+Display version information for Cortex CLI and Node.js.
+
+```bash
+cortex version
+```
+
+### Global Options
+
+- `--help, -h` - Show help for any command
+- `--version, -v` - Show CLI version
+
+**Examples:**
+```bash
+# Show general help
+cortex --help
+
+# Show command-specific help
+cortex create --help
+cortex serve --help
+```
+
+## Example Usage
 
 #### Creating an Actor
 
