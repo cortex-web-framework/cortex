@@ -40,6 +40,74 @@ await actorSystem.dispatch('ping-actor', { type: 'ping' });
 await server.listen();
 ```
 
+## CLI Tools
+
+### Installation
+
+Install Cortex globally to use the CLI:
+
+```bash
+npm install -g cortex
+# or use npx
+npx cortex --version
+```
+
+### Create Your First Project
+
+```bash
+# Interactive mode
+cortex create my-app
+
+# Or with options
+cortex create my-app --typescript --testing vitest --port 8080
+
+# Batch mode (no prompts)
+cortex create my-app --yes --skip-git --skip-install
+```
+
+### Available Commands
+
+- **`cortex create [name]`** - Create new Cortex project
+- **`cortex serve`** - Start development server
+- **`cortex build`** - Build for production
+- **`cortex test`** - Run test suite
+- **`cortex generate <type> <name>`** - Generate code (actor, service, route)
+- **`cortex info`** - Show project information
+- **`cortex version`** - Show version information
+- **`cortex --help`** - Show help
+
+### CLI Options for `create`
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| name | string | required | Project name |
+| --typescript | boolean | true | Enable TypeScript |
+| --testing | string | vitest | Testing framework (vitest, jest, none) |
+| --port | number | 3000 | Dev server port |
+| --redis | boolean | false | Include Redis |
+| --postgres | boolean | false | Include PostgreSQL |
+| --websocket | boolean | false | WebSocket support |
+| --auth | boolean | false | Authentication system |
+| --deploy | string | none | Deployment platform |
+| --yes | boolean | false | Skip prompts |
+| --skip-git | boolean | false | Skip Git init |
+| --skip-install | boolean | false | Skip npm install |
+
+### Generate Commands
+
+Create actors, services, and routes with built-in test files:
+
+```bash
+# Generate an actor
+cortex generate actor MyActor
+
+# Generate a service
+cortex generate service MyService
+
+# Generate API routes
+cortex generate route MyRoute
+```
+
 ### 📚 Documentation
 
 - **[Full Documentation](https://cortex-web-framework.github.io/cortex/)** - Complete guide and API reference
